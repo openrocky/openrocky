@@ -1,0 +1,3117 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "\"%@\"" : {
+
+    },
+    "\"Hey Siri, Open OpenRocky\"" : {
+
+    },
+    "\"Hey Siri, Open Rocky\"" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「嘿 Siri，打开 Rocky」"
+          }
+        }
+      }
+    },
+    "%@" : {
+
+    },
+    "%@ — %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ — %2$@"
+          }
+        }
+      }
+    },
+    "%@ · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "%lld characters total. Tap to activate, swipe to delete custom characters." : {
+
+    },
+    "%lld memories stored" : {
+
+    },
+    "%lld of %lld enabled" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld enabled"
+          }
+        }
+      }
+    },
+    "%lld of %lld tools" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld of %2$lld tools"
+          }
+        }
+      }
+    },
+    "%lld req" : {
+
+    },
+    "%lld sessions" : {
+
+    },
+    "%lld souls total. Tap to activate, swipe to delete custom souls." : {
+
+    },
+    "$" : {
+
+    },
+    "7 Days" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 天"
+          }
+        }
+      }
+    },
+    "14 Days" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "14 天"
+          }
+        }
+      }
+    },
+    "30 Days" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 天"
+          }
+        }
+      }
+    },
+    "465" : {
+
+    },
+    "2024-10-21" : {
+
+    },
+    "About" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关于"
+          }
+        }
+      }
+    },
+    "Access Token" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Access Token"
+          }
+        }
+      }
+    },
+    "Access Token from console" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "控制台中的 Access Token"
+          }
+        }
+      }
+    },
+    "Account" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "账户"
+          }
+        }
+      }
+    },
+    "Activate" : {
+
+    },
+    "Activate This Provider" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "激活此服务商"
+          }
+        }
+      }
+    },
+    "Active" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "活跃"
+          }
+        }
+      }
+    },
+    "Add an API key in Settings to start chatting." : {
+
+    },
+    "Add Custom Character" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加自定义角色"
+          }
+        }
+      }
+    },
+    "Add Custom Soul" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加自定义灵魂"
+          }
+        }
+      }
+    },
+    "Add Provider" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加服务商"
+          }
+        }
+      }
+    },
+    "Add Voice Provider" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加语音服务商"
+          }
+        }
+      }
+    },
+    "AIProxy" : {
+
+    },
+    "AIza..." : {
+
+    },
+    "All" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全部"
+          }
+        }
+      }
+    },
+    "All skills already installed" : {
+
+    },
+    "An open-source AI assistant for iOS/iPadOS.\nVoice conversation, tool calling, and more." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开源 iOS/iPadOS AI 助手。\n语音对话、工具调用等。"
+          }
+        }
+      }
+    },
+    "Analytics" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "统计"
+          }
+        }
+      }
+    },
+    "Anthropic" : {
+
+    },
+    "API Key" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "API 密钥"
+          }
+        }
+      }
+    },
+    "APP ID" : {
+
+    },
+    "APP ID and Access Token are found in the Volcengine speech console." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APP ID 和 Access Token 可在火山引擎语音控制台找到。"
+          }
+        }
+      }
+    },
+    "App password" : {
+
+    },
+    "App Password" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "应用密码"
+          }
+        }
+      }
+    },
+    "Apple Intelligence" : {
+
+    },
+    "Apple Intelligence is available on this device." : {
+
+    },
+    "Apple Intelligence is not available on this device." : {
+
+    },
+    "Apple Voice (Beta)" : {
+
+    },
+    "Avg / Day" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日均"
+          }
+        }
+      }
+    },
+    "Azure" : {
+
+    },
+    "Azure OpenAI" : {
+
+    },
+    "Back" : {
+
+    },
+    "Bootstrapping runtime..." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在启动运行时..."
+          }
+        }
+      }
+    },
+    "Bright" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "明亮"
+          }
+        }
+      }
+    },
+    "Bright and optimistic" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "明亮乐观"
+          }
+        }
+      }
+    },
+    "Browse Models on OpenRouter" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 OpenRouter 上浏览模型"
+          }
+        }
+      }
+    },
+    "Browser" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "浏览器"
+          }
+        }
+      }
+    },
+    "Built-in" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内置"
+          }
+        }
+      }
+    },
+    "Built-in Tools" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内置工具"
+          }
+        }
+      }
+    },
+    "Calendar & Reminders" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日历与提醒"
+          }
+        }
+      }
+    },
+    "Calm and wise" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沉稳睿智"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
+        }
+      }
+    },
+    "Character" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色"
+          }
+        }
+      }
+    },
+    "Characters" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色"
+          }
+        }
+      }
+    },
+    "Chat" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聊天"
+          }
+        }
+      }
+    },
+    "Chat and voice are ready.\nExplore more providers and settings anytime." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聊天和语音已准备就绪。\n随时探索更多服务商和设置。"
+          }
+        }
+      }
+    },
+    "Chat Provider" : {
+
+    },
+    "Chat Providers" : {
+
+    },
+    "Chat with any AI model" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "与任何 AI 模型对话"
+          }
+        }
+      }
+    },
+    "Choose Your Provider" : {
+
+    },
+    "Clear" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除"
+          }
+        }
+      }
+    },
+    "Clear All Logs?" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除所有日志？"
+          }
+        }
+      }
+    },
+    "Clear All Usage Data" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除所有用量数据"
+          }
+        }
+      }
+    },
+    "Clear All Usage Data?" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除所有用量数据？"
+          }
+        }
+      }
+    },
+    "Clear and approachable" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清晰友好"
+          }
+        }
+      }
+    },
+    "Clear Credential" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除凭据"
+          }
+        }
+      }
+    },
+    "Close" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关闭"
+          }
+        }
+      }
+    },
+    "Communication" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通讯"
+          }
+        }
+      }
+    },
+    "Community" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "社区"
+          }
+        }
+      }
+    },
+    "Completion" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "补全"
+          }
+        }
+      }
+    },
+    "Confident and direct" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自信直接"
+          }
+        }
+      }
+    },
+    "Configured" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已配置"
+          }
+        }
+      }
+    },
+    "Connect" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连接"
+          }
+        }
+      }
+    },
+    "Connect a Provider" : {
+
+    },
+    "Connect a provider to start" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连接服务商以开始"
+          }
+        }
+      }
+    },
+    "Connected — " : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已连接 — "
+          }
+        }
+      }
+    },
+    "Connected — %@" : {
+
+    },
+    "Connection" : {
+
+    },
+    "Connection Test" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "连接测试"
+          }
+        }
+      }
+    },
+    "Contacts" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通讯录"
+          }
+        }
+      }
+    },
+    "Continue with Apple" : {
+
+    },
+    "Continue with OpenAI" : {
+
+    },
+    "Conversations" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "对话"
+          }
+        }
+      }
+    },
+    "Copied" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已复制"
+          }
+        }
+      }
+    },
+    "Copy" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "复制"
+          }
+        }
+      }
+    },
+    "Copy All Text" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "复制全部文本"
+          }
+        }
+      }
+    },
+    "Create Custom Skill" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "创建自定义技能"
+          }
+        }
+      }
+    },
+    "Credential" : {
+
+    },
+    "Current Plan" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当前计划"
+          }
+        }
+      }
+    },
+    "Custom GitHub Repository" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定义 GitHub 仓库"
+          }
+        }
+      }
+    },
+    "Custom Host" : {
+
+    },
+    "Custom host is optional. Use it if you have a proxy or self-hosted endpoint." : {
+
+    },
+    "Custom Repository" : {
+
+    },
+    "Custom Skills" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定义技能"
+          }
+        }
+      }
+    },
+    "Custom SMTP" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自定义 SMTP"
+          }
+        }
+      }
+    },
+    "Daily Tokens" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每日 Token 用量"
+          }
+        }
+      }
+    },
+    "Date" : {
+
+    },
+    "Debug" : {
+
+    },
+    "Deep, authoritative" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "深沉、权威"
+          }
+        }
+      }
+    },
+    "DeepSeek" : {
+
+    },
+    "Default" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "默认"
+          }
+        }
+      }
+    },
+    "Delete" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除"
+          }
+        }
+      }
+    },
+    "Describes the character's conversation style for the voice model." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "描述角色的对话风格，供语音模型参考。"
+          }
+        }
+      }
+    },
+    "Description" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "描述"
+          }
+        }
+      }
+    },
+    "Description (optional)" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "描述（可选）"
+          }
+        }
+      }
+    },
+    "Details" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "详情"
+          }
+        }
+      }
+    },
+    "Device Support" : {
+
+    },
+    "Done" : {
+
+    },
+    "Doubao" : {
+
+    },
+    "Doubao (Volcengine)" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "豆包（火山引擎）"
+          }
+        }
+      }
+    },
+    "Doubao Realtime" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "豆包实时"
+          }
+        }
+      }
+    },
+    "Doubao Realtime (Beta)" : {
+
+    },
+    "Doubao Speaker" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "豆包音色"
+          }
+        }
+      }
+    },
+    "Doubao Speech" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "豆包语音"
+          }
+        }
+      }
+    },
+    "Each skill should be in a subdirectory with a SKILL.md file. Already imported skills will be skipped." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "每个技能应在包含 SKILL.md 文件的子目录中。已导入的技能将被跳过。"
+          }
+        }
+      }
+    },
+    "Edit Character" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑角色"
+          }
+        }
+      }
+    },
+    "Edit Provider" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑服务商"
+          }
+        }
+      }
+    },
+    "Edit Skill" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑技能"
+          }
+        }
+      }
+    },
+    "Edit Soul" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑灵魂"
+          }
+        }
+      }
+    },
+    "Edit Voice Provider" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑语音服务商"
+          }
+        }
+      }
+    },
+    "Email" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "邮箱"
+          }
+        }
+      }
+    },
+    "Email Configured" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "邮件已配置"
+          }
+        }
+      }
+    },
+    "Email Provider" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "邮件服务商"
+          }
+        }
+      }
+    },
+    "Email Setup" : {
+
+    },
+    "Empty" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "空"
+          }
+        }
+      }
+    },
+    "Enabled" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已启用"
+          }
+        }
+      }
+    },
+    "End" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "结束"
+          }
+        }
+      }
+    },
+    "End Session" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "结束会话"
+          }
+        }
+      }
+    },
+    "Ensure Siri is Enabled" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "确保 Siri 已启用"
+          }
+        }
+      }
+    },
+    "Enter OpenAI API Key" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入 OpenAI API 密钥"
+          }
+        }
+      }
+    },
+    "Enter your SMTP server details and app password below." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请在下方输入 SMTP 服务器信息和应用密码。"
+          }
+        }
+      }
+    },
+    "Executing" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "执行中"
+          }
+        }
+      }
+    },
+    "exit %d" : {
+
+    },
+    "Export" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导出"
+          }
+        }
+      }
+    },
+    "Features" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "功能"
+          }
+        }
+      }
+    },
+    "Features are optional capabilities that require extra setup before they can be used." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "功能是需要额外设置才能使用的可选能力。"
+          }
+        }
+      }
+    },
+    "Files & Shell" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文件与终端"
+          }
+        }
+      }
+    },
+    "Files created by the assistant" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "助手创建的文件"
+          }
+        }
+      }
+    },
+    "Firm" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "坚定"
+          }
+        }
+      }
+    },
+    "Firm, professional" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "坚定、专业"
+          }
+        }
+      }
+    },
+    "Gemini" : {
+
+    },
+    "Gemini Live (Beta)" : {
+
+    },
+    "Gentle" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "温柔"
+          }
+        }
+      }
+    },
+    "Get %@ API Key" : {
+
+    },
+    "Get Gemini API Key" : {
+
+    },
+    "Get Real-Time API Access Token" : {
+
+    },
+    "Get Started" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始使用"
+          }
+        }
+      }
+    },
+    "GitHub" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHub"
+          }
+        }
+      }
+    },
+    "Gmail" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gmail"
+          }
+        }
+      }
+    },
+    "Google AI Studio" : {
+
+    },
+    "Greeting" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "问候语"
+          }
+        }
+      }
+    },
+    "Groq" : {
+
+    },
+    "Group" : {
+
+    },
+    "Health & Fitness" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "健康与运动"
+          }
+        }
+      }
+    },
+    "Hey, what can I do for you?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "嘿，有什么可以帮你的？"
+          }
+        }
+      }
+    },
+    "Host" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "主机"
+          }
+        }
+      }
+    },
+    "How It Works" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用方式"
+          }
+        }
+      }
+    },
+    "https://api.aiproxy.pro/..." : {
+
+    },
+    "https://api.openai.com (Optional)" : {
+
+    },
+    "https://github.com/username/repo" : {
+
+    },
+    "https://your-proxy.example.com" : {
+
+    },
+    "Import from GitHub" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从 GitHub 导入"
+          }
+        }
+      }
+    },
+    "Import Skills" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "导入技能"
+          }
+        }
+      }
+    },
+    "Import skills from a GitHub repo" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从 GitHub 仓库导入技能"
+          }
+        }
+      }
+    },
+    "Imported %lld skills" : {
+
+    },
+    "Info" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信息"
+          }
+        }
+      }
+    },
+    "Installed (%lld)" : {
+
+    },
+    "Instance Name" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "实例名称"
+          }
+        }
+      }
+    },
+    "Intelligence" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "智能"
+          }
+        }
+      }
+    },
+    "Launch OpenRocky hands-free with Siri" : {
+
+    },
+    "Launch Rocky hands-free with Siri" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通过 Siri 免提启动 Rocky"
+          }
+        }
+      }
+    },
+    "Launch Rocky with Siri voice command" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "通过 Siri 语音命令启动 Rocky"
+          }
+        }
+      }
+    },
+    "Launch the OpenRocky AI assistant and start a voice session." : {
+
+    },
+    "Launch the Rocky AI assistant and start a voice session." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "启动 Rocky AI 助手并开始语音会话。"
+          }
+        }
+      }
+    },
+    "Leave empty for no greeting" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "留空则不发送问候"
+          }
+        }
+      }
+    },
+    "Links" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "链接"
+          }
+        }
+      }
+    },
+    "Listening" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "聆听中"
+          }
+        }
+      }
+    },
+    "Live Transcript" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "实时转录"
+          }
+        }
+      }
+    },
+    "Location & Weather" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "位置与天气"
+          }
+        }
+      }
+    },
+    "Log Detail" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日志详情"
+          }
+        }
+      }
+    },
+    "Logs" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日志"
+          }
+        }
+      }
+    },
+    "Manage" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "管理"
+          }
+        }
+      }
+    },
+    "Media" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "媒体"
+          }
+        }
+      }
+    },
+    "Memory" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记忆"
+          }
+        }
+      }
+    },
+    "Message" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "消息"
+          }
+        }
+      }
+    },
+    "Model" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型"
+          }
+        }
+      }
+    },
+    "Model Breakdown" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型用量明细"
+          }
+        }
+      }
+    },
+    "Model ID" : {
+
+    },
+    "my-resource" : {
+
+    },
+    "Name" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "名称"
+          }
+        }
+      }
+    },
+    "Name (e.g. My OpenAI Voice)" : {
+
+    },
+    "Name (e.g. Personal OpenAI)" : {
+
+    },
+    "Neutral and balanced" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中性平衡"
+          }
+        }
+      }
+    },
+    "New Character" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新角色"
+          }
+        }
+      }
+    },
+    "New Skill" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新技能"
+          }
+        }
+      }
+    },
+    "New Soul" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新灵魂"
+          }
+        }
+      }
+    },
+    "No custom skills installed. Create one or import from GitHub." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未安装自定义技能。创建一个或从 GitHub 导入。"
+          }
+        }
+      }
+    },
+    "No Entries" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无条目"
+          }
+        }
+      }
+    },
+    "No files in this directory." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此目录中没有文件。"
+          }
+        }
+      }
+    },
+    "No Logs" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无日志"
+          }
+        }
+      }
+    },
+    "No memories stored yet." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无存储的记忆。"
+          }
+        }
+      }
+    },
+    "No providers configured. Add one to get started." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未配置服务商。添加一个以开始。"
+          }
+        }
+      }
+    },
+    "No usage data for this period" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "该时段暂无用量数据"
+          }
+        }
+      }
+    },
+    "No usage data yet" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无用量数据"
+          }
+        }
+      }
+    },
+    "No voice providers configured. Add one to get started." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未配置语音服务商。添加一个以开始。"
+          }
+        }
+      }
+    },
+    "OFF" : {
+
+    },
+    "Official Website" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "官方网站"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "好的"
+          }
+        }
+      }
+    },
+    "ON" : {
+
+    },
+    "One key powers both chat and voice." : {
+
+    },
+    "One key powers both chat and voice.\nYou can add other providers in Settings later." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一个密钥即可驱动聊天和语音。\n你可以稍后在设置中添加其他服务商。"
+          }
+        }
+      }
+    },
+    "Open OpenRocky" : {
+
+    },
+    "Open Rocky" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开 Rocky"
+          }
+        }
+      }
+    },
+    "Open Settings" : {
+
+    },
+    "Open Shortcuts App" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开捷径 App"
+          }
+        }
+      }
+    },
+    "Open Source Libraries" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开源库"
+          }
+        }
+      }
+    },
+    "Open source project & credits" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开源项目与致谢"
+          }
+        }
+      }
+    },
+    "OpenAI" : {
+
+    },
+    "OpenAI Realtime" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenAI 实时"
+          }
+        }
+      }
+    },
+    "OpenAI uses realtime models. Doubao expects the transcription model ID." : {
+
+    },
+    "OpenAI Voice" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenAI 语音"
+          }
+        }
+      }
+    },
+    "Opening OpenRocky..." : {
+
+    },
+    "OpenRocky" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenRocky"
+          }
+        }
+      }
+    },
+    "OpenRocky launches and starts voice mode automatically" : {
+
+    },
+    "OpenRouter" : {
+
+    },
+    "Opens a WebSocket to verify your credential and model are accepted." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开 WebSocket 以验证凭据和模型是否被接受。"
+          }
+        }
+      }
+    },
+    "Optional resource ID" : {
+
+    },
+    "Optional. Override the default API host for this provider." : {
+
+    },
+    "Optional. Override the default WebSocket host for this voice provider." : {
+
+    },
+    "Outlook" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outlook"
+          }
+        }
+      }
+    },
+    "Partial Key" : {
+
+    },
+    "Persistent key-value store" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "持久化键值存储"
+          }
+        }
+      }
+    },
+    "Personality Prompt" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "人设提示词"
+          }
+        }
+      }
+    },
+    "Pick how Rocky thinks and speaks.\nYou can change this in Settings anytime." : {
+
+    },
+    "Planning" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "规划中"
+          }
+        }
+      }
+    },
+    "Please set up a voice provider in Settings before starting a voice session." : {
+
+    },
+    "Port" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "端口"
+          }
+        }
+      }
+    },
+    "Preferred speaker when using Doubao realtime." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用豆包实时模式时的首选音色。"
+          }
+        }
+      }
+    },
+    "Preferred voice when using OpenAI realtime." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用 OpenAI 实时模式时的首选语音。"
+          }
+        }
+      }
+    },
+    "Prerequisites" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前提条件"
+          }
+        }
+      }
+    },
+    "Productivity" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "效率"
+          }
+        }
+      }
+    },
+    "Prompt" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提示"
+          }
+        }
+      }
+    },
+    "Prompt Content" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提示词内容"
+          }
+        }
+      }
+    },
+    "Prompts" : {
+
+    },
+    "Provider" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务商"
+          }
+        }
+      }
+    },
+    "Providers" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "服务商"
+          }
+        }
+      }
+    },
+    "QQ Mail" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QQ 邮箱"
+          }
+        }
+      }
+    },
+    "Quick Starts" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "快速开始"
+          }
+        }
+      }
+    },
+    "Ready" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "就绪"
+          }
+        }
+      }
+    },
+    "Ready — " : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "就绪 — "
+          }
+        }
+      }
+    },
+    "Real-time transcript is active. OpenRocky is waiting for the next intent." : {
+
+    },
+    "Real-time transcript is active. Rocky is waiting for the next intent." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "实时转录已激活。Rocky 正在等待下一个指令。"
+          }
+        }
+      }
+    },
+    "Realtime voice conversations" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "实时语音对话"
+          }
+        }
+      }
+    },
+    "Recent Requests" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近请求"
+          }
+        }
+      }
+    },
+    "Recent Timeline" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最近时间线"
+          }
+        }
+      }
+    },
+    "Register Shortcuts with Siri" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "向 Siri 注册捷径"
+          }
+        }
+      }
+    },
+    "Remove" : {
+
+    },
+    "Remove Email Configuration" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除邮件配置"
+          }
+        }
+      }
+    },
+    "Remove email configuration?" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "移除邮件配置？"
+          }
+        }
+      }
+    },
+    "req" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次"
+          }
+        }
+      }
+    },
+    "Requests" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请求数"
+          }
+        }
+      }
+    },
+    "Requires a supported iPhone with iOS 26 or later. No API key needed." : {
+
+    },
+    "Reset to Default" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重置为默认"
+          }
+        }
+      }
+    },
+    "Resource name and API version. Model should be your deployment name." : {
+
+    },
+    "Rocky" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rocky"
+          }
+        }
+      }
+    },
+    "ROCKY" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ROCKY"
+          }
+        }
+      }
+    },
+    "Rocky launches and starts voice mode automatically" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rocky 启动并自动进入语音模式"
+          }
+        }
+      }
+    },
+    "Runtime logs will appear here as the app runs.\nOne file per launch, kept for 7 days." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "运行日志会在应用运行时显示在这里。\n每次启动一个文件，保留 7 天。"
+          }
+        }
+      }
+    },
+    "Save" : {
+
+    },
+    "Save and activate this provider, then return to the list." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存并激活此服务商，然后返回列表。"
+          }
+        }
+      }
+    },
+    "Save Configuration" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存配置"
+          }
+        }
+      }
+    },
+    "Say any of these phrases to Siri to launch OpenRocky with voice mode." : {
+
+    },
+    "Say any of these phrases to Siri to launch Rocky with voice mode." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "对 Siri 说出以下任一语句即可以语音模式启动 Rocky。"
+          }
+        }
+      }
+    },
+    "Send Email" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送邮件"
+          }
+        }
+      }
+    },
+    "Send Test Email" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送测试邮件"
+          }
+        }
+      }
+    },
+    "Sends a minimal request to verify your API key and model are working." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送一个最小请求以验证 API 密钥和模型是否正常工作。"
+          }
+        }
+      }
+    },
+    "Set the Volcengine resource ID if your gateway requires it." : {
+
+    },
+    "Set this instance as the active chat provider." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "将此实例设为当前聊天服务商。"
+          }
+        }
+      }
+    },
+    "Settings" : {
+
+    },
+    "Setup Required" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要设置"
+          }
+        }
+      }
+    },
+    "Share This File" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "分享此文件"
+          }
+        }
+      }
+    },
+    "Shortcuts registered with Siri" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已注册 Siri 捷径"
+          }
+        }
+      }
+    },
+    "Siri & Search Settings" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siri 与搜索设置"
+          }
+        }
+      }
+    },
+    "Siri Integration" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siri 集成"
+          }
+        }
+      }
+    },
+    "Siri must be turned on in system Settings for voice shortcuts to work." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siri 必须在系统设置中开启，语音捷径才能生效。"
+          }
+        }
+      }
+    },
+    "Siri Shortcuts" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siri 捷径"
+          }
+        }
+      }
+    },
+    "Siri, Email & more" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siri、邮件等"
+          }
+        }
+      }
+    },
+    "sk-..." : {
+
+    },
+    "Skill Name" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "技能名称"
+          }
+        }
+      }
+    },
+    "Skills" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "技能"
+          }
+        }
+      }
+    },
+    "Skills & Tools" : {
+
+    },
+    "Skip for now" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂时跳过"
+          }
+        }
+      }
+    },
+    "SMTP is ready to send emails." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMTP 已准备好发送邮件。"
+          }
+        }
+      }
+    },
+    "SMTP Server" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SMTP 服务器"
+          }
+        }
+      }
+    },
+    "SMTP setup required (Gmail, Outlook, QQ, etc.)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要设置 SMTP（Gmail、Outlook、QQ 等）"
+          }
+        }
+      }
+    },
+    "smtp.gmail.com" : {
+
+    },
+    "Soft and thoughtful" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "柔和沉思"
+          }
+        }
+      }
+    },
+    "Soul" : {
+
+    },
+    "Souls" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "灵魂"
+          }
+        }
+      }
+    },
+    "Speaking Style" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "说话风格"
+          }
+        }
+      }
+    },
+    "Star us on GitHub!" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 GitHub 上给我们 Star！"
+          }
+        }
+      }
+    },
+    "Start Chatting" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始聊天"
+          }
+        }
+      }
+    },
+    "Stop" : {
+
+    },
+    "Storage" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "存储"
+          }
+        }
+      }
+    },
+    "Stored in the iOS Keychain on this device." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "存储在本设备的 iOS 钥匙串中。"
+          }
+        }
+      }
+    },
+    "Supported Phrases" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "支持的语句"
+          }
+        }
+      }
+    },
+    "System" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "系统"
+          }
+        }
+      }
+    },
+    "Tap \"Register\" to sync shortcuts with the system. You can also find and customize them in the Shortcuts app." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击「注册」将捷径同步到系统。你也可以在捷径 App 中查找和自定义。"
+          }
+        }
+      }
+    },
+    "Tap to activate. Only one provider can be active at a time." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击激活。同一时间只能激活一个服务商。"
+          }
+        }
+      }
+    },
+    "Tap to activate. Only one voice provider can be active at a time." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击激活。同一时间只能激活一个语音服务商。"
+          }
+        }
+      }
+    },
+    "Tap To Listen Again" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击再次聆听"
+          }
+        }
+      }
+    },
+    "Tap To Mark Complete" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击标记完成"
+          }
+        }
+      }
+    },
+    "Tap To Pause Listening" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击暂停聆听"
+          }
+        }
+      }
+    },
+    "Tap To Start Execution" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "点击开始执行"
+          }
+        }
+      }
+    },
+    "Test Connection" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "测试连接"
+          }
+        }
+      }
+    },
+    "Test Result" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "测试结果"
+          }
+        }
+      }
+    },
+    "Testing..." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "测试中..."
+          }
+        }
+      }
+    },
+    "The instructions that will be appended to the system prompt when this skill is active." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此技能激活时追加到系统提示词的指令。"
+          }
+        }
+      }
+    },
+    "The runtime is turning speech into an explicit task graph." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "运行时正在将语音转换为任务图。"
+          }
+        }
+      }
+    },
+    "The session is quiet, but context is still attached." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "会话处于静默状态，但上下文仍然保留。"
+          }
+        }
+      }
+    },
+    "The system prompt sent to the model. Defines behavior, tone, and tool routing." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送给模型的系统提示词。定义行为、语气和工具调用。"
+          }
+        }
+      }
+    },
+    "This will delete all log files." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这将删除所有日志文件。"
+          }
+        }
+      }
+    },
+    "This will permanently delete all recorded usage data." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这将永久删除所有已记录的用量数据。"
+          }
+        }
+      }
+    },
+    "This will remove your SMTP settings and password. The email tool will be disabled." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这将移除你的 SMTP 设置和密码。邮件工具将被禁用。"
+          }
+        }
+      }
+    },
+    "Tokens" : {
+
+    },
+    "Tool ID" : {
+
+    },
+    "Tools" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "工具"
+          }
+        }
+      }
+    },
+    "Tools are running and the visible timeline is updating." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "工具正在运行，时间线正在更新。"
+          }
+        }
+      }
+    },
+    "Tools, skills & memory" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "工具、技能与记忆"
+          }
+        }
+      }
+    },
+    "Total Tokens" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "总 Token 数"
+          }
+        }
+      }
+    },
+    "TRANSCRIPT" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "转录"
+          }
+        }
+      }
+    },
+    "Trigger conditions (optional)" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "触发条件（可选）"
+          }
+        }
+      }
+    },
+    "Trigger describes when this skill should activate, e.g. \"when user asks to review code\"." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "触发条件描述此技能何时激活，例如「当用户要求审查代码时」。"
+          }
+        }
+      }
+    },
+    "Type a request..." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入请求..."
+          }
+        }
+      }
+    },
+    "Type any model identifier supported by the selected provider." : {
+
+    },
+    "Type any model identifier, or pick a suggested one above." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入模型标识符，或从上方选择推荐模型。"
+          }
+        }
+      }
+    },
+    "Unable to load image" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法加载图片"
+          }
+        }
+      }
+    },
+    "Unable to read file." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法读取文件。"
+          }
+        }
+      }
+    },
+    "Upbeat, conversational" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "活泼、对话式"
+          }
+        }
+      }
+    },
+    "Usage" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用量"
+          }
+        }
+      }
+    },
+    "Usage data will appear here" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用量数据将显示在这里"
+          }
+        }
+      }
+    },
+    "Use a Google App Password (not your Gmail password). Generate one at myaccount.google.com → Security → App passwords." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用 Google 应用密码（不是 Gmail 密码）。在 myaccount.google.com → 安全 → 应用密码 中生成。"
+          }
+        }
+      }
+    },
+    "Use QQ Mail authorization code (not your QQ password). Get it from QQ Mail Settings → Account → POP3/SMTP." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用 QQ 邮箱授权码（不是 QQ 密码）。在 QQ 邮箱设置 → 账户 → POP3/SMTP 中获取。"
+          }
+        }
+      }
+    },
+    "Use TLS" : {
+
+    },
+    "Use your Outlook/Microsoft account password or an app password if 2FA is enabled." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用 Outlook/Microsoft 账户密码，或已启用双重验证时的应用密码。"
+          }
+        }
+      }
+    },
+    "Uses on-device Speech Recognition, Apple Intelligence, and system TTS. No API key required." : {
+
+    },
+    "v%@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "v%1$@ (%2$@)"
+          }
+        }
+      }
+    },
+    "Versatile and dynamic" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "多变活力"
+          }
+        }
+      }
+    },
+    "View & share runtime logs" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "查看和分享运行日志"
+          }
+        }
+      }
+    },
+    "Vivi 2.0" : {
+
+    },
+    "Voice" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语音"
+          }
+        }
+      }
+    },
+    "Voice & Siri" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语音与 Siri"
+          }
+        }
+      }
+    },
+    "VOICE FIRST" : {
+
+    },
+    "VOICE LIVE" : {
+
+    },
+    "Voice Model" : {
+
+    },
+    "Voice Provider" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语音服务商"
+          }
+        }
+      }
+    },
+    "Voice Provider Not Configured" : {
+
+    },
+    "Voice Providers" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "语音服务商"
+          }
+        }
+      }
+    },
+    "Warm and engaging" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "温暖亲切"
+          }
+        }
+      }
+    },
+    "Warm, approachable" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "温暖、平易近人"
+          }
+        }
+      }
+    },
+    "Web & Search" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "网页与搜索"
+          }
+        }
+      }
+    },
+    "Welcome to Rocky" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "欢迎使用 Rocky"
+          }
+        }
+      }
+    },
+    "What the character says when a voice session starts. Leave empty to stay silent." : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "角色在语音会话开始时说的话。留空则保持沉默。"
+          }
+        }
+      }
+    },
+    "Workspace" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "工作空间"
+          }
+        }
+      }
+    },
+    "wss://your-proxy.example.com" : {
+
+    },
+    "xAI" : {
+
+    },
+    "YOU" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你"
+          }
+        }
+      }
+    },
+    "You can set up a provider later in Settings." : {
+
+    },
+    "You're all set!" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一切就绪！"
+          }
+        }
+      }
+    },
+    "you@gmail.com" : {
+
+    },
+    "Your open-source AI assistant on iOS" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的开源 iOS AI 助手"
+          }
+        }
+      }
+    },
+    "云舟 2.0" : {
+
+    },
+    "声线甜美有活力的妹妹，活泼开朗，笑容明媚" : {
+
+    },
+    "声音磁性的男生，成熟理性，做事有条理" : {
+
+    },
+    "小何 2.0" : {
+
+    },
+    "小天 2.0" : {
+
+    },
+    "眉目清朗男大，清澈温润有朝气，开朗真诚" : {
+
+    },
+    "简洁明了，语速适中，语调自然。" : {
+
+    },
+    "语调平稳、咬字柔和、自带治愈安抚力的女声音色" : {
+
+    }
+  },
+  "version" : "1.0"
+}

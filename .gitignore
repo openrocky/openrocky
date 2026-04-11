@@ -1,0 +1,26 @@
+# Claude Code
+.claude/
+
+# Xcode
+build/
+DerivedData/
+OpenRocky/build/
+OpenRocky/OpenRocky.xcodeproj/xcuserdata/
+OpenRocky/OpenRocky.xcodeproj/project.xcworkspace/xcuserdata/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# SPM
+.build/
+.swiftpm/
+
+# Python (binary, downloaded separately)
+Packages/OpenRockyPython/Python.xcframework/
+Packages/OpenRockyPython/site-packages/
+
+# macOS
+.DS_Store
+
+# website
+website/

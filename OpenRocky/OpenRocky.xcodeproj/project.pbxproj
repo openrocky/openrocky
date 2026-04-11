@@ -1,0 +1,746 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		882DA1B83026304405560935 /* LanguageModelChatUI in Frameworks */ = {isa = PBXBuildFile; productRef = EF76DA762BAE26A2F7095B8D /* LanguageModelChatUI */; };
+		9F1B12A13AD64D389A72BFA1 /* LanguageModelChatUI in Embed Frameworks */ = {isa = PBXBuildFile; productRef = EF76DA762BAE26A2F7095B8D /* LanguageModelChatUI */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A1B2C3D42E00000111111111 /* SwiftOpenAI in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D62E00000111111111 /* SwiftOpenAI */; };
+		B1C2D3E40000000100000001 /* OpenRockyPython in Frameworks */ = {isa = PBXBuildFile; productRef = B1C2D3E50000000100000001 /* OpenRockyPython */; };
+		C1D2E3F40000000200000001 /* FFmpeg-iOS in Frameworks */ = {isa = PBXBuildFile; productRef = C1D2E3F50000000200000001 /* FFmpeg-iOS */; };
+		D32D223A2B51040A218E9842 /* ChatClientKit in Frameworks */ = {isa = PBXBuildFile; productRef = C4BF11278C02AEA62105AB4F /* ChatClientKit */; };
+		FDA56508CB1B04881A863506 /* OpenRockyIOSSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 756A990F8FE77C7B028E8859 /* OpenRockyIOSSystem */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5A25EDED2F77519E008A6F1F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A25EDD72F77519D008A6F1F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A25EDDE2F77519D008A6F1F;
+			remoteInfo = OpenRocky;
+		};
+		5A25EDF72F77519E008A6F1F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A25EDD72F77519D008A6F1F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A25EDDE2F77519D008A6F1F;
+			remoteInfo = OpenRocky;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9F1B12A23AD64D389A72BFA1 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				9F1B12A13AD64D389A72BFA1 /* LanguageModelChatUI in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		5A25EDDF2F77519D008A6F1F /* OpenRocky.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenRocky.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A25EDEC2F77519E008A6F1F /* OpenRockyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OpenRockyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5A25EDF62F77519E008A6F1F /* OpenRockyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OpenRockyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		5A25EDE12F77519D008A6F1F /* OpenRocky */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = OpenRocky;
+			sourceTree = "<group>";
+		};
+		5A25EDEF2F77519E008A6F1F /* OpenRockyTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = OpenRockyTests;
+			sourceTree = "<group>";
+		};
+		5A25EDF92F77519E008A6F1F /* OpenRockyUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = OpenRockyUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5A25EDDC2F77519D008A6F1F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B2C3D42E00000111111111 /* SwiftOpenAI in Frameworks */,
+				D32D223A2B51040A218E9842 /* ChatClientKit in Frameworks */,
+				882DA1B83026304405560935 /* LanguageModelChatUI in Frameworks */,
+				FDA56508CB1B04881A863506 /* OpenRockyIOSSystem in Frameworks */,
+				B1C2D3E40000000100000001 /* OpenRockyPython in Frameworks */,
+				C1D2E3F40000000200000001 /* FFmpeg-iOS in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A25EDE92F77519E008A6F1F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A25EDF32F77519E008A6F1F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5A25EDD62F77519D008A6F1F = {
+			isa = PBXGroup;
+			children = (
+				5A25EDE12F77519D008A6F1F /* OpenRocky */,
+				5A25EDEF2F77519E008A6F1F /* OpenRockyTests */,
+				5A25EDF92F77519E008A6F1F /* OpenRockyUITests */,
+				5A25EDE02F77519D008A6F1F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5A25EDE02F77519D008A6F1F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5A25EDDF2F77519D008A6F1F /* OpenRocky.app */,
+				5A25EDEC2F77519E008A6F1F /* OpenRockyTests.xctest */,
+				5A25EDF62F77519E008A6F1F /* OpenRockyUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5A25EDDE2F77519D008A6F1F /* OpenRocky */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A25EE002F77519E008A6F1F /* Build configuration list for PBXNativeTarget "OpenRocky" */;
+			buildPhases = (
+				5A25EDDB2F77519D008A6F1F /* Sources */,
+				5A25EDDC2F77519D008A6F1F /* Frameworks */,
+				5A25EDDD2F77519D008A6F1F /* Resources */,
+				B1C2D3E60000000100000001 /* Install Python Standard Library */,
+				9F1B12A23AD64D389A72BFA1 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5A25EDE12F77519D008A6F1F /* OpenRocky */,
+			);
+			name = OpenRocky;
+			packageProductDependencies = (
+				C4BF11278C02AEA62105AB4F /* ChatClientKit */,
+				EF76DA762BAE26A2F7095B8D /* LanguageModelChatUI */,
+				756A990F8FE77C7B028E8859 /* OpenRockyIOSSystem */,
+				A1B2C3D62E00000111111111 /* SwiftOpenAI */,
+				B1C2D3E50000000100000001 /* OpenRockyPython */,
+				C1D2E3F50000000200000001 /* FFmpeg-iOS */,
+			);
+			productName = OpenRocky;
+			productReference = 5A25EDDF2F77519D008A6F1F /* OpenRocky.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5A25EDEB2F77519E008A6F1F /* OpenRockyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A25EE032F77519E008A6F1F /* Build configuration list for PBXNativeTarget "OpenRockyTests" */;
+			buildPhases = (
+				5A25EDE82F77519E008A6F1F /* Sources */,
+				5A25EDE92F77519E008A6F1F /* Frameworks */,
+				5A25EDEA2F77519E008A6F1F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5A25EDEE2F77519E008A6F1F /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				5A25EDEF2F77519E008A6F1F /* OpenRockyTests */,
+			);
+			name = OpenRockyTests;
+			productName = OpenRockyTests;
+			productReference = 5A25EDEC2F77519E008A6F1F /* OpenRockyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		5A25EDF52F77519E008A6F1F /* OpenRockyUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A25EE062F77519E008A6F1F /* Build configuration list for PBXNativeTarget "OpenRockyUITests" */;
+			buildPhases = (
+				5A25EDF22F77519E008A6F1F /* Sources */,
+				5A25EDF32F77519E008A6F1F /* Frameworks */,
+				5A25EDF42F77519E008A6F1F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5A25EDF82F77519E008A6F1F /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				5A25EDF92F77519E008A6F1F /* OpenRockyUITests */,
+			);
+			name = OpenRockyUITests;
+			productName = OpenRockyUITests;
+			productReference = 5A25EDF62F77519E008A6F1F /* OpenRockyUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5A25EDD72F77519D008A6F1F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2630;
+				LastUpgradeCheck = 2630;
+				TargetAttributes = {
+					5A25EDDE2F77519D008A6F1F = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					5A25EDEB2F77519E008A6F1F = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 5A25EDDE2F77519D008A6F1F;
+					};
+					5A25EDF52F77519E008A6F1F = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 5A25EDDE2F77519D008A6F1F;
+					};
+				};
+			};
+			buildConfigurationList = 5A25EDDA2F77519D008A6F1F /* Build configuration list for PBXProject "OpenRocky" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+				"zh-Hans",
+			);
+			mainGroup = 5A25EDD62F77519D008A6F1F;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F87F580FD02EE4ED498ED3D5 /* XCLocalSwiftPackageReference "../Packages/LanguageModelChatUI" */,
+				A1B2C3D52E00000111111111 /* XCLocalSwiftPackageReference "../Packages/SwiftOpenAI" */,
+				A670F11628EB65C1BE35E899 /* XCLocalSwiftPackageReference "../Packages/OpenRockyIOSSystem" */,
+				B1C2D3E30000000100000001 /* XCLocalSwiftPackageReference "../Packages/OpenRockyPython" */,
+				C1D2E3F30000000200000001 /* XCRemoteSwiftPackageReference "FFmpeg-iOS" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 5A25EDE02F77519D008A6F1F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5A25EDDE2F77519D008A6F1F /* OpenRocky */,
+				5A25EDEB2F77519E008A6F1F /* OpenRockyTests */,
+				5A25EDF52F77519E008A6F1F /* OpenRockyUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5A25EDDD2F77519D008A6F1F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A25EDEA2F77519E008A6F1F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A25EDF42F77519E008A6F1F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		B1C2D3E60000000100000001 /* Install Python Standard Library */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Install Python Standard Library";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\nPYTHON_XCFRAMEWORK_REL=\"../Packages/OpenRockyPython/Python.xcframework\"\nsource \"$PROJECT_DIR/$PYTHON_XCFRAMEWORK_REL/build/utils.sh\"\ninstall_python \"$PYTHON_XCFRAMEWORK_REL\"\n\n# Copy pre-bundled site-packages\nSITE_PACKAGES=\"$PROJECT_DIR/../Packages/OpenRockyPython/site-packages\"\nif [ -d \"$SITE_PACKAGES\" ]; then\n  PYTHON_VER=$(ls -1 \"$CODESIGNING_FOLDER_PATH/python/lib\")\n  mkdir -p \"$CODESIGNING_FOLDER_PATH/python/lib/$PYTHON_VER/site-packages\"\n  rsync -au \"$SITE_PACKAGES/\" \"$CODESIGNING_FOLDER_PATH/python/lib/$PYTHON_VER/site-packages/\"\n  echo \"Installed pre-bundled site-packages\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5A25EDDB2F77519D008A6F1F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A25EDE82F77519E008A6F1F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5A25EDF22F77519E008A6F1F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5A25EDEE2F77519E008A6F1F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A25EDDE2F77519D008A6F1F /* OpenRocky */;
+			targetProxy = 5A25EDED2F77519E008A6F1F /* PBXContainerItemProxy */;
+		};
+		5A25EDF82F77519E008A6F1F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A25EDDE2F77519D008A6F1F /* OpenRocky */;
+			targetProxy = 5A25EDF72F77519E008A6F1F /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		5A25EDFE2F77519E008A6F1F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = YPV49M8592;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		5A25EDFF2F77519E008A6F1F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = YPV49M8592;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5A25EE012F77519E008A6F1F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = OpenRocky/OpenRocky.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 61;
+				DEVELOPMENT_TEAM = YPV49M8592;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Rocky;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Rocky reads and creates calendar events to help manage your schedule.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Rocky uses the camera to capture photos when requested by the assistant.";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Rocky searches your contacts to look up phone numbers, emails, and other information.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Rocky reads your health data (steps, heart rate, sleep) to answer health-related questions.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Rocky does not write health data, but HealthKit requires this key to be present.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Rocky uses your location to run apple-location and apple-weather requests.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Rocky needs microphone access for live voice conversations and incremental transcription.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Rocky accesses your photo library to pick photos when requested by the assistant.";
+				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "Rocky reads and creates reminders to help manage your tasks.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Rocky uses speech recognition for voice-to-text input in the chat composer.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIFileSharingEnabled = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xnu.rocky;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5A25EE022F77519E008A6F1F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = OpenRocky/OpenRocky.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 61;
+				DEVELOPMENT_TEAM = YPV49M8592;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Rocky;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Rocky reads and creates calendar events to help manage your schedule.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Rocky uses the camera to capture photos when requested by the assistant.";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Rocky searches your contacts to look up phone numbers, emails, and other information.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Rocky reads your health data (steps, heart rate, sleep) to answer health-related questions.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Rocky does not write health data, but HealthKit requires this key to be present.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Rocky uses your location to run apple-location and apple-weather requests.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Rocky needs microphone access for live voice conversations and incremental transcription.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Rocky accesses your photo library to pick photos when requested by the assistant.";
+				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "Rocky reads and creates reminders to help manage your tasks.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Rocky uses speech recognition for voice-to-text input in the chat composer.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIFileSharingEnabled = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xnu.rocky;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		5A25EE042F77519E008A6F1F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 55;
+				DEVELOPMENT_TEAM = YPV49M8592;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xnu.OpenRockyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpenRocky.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/OpenRocky";
+			};
+			name = Debug;
+		};
+		5A25EE052F77519E008A6F1F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 55;
+				DEVELOPMENT_TEAM = YPV49M8592;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xnu.OpenRockyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OpenRocky.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/OpenRocky";
+			};
+			name = Release;
+		};
+		5A25EE072F77519E008A6F1F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 55;
+				DEVELOPMENT_TEAM = YPV49M8592;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xnu.OpenRockyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = OpenRocky;
+			};
+			name = Debug;
+		};
+		5A25EE082F77519E008A6F1F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 55;
+				DEVELOPMENT_TEAM = YPV49M8592;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.xnu.OpenRockyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = OpenRocky;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5A25EDDA2F77519D008A6F1F /* Build configuration list for PBXProject "OpenRocky" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A25EDFE2F77519E008A6F1F /* Debug */,
+				5A25EDFF2F77519E008A6F1F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5A25EE002F77519E008A6F1F /* Build configuration list for PBXNativeTarget "OpenRocky" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A25EE012F77519E008A6F1F /* Debug */,
+				5A25EE022F77519E008A6F1F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5A25EE032F77519E008A6F1F /* Build configuration list for PBXNativeTarget "OpenRockyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A25EE042F77519E008A6F1F /* Debug */,
+				5A25EE052F77519E008A6F1F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5A25EE062F77519E008A6F1F /* Build configuration list for PBXNativeTarget "OpenRockyUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A25EE072F77519E008A6F1F /* Debug */,
+				5A25EE082F77519E008A6F1F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A1B2C3D52E00000111111111 /* XCLocalSwiftPackageReference "../Packages/SwiftOpenAI" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/SwiftOpenAI;
+		};
+		A670F11628EB65C1BE35E899 /* XCLocalSwiftPackageReference "../Packages/OpenRockyIOSSystem" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/OpenRockyIOSSystem;
+		};
+		B1C2D3E30000000100000001 /* XCLocalSwiftPackageReference "../Packages/OpenRockyPython" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/OpenRockyPython;
+		};
+		F87F580FD02EE4ED498ED3D5 /* XCLocalSwiftPackageReference "../Packages/LanguageModelChatUI" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../Packages/LanguageModelChatUI;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C1D2E3F30000000200000001 /* XCRemoteSwiftPackageReference "FFmpeg-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kewlbear/FFmpeg-iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = "0.0.6-b";
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		756A990F8FE77C7B028E8859 /* OpenRockyIOSSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A670F11628EB65C1BE35E899 /* XCLocalSwiftPackageReference "../Packages/OpenRockyIOSSystem" */;
+			productName = OpenRockyIOSSystem;
+		};
+		A1B2C3D62E00000111111111 /* SwiftOpenAI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D52E00000111111111 /* XCLocalSwiftPackageReference "../Packages/SwiftOpenAI" */;
+			productName = SwiftOpenAI;
+		};
+		B1C2D3E50000000100000001 /* OpenRockyPython */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B1C2D3E30000000100000001 /* XCLocalSwiftPackageReference "../Packages/OpenRockyPython" */;
+			productName = OpenRockyPython;
+		};
+		C1D2E3F50000000200000001 /* FFmpeg-iOS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C1D2E3F30000000200000001 /* XCRemoteSwiftPackageReference "FFmpeg-iOS" */;
+			productName = "FFmpeg-iOS";
+		};
+		C4BF11278C02AEA62105AB4F /* ChatClientKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F87F580FD02EE4ED498ED3D5 /* XCLocalSwiftPackageReference "../Packages/LanguageModelChatUI" */;
+			productName = ChatClientKit;
+		};
+		EF76DA762BAE26A2F7095B8D /* LanguageModelChatUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F87F580FD02EE4ED498ED3D5 /* XCLocalSwiftPackageReference "../Packages/LanguageModelChatUI" */;
+			productName = LanguageModelChatUI;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 5A25EDD72F77519D008A6F1F /* Project object */;
+}
