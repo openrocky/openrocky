@@ -20,6 +20,7 @@ struct OpenRockyRealtimeProviderInstance: Codable, Identifiable, Equatable {
     var doubaoSpeaker: String?
     var openaiVoice: String?
     var geminiVoice: String?
+    var glmVoice: String?
     var customHost: String?
     var isBuiltIn: Bool
 
@@ -38,6 +39,7 @@ struct OpenRockyRealtimeProviderInstance: Codable, Identifiable, Equatable {
             doubaoSpeaker: doubaoSpeaker,
             openaiVoice: openaiVoice,
             geminiVoice: geminiVoice,
+            glmVoice: glmVoice,
             customHost: customHost
         )
     }

@@ -22,14 +22,19 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
     @State private var doubaoAppId: String = ""
     @State private var doubaoAppKey: String = ""
     @State private var doubaoSpeaker: String = OpenRockyDoubaoSpeaker.vivi.rawValue
+
     @State private var openaiVoice: String = OpenRockyOpenAIVoice.alloy.rawValue
     @State private var geminiModel: String = OpenRockyRealtimeProviderKind.gemini.defaultModel
     @State private var geminiVoice: String = OpenRockyGeminiVoice.puck.rawValue
+    @State private var glmVoice: String = OpenRockyGLMVoice.tongtong.rawValue
     @State private var customHost: String = ""
     @State private var previousProvider: OpenRockyRealtimeProviderKind = .openAI
     @State private var testState: VoiceTestConnectionState = .idle
     @State private var nameManuallyEdited: Bool = false
     @StateObject private var voicePreview = OpenRockyDoubaoVoicePreview()
+    @StateObject private var openaiVoicePreview = OpenRockyOpenAIVoicePreview()
+    @StateObject private var geminiVoicePreview = OpenRockyGeminiVoicePreview()
+    @StateObject private var glmVoicePreview = OpenRockyGLMVoicePreview()
 
     private var isNew: Bool { editingInstanceID == nil }
 
@@ -84,20 +89,118 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 }
 
                 Section {
-                    Picker("Voice", selection: $geminiVoice) {
-                        ForEach(OpenRockyGeminiVoice.allCases) { voice in
-                            HStack {
-                                Text(voice.displayName)
+                    ForEach(OpenRockyGeminiVoice.allCases) { voice in
+                        Button {
+                            geminiVoice = voice.rawValue
+                        } label: {
+                            HStack(spacing: 12) {
+                                Image(systemName: geminiVoice == voice.rawValue ? "checkmark.circle.fill" : "circle")
+                                    .foregroundStyle(geminiVoice == voice.rawValue ? Color.accentColor : .secondary)
+                                    .font(.system(size: 20))
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(voice.displayName)
+                                        .foregroundStyle(.primary)
+                                        .font(.subheadline.weight(.medium))
+                                    Text(voice.subtitle)
+                                        .foregroundStyle(.secondary)
+                                        .font(.caption2)
+                                        .lineLimit(2)
+                                }
                                 Spacer()
-                                Text(voice.subtitle)
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
+                                Button {
+                                    if geminiVoicePreview.playingVoice == voice.rawValue {
+                                        geminiVoicePreview.stop()
+                                    } else {
+                                        geminiVoicePreview.play(
+                                            voice: voice.rawValue,
+                                            credential: credential,
+                                            customHost: customHost.isEmpty ? nil : customHost
+                                        )
+                                    }
+                                } label: {
+                                    Image(systemName: geminiVoicePreview.playingVoice == voice.rawValue ? "stop.circle.fill" : "play.circle.fill")
+                                        .font(.system(size: 26))
+                                        .foregroundStyle(geminiVoicePreview.playingVoice == voice.rawValue ? .orange : .accentColor)
+                                }
+                                .buttonStyle(.plain)
                             }
-                            .tag(voice.rawValue)
                         }
+                        .buttonStyle(.plain)
                     }
-                    .pickerStyle(.inline)
+                    if let err = geminiVoicePreview.error {
+                        Text(err)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
+                } header: {
+                    Text("Voice")
+                }
+            } else if selectedProvider == .glm {
+                Section {
+                    SecureField(
+                        "API Key",
+                        text: $credential,
+                        prompt: Text("your-api-key...")
+                    )
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .textContentType(.init(rawValue: ""))
+
+                    Link(destination: URL(string: "https://open.bigmodel.cn/usercenter/apikeys")!) {
+                        HStack {
+                            Image(systemName: "arrow.up.forward.square")
+                            Text("Get Zhipu AI API Key")
+                        }
+                        .font(.subheadline)
+                    }
+                } header: {
+                    Text("Zhipu AI Open Platform")
+                }
+
+                Section {
+                    ForEach(OpenRockyGLMVoice.allCases) { voice in
+                        Button {
+                            glmVoice = voice.rawValue
+                        } label: {
+                            HStack(spacing: 12) {
+                                Image(systemName: glmVoice == voice.rawValue ? "checkmark.circle.fill" : "circle")
+                                    .foregroundStyle(glmVoice == voice.rawValue ? Color.accentColor : .secondary)
+                                    .font(.system(size: 20))
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(voice.displayName)
+                                        .foregroundStyle(.primary)
+                                        .font(.subheadline.weight(.medium))
+                                    Text(voice.subtitle)
+                                        .foregroundStyle(.secondary)
+                                        .font(.caption2)
+                                        .lineLimit(2)
+                                }
+                                Spacer()
+                                Button {
+                                    if glmVoicePreview.playingVoice == voice.rawValue {
+                                        glmVoicePreview.stop()
+                                    } else {
+                                        glmVoicePreview.play(
+                                            voice: voice.rawValue,
+                                            credential: credential,
+                                            customHost: customHost.isEmpty ? nil : customHost
+                                        )
+                                    }
+                                } label: {
+                                    Image(systemName: glmVoicePreview.playingVoice == voice.rawValue ? "stop.circle.fill" : "play.circle.fill")
+                                        .font(.system(size: 26))
+                                        .foregroundStyle(glmVoicePreview.playingVoice == voice.rawValue ? .orange : .accentColor)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    if let err = glmVoicePreview.error {
+                        Text(err)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
                 } header: {
                     Text("Voice")
                 }
@@ -172,6 +275,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 } header: {
                     Text("Voice")
                 }
+
             } else {
                 Section {
                     SecureField(
@@ -197,20 +301,49 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 }
 
                 Section {
-                    Picker("Voice", selection: $openaiVoice) {
-                        ForEach(OpenRockyOpenAIVoice.allCases) { voice in
-                            HStack {
-                                Text(voice.displayName)
+                    ForEach(OpenRockyOpenAIVoice.allCases) { voice in
+                        Button {
+                            openaiVoice = voice.rawValue
+                        } label: {
+                            HStack(spacing: 12) {
+                                Image(systemName: openaiVoice == voice.rawValue ? "checkmark.circle.fill" : "circle")
+                                    .foregroundStyle(openaiVoice == voice.rawValue ? Color.accentColor : .secondary)
+                                    .font(.system(size: 20))
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(voice.displayName)
+                                        .foregroundStyle(.primary)
+                                        .font(.subheadline.weight(.medium))
+                                    Text(voice.subtitle)
+                                        .foregroundStyle(.secondary)
+                                        .font(.caption2)
+                                        .lineLimit(2)
+                                }
                                 Spacer()
-                                Text(voice.subtitle)
-                                    .font(.caption2)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
+                                Button {
+                                    if openaiVoicePreview.playingVoice == voice.rawValue {
+                                        openaiVoicePreview.stop()
+                                    } else {
+                                        openaiVoicePreview.play(
+                                            voice: voice.rawValue,
+                                            credential: credential,
+                                            customHost: customHost.isEmpty ? nil : customHost
+                                        )
+                                    }
+                                } label: {
+                                    Image(systemName: openaiVoicePreview.playingVoice == voice.rawValue ? "stop.circle.fill" : "play.circle.fill")
+                                        .font(.system(size: 26))
+                                        .foregroundStyle(openaiVoicePreview.playingVoice == voice.rawValue ? .orange : .accentColor)
+                                }
+                                .buttonStyle(.plain)
                             }
-                            .tag(voice.rawValue)
                         }
+                        .buttonStyle(.plain)
                     }
-                    .pickerStyle(.inline)
+                    if let err = openaiVoicePreview.error {
+                        Text(err)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
                 } header: {
                     Text("Voice")
                 }
@@ -324,11 +457,15 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
         doubaoAppId = instance.doubaoAppId ?? ""
         doubaoAppKey = instance.doubaoAppKey ?? ""
         doubaoSpeaker = instance.doubaoSpeaker ?? OpenRockyDoubaoSpeaker.vivi.rawValue
+
         openaiVoice = instance.openaiVoice ?? OpenRockyOpenAIVoice.alloy.rawValue
         customHost = instance.customHost ?? ""
         if instance.kind == .gemini {
             geminiModel = instance.modelID
             geminiVoice = instance.geminiVoice ?? OpenRockyGeminiVoice.puck.rawValue
+        }
+        if instance.kind == .glm {
+            glmVoice = instance.glmVoice ?? OpenRockyGLMVoice.tongtong.rawValue
         }
         previousProvider = instance.kind
     }
@@ -336,6 +473,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
     private var draftModelID: String {
         switch selectedProvider {
         case .gemini: geminiModel
+        case .glm: selectedProvider.defaultModel
         default: selectedProvider.defaultModel
         }
     }
@@ -384,11 +522,17 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                     testModelID = "gemini-2.5-flash-native-audio-latest"
                     let geminiHost = config.customHost ?? "wss://generativelanguage.googleapis.com"
                     url = URL(string: "\(geminiHost)/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=\(config.credential ?? "")")!
+                case .glm:
+                    testModelID = "glm-realtime"
+                    let glmHost = config.customHost ?? "wss://open.bigmodel.cn"
+                    url = URL(string: "\(glmHost)/api/paas/v4/realtime")!
                 }
 
                 var request = URLRequest(url: url)
                 if config.provider == .gemini {
                     // Gemini uses API key in URL, no additional auth headers needed
+                } else if config.provider == .glm {
+                    request.setValue("Bearer \(config.credential ?? "")", forHTTPHeaderField: "Authorization")
                 } else if config.provider == .openAI {
                     request.setValue("Bearer \(config.credential ?? "")", forHTTPHeaderField: "Authorization")
                     request.setValue("realtime=v1", forHTTPHeaderField: "openai-beta")
@@ -415,6 +559,23 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                         ]
                     ]
                     let setupData = try JSONSerialization.data(withJSONObject: setup)
+                    if let setupText = String(data: setupData, encoding: .utf8) {
+                        try await socket.send(.string(setupText))
+                    }
+                }
+
+                // For GLM: send session.update
+                if config.provider == .glm {
+                    let sessionUpdate: [String: Any] = [
+                        "type": "session.update",
+                        "session": [
+                            "model": testModelID,
+                            "voice": "tongtong",
+                            "modalities": ["audio", "text"],
+                            "output_audio_format": "pcm"
+                        ] as [String: Any]
+                    ]
+                    let setupData = try JSONSerialization.data(withJSONObject: sessionUpdate)
                     if let setupText = String(data: setupData, encoding: .utf8) {
                         try await socket.send(.string(setupText))
                     }
@@ -507,7 +668,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 case .doubao:
                     let nsError = error as NSError
                     testState = .failure(message: "WebSocket handshake failed (\(nsError.code)). Check APP ID and Access Token.")
-                case .openAI, .gemini:
+                case .openAI, .gemini, .glm:
                     let probeMsg = await probeEndpointError(config: config)
                     rlog.debug("Realtime test probe: \(probeMsg)", category: "Test")
                     testState = .failure(message: probeMsg)
@@ -529,6 +690,9 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
         case .gemini:
             let host = config.customHost?.replacingOccurrences(of: "wss://", with: "https://") ?? "https://generativelanguage.googleapis.com"
             httpURL = URL(string: "\(host)/v1beta/models/gemini-2.5-flash-native-audio-latest?key=\(config.credential ?? "")")!
+        case .glm:
+            let host = config.customHost?.replacingOccurrences(of: "wss://", with: "https://") ?? "https://open.bigmodel.cn"
+            httpURL = URL(string: "\(host)/api/paas/v4/models")!
         }
 
         var request = URLRequest(url: httpURL)
@@ -542,6 +706,8 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
             }
         } else if config.provider == .gemini {
             // Gemini uses API key in the URL query parameter, no auth header needed
+        } else if config.provider == .glm {
+            request.setValue("Bearer \(config.credential ?? "")", forHTTPHeaderField: "Authorization")
         } else {
             request.setValue("Bearer \(config.credential ?? "")", forHTTPHeaderField: "Authorization")
         }
@@ -583,8 +749,10 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
             instance.doubaoAppId = doubaoAppId.isEmpty ? nil : doubaoAppId
             instance.doubaoAppKey = doubaoAppKey.isEmpty ? nil : doubaoAppKey
             instance.doubaoSpeaker = doubaoSpeaker
+
             instance.openaiVoice = openaiVoice
             instance.geminiVoice = geminiVoice
+            instance.glmVoice = glmVoice
             instance.customHost = customHost.isEmpty ? nil : customHost
             realtimeProviderStore.update(instance, credential: cred.isEmpty ? nil : cred)
         } else {
@@ -597,8 +765,10 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 doubaoAppId: doubaoAppId.isEmpty ? nil : doubaoAppId,
                 doubaoAppKey: doubaoAppKey.isEmpty ? nil : doubaoAppKey,
                 doubaoSpeaker: doubaoSpeaker,
+
                 openaiVoice: openaiVoice,
                 geminiVoice: geminiVoice,
+                glmVoice: glmVoice,
                 customHost: customHost.isEmpty ? nil : customHost,
                 isBuiltIn: false
             )

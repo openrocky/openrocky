@@ -498,7 +498,7 @@ final class OpenRockyDoubaoRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
             }
             let ttsType = json?["tts_type"] as? String ?? ""
             shouldPlayAudio = (ttsType == "chat_tts_text")
-            // Emit text from our injected TTS (greeting / chat model response)
+            // Emit text
             if shouldPlayAudio, let text = json?["text"] as? String, !text.isEmpty {
                 emit(.assistantTranscriptDelta(text))
             }
