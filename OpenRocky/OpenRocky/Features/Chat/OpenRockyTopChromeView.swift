@@ -37,6 +37,14 @@ struct OpenRockyTopChromeView: View {
         .padding(.top, 12)
         .padding(.bottom, 14)
         .background(OpenRockyPalette.background)
+        .background(
+            GeometryReader { geo in
+                Color.clear.preference(
+                    key: OpenRockyTopChromeHeightPreferenceKey.self,
+                    value: geo.size.height
+                )
+            }
+        )
     }
 
     // MARK: - Left Cluster

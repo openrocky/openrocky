@@ -182,12 +182,7 @@ struct ContentView: View {
             .toolbarBackground(OpenRockyPalette.background, for: .navigationBar)
         } detail: {
             // Detail: chat experience with top chrome
-            ZStack(alignment: .top) {
-                if !conversationID.isEmpty {
-                    chatExperienceView
-                        .ignoresSafeArea()
-                }
-
+            VStack(spacing: 0) {
                 OpenRockyTopChromeView(
                     providerStatus: chatProviderStore.status,
                     isVoiceActive: showsVoiceOverlay,
@@ -198,6 +193,10 @@ struct ContentView: View {
                     },
                     onNewConversation: { startNewConversation() }
                 )
+
+                if !conversationID.isEmpty {
+                    chatExperienceView
+                }
             }
             .toolbar(.hidden, for: .navigationBar)
         }
