@@ -83,7 +83,7 @@ final class OpenRockyOAuthService: NSObject, ASWebAuthenticationPresentationCont
             if let scene = scenes.first {
                 return ASPresentationAnchor(windowScene: scene)
             }
-            return ASPresentationAnchor(frame: .zero)
+            return ASPresentationAnchor()
         }
     }
 

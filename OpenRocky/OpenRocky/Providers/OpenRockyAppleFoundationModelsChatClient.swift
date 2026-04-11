@@ -41,10 +41,7 @@ final class OpenRockyAppleFoundationModelsChatClient: ChatClient, @unchecked Sen
         #if targetEnvironment(simulator)
         return false
         #else
-        if #available(iOS 26.0, *) {
-            return SystemLanguageModel.default.isAvailable
-        }
-        return false
+        return SystemLanguageModel.default.isAvailable
         #endif
     }
 

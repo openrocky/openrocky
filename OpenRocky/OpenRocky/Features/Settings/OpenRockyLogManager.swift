@@ -473,4 +473,4 @@ nonisolated private final class _OpenRockyLogStorage: @unchecked Sendable {
 
 // MARK: - Convenience global
 
-nonisolated(unsafe) let rlog = OpenRockyLogManager.shared
+nonisolated let rlog = OpenRockyLogManager.shared
