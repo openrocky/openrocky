@@ -22,7 +22,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
     @State private var doubaoAppId: String = ""
     @State private var doubaoAppKey: String = ""
     @State private var doubaoSpeaker: String = OpenRockyDoubaoSpeaker.vivi.rawValue
-    @State private var doubaoDirectMode: Bool = false
+
     @State private var openaiVoice: String = OpenRockyOpenAIVoice.alloy.rawValue
     @State private var geminiModel: String = OpenRockyRealtimeProviderKind.gemini.defaultModel
     @State private var geminiVoice: String = OpenRockyGeminiVoice.puck.rawValue
@@ -276,18 +276,6 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                     Text("Voice")
                 }
 
-                Section {
-                    Toggle("Direct Mode", isOn: $doubaoDirectMode)
-
-                } header: {
-                    Text("Conversation Mode")
-                } footer: {
-                    if doubaoDirectMode {
-                        Text("Direct: Doubao dialog model handles the full conversation end-to-end. Lower latency, but no external tool calling.")
-                    } else {
-                        Text("Cascaded (Default): External chat model generates responses, Doubao handles speech-to-text and text-to-speech. Supports tool calling.")
-                    }
-                }
             } else {
                 Section {
                     SecureField(
@@ -469,7 +457,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
         doubaoAppId = instance.doubaoAppId ?? ""
         doubaoAppKey = instance.doubaoAppKey ?? ""
         doubaoSpeaker = instance.doubaoSpeaker ?? OpenRockyDoubaoSpeaker.vivi.rawValue
-        doubaoDirectMode = instance.doubaoDirectMode ?? false
+
         openaiVoice = instance.openaiVoice ?? OpenRockyOpenAIVoice.alloy.rawValue
         customHost = instance.customHost ?? ""
         if instance.kind == .gemini {
@@ -761,7 +749,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
             instance.doubaoAppId = doubaoAppId.isEmpty ? nil : doubaoAppId
             instance.doubaoAppKey = doubaoAppKey.isEmpty ? nil : doubaoAppKey
             instance.doubaoSpeaker = doubaoSpeaker
-            instance.doubaoDirectMode = doubaoDirectMode ? true : nil
+
             instance.openaiVoice = openaiVoice
             instance.geminiVoice = geminiVoice
             instance.glmVoice = glmVoice
@@ -777,7 +765,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 doubaoAppId: doubaoAppId.isEmpty ? nil : doubaoAppId,
                 doubaoAppKey: doubaoAppKey.isEmpty ? nil : doubaoAppKey,
                 doubaoSpeaker: doubaoSpeaker,
-                doubaoDirectMode: doubaoDirectMode ? true : nil,
+
                 openaiVoice: openaiVoice,
                 geminiVoice: geminiVoice,
                 glmVoice: glmVoice,

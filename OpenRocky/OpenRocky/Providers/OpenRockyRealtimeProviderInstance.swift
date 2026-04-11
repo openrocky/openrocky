@@ -18,7 +18,6 @@ struct OpenRockyRealtimeProviderInstance: Codable, Identifiable, Equatable {
     var doubaoAppId: String?
     var doubaoAppKey: String?
     var doubaoSpeaker: String?
-    var doubaoDirectMode: Bool?
     var openaiVoice: String?
     var geminiVoice: String?
     var glmVoice: String?
@@ -38,7 +37,6 @@ struct OpenRockyRealtimeProviderInstance: Codable, Identifiable, Equatable {
             doubaoAppId: doubaoAppId,
             doubaoAppKey: doubaoAppKey,
             doubaoSpeaker: doubaoSpeaker,
-            doubaoDirectMode: doubaoDirectMode,
             openaiVoice: openaiVoice,
             geminiVoice: geminiVoice,
             glmVoice: glmVoice,

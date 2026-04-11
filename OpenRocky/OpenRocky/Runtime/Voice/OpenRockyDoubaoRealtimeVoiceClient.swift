@@ -17,9 +17,6 @@ final class OpenRockyDoubaoRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
 
     private let configuration: OpenRockyRealtimeProviderConfiguration
     private let soulInstructions: String
-    /// When true, Doubao's built-in dialog model handles the full conversation end-to-end.
-    /// When false (default), an external chat model generates text and Doubao only does STT + TTS.
-    private let directMode: Bool
     private var socket: URLSessionWebSocketTask?
     private var receiveTask: Task<Void, Never>?
     private var eventSink: (@Sendable (OpenRockyRealtimeEvent) -> Void)?
@@ -40,26 +37,13 @@ final class OpenRockyDoubaoRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
         self.configuration = configuration.normalized()
         self.modelID = "doubao-e2e-voice"
         self.soulInstructions = soulInstructions
-        self.directMode = configuration.doubaoDirectMode == true
-        if self.directMode {
-            // Direct mode: Doubao dialog model handles everything end-to-end
-            features = OpenRockyRealtimeVoiceFeatures(
-                supportsTextInput: true,
-                supportsAssistantStreaming: true,   // Dialog model streams text
-                supportsToolCalls: false,           // No external tool calling
-                supportsAudioOutput: true,
-                needsMicSuspension: false           // Doubao handles VAD internally
-            )
-        } else {
-            // Cascaded mode: external chat model generates text, Doubao does STT + TTS
-            features = OpenRockyRealtimeVoiceFeatures(
-                supportsTextInput: true,
-                supportsAssistantStreaming: false,   // Chat model handles response
-                supportsToolCalls: true,             // Chat model handles tools
-                supportsAudioOutput: true,
-                needsMicSuspension: false            // Keep mic active — Doubao paces TTS based on incoming audio
-            )
-        }
+        features = OpenRockyRealtimeVoiceFeatures(
+            supportsTextInput: true,
+            supportsAssistantStreaming: false,  // Chat model handles response
+            supportsToolCalls: true,            // Chat model handles tools
+            supportsAudioOutput: true,
+            needsMicSuspension: false           // Keep mic active — Doubao paces TTS based on incoming audio
+        )
     }
 
     func connect(eventSink: @escaping @Sendable (OpenRockyRealtimeEvent) -> Void) async throws {
@@ -513,13 +497,7 @@ final class OpenRockyDoubaoRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
                 rlog.debug("Doubao TTSSentenceStart: \(jsonStr.prefix(300))", category: "Voice")
             }
             let ttsType = json?["tts_type"] as? String ?? ""
-            if directMode {
-                // Direct mode: play all audio from dialog model
-                shouldPlayAudio = true
-            } else {
-                // Cascaded mode: only play our injected TTS
-                shouldPlayAudio = (ttsType == "chat_tts_text")
-            }
+            shouldPlayAudio = (ttsType == "chat_tts_text")
             // Emit text
             if shouldPlayAudio, let text = json?["text"] as? String, !text.isEmpty {
                 emit(.assistantTranscriptDelta(text))
@@ -535,8 +513,8 @@ final class OpenRockyDoubaoRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
             // TTSEnded
             if shouldPlayAudio {
                 finalizeTurnIfNeeded()
-            } else if !directMode {
-                // Cascaded mode: dialog model's TTS cycle completed — flush any queued speakText
+            } else {
+                // Dialog model's TTS cycle completed — flush any queued speakText
                 flushPendingSpeakText()
             }
             shouldPlayAudio = false
@@ -546,20 +524,13 @@ final class OpenRockyDoubaoRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
             finalizeTurnIfNeeded()
 
         case 550:
-            // ChatResponse from dialog model
-            if directMode, let text = json?["text"] as? String, !text.isEmpty {
-                // Direct mode: emit dialog model text as assistant transcript
-                emit(.assistantTranscriptDelta(text))
-            }
-            // Cascaded mode: ignore (external chat model handles response)
+            // ChatResponse from dialog model — ignore (chat model handles response)
+            break
 
         case 553:
-            // ChatStarted — dialog model begins
+            // ChatStarted — dialog model begins, suppress its TTS
             isDialogModelActive = true
-            if !directMode {
-                // Cascaded mode: suppress dialog model's TTS
-                shouldPlayAudio = false
-            }
+            shouldPlayAudio = false
 
         case 559:
             // ChatEnded — dialog model finished its text generation
