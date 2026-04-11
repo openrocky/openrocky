@@ -16,6 +16,7 @@ struct OpenRockyProviderSettingsView: View {
     @ObservedObject var characterStore: OpenRockyCharacterStore
     @StateObject private var customSkillStore = OpenRockyCustomSkillStore.shared
     @Environment(\.dismiss) private var dismiss
+    @State private var showsOnboarding = false
 
     var body: some View {
         NavigationStack {
@@ -40,6 +41,19 @@ struct OpenRockyProviderSettingsView: View {
                             tint: OpenRockyPalette.secondary,
                             title: "Voice",
                             subtitle: voiceStatusSummary
+                        )
+                    }
+                }
+
+                Section {
+                    Button {
+                        showsOnboarding = true
+                    } label: {
+                        settingsRow(
+                            icon: "wand.and.stars",
+                            tint: OpenRockyPalette.accent,
+                            title: "Setup Wizard",
+                            subtitle: "Configure unified chat + voice provider"
                         )
                     }
                 }
@@ -158,6 +172,12 @@ struct OpenRockyProviderSettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .fullScreenCover(isPresented: $showsOnboarding) {
+                OpenRockyOnboardingView(
+                    providerStore: providerStore,
+                    realtimeProviderStore: realtimeProviderStore
+                )
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }

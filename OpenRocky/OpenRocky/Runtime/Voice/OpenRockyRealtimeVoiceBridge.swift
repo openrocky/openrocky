@@ -217,6 +217,8 @@ final class OpenRockyRealtimeVoiceBridge {
             return OpenRockyDoubaoRealtimeVoiceClient(configuration: configuration, soulInstructions: soulInstructions)
         case .gemini:
             return OpenRockyGeminiRealtimeVoiceClient(configuration: configuration, soulInstructions: soulInstructions)
+        case .glm:
+            return OpenRockyGLMRealtimeVoiceClient(configuration: configuration, soulInstructions: soulInstructions)
         }
     }
 }

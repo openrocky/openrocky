@@ -19,6 +19,7 @@ struct OpenRockyRealtimeProviderConfiguration: Equatable {
     var doubaoSpeaker: String? = nil
     var openaiVoice: String? = nil
     var geminiVoice: String? = nil
+    var glmVoice: String? = nil
     var customHost: String? = nil
 
     // Character persona (injected from active character)
@@ -33,6 +34,7 @@ struct OpenRockyRealtimeProviderConfiguration: Equatable {
         parts.append(doubaoSpeaker ?? "-")
         parts.append(openaiVoice ?? "-")
         parts.append(geminiVoice ?? "-")
+        parts.append(glmVoice ?? "-")
         parts.append(customHost ?? "-")
         parts.append(characterName ?? "-")
         parts.append(characterSpeakingStyle ?? "-")
@@ -60,6 +62,7 @@ struct OpenRockyRealtimeProviderConfiguration: Equatable {
             doubaoSpeaker: doubaoSpeaker?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             openaiVoice: openaiVoice?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             geminiVoice: geminiVoice?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
+            glmVoice: glmVoice?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             customHost: customHost?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             characterName: characterName?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             characterSpeakingStyle: characterSpeakingStyle?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,

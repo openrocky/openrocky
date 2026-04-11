@@ -26,4 +26,12 @@ struct OpenRockyRealtimeVoiceFeatures: Sendable, Equatable {
         needsMicSuspension: true
     )
 
+    static let glm = OpenRockyRealtimeVoiceFeatures(
+        supportsTextInput: true,
+        supportsAssistantStreaming: true,
+        supportsToolCalls: true,
+        supportsAudioOutput: true,
+        needsMicSuspension: true
+    )
+
 }

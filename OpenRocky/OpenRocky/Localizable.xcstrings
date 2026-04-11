@@ -1137,6 +1137,9 @@
         }
       }
     },
+    "Feedback" : {
+
+    },
     "Files & Shell" : {
       "extractionState" : "stale",
       "localizations" : {

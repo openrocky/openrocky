@@ -20,6 +20,7 @@ enum OpenRockyProviderKind: String, Codable, CaseIterable, Identifiable {
     case openRouter
     case deepSeek
     case volcengine
+    case zhipuAI
     case aiProxy
 
     nonisolated var id: String { rawValue }
@@ -36,6 +37,7 @@ enum OpenRockyProviderKind: String, Codable, CaseIterable, Identifiable {
         case .openRouter: String(localized: "OpenRouter")
         case .deepSeek: String(localized: "DeepSeek")
         case .volcengine: String(localized: "Doubao (Volcengine)")
+        case .zhipuAI: String(localized: "Zhipu AI (GLM)")
         case .aiProxy: String(localized: "AIProxy")
         }
     }
@@ -52,6 +54,7 @@ enum OpenRockyProviderKind: String, Codable, CaseIterable, Identifiable {
         case .openRouter: "anthropic/claude-sonnet-4.5"
         case .deepSeek: "deepseek-chat"
         case .volcengine: "doubao-seed-1-8-251228"
+        case .zhipuAI: "glm-4-plus"
         case .aiProxy: "gpt-5"
         }
     }
@@ -78,6 +81,8 @@ enum OpenRockyProviderKind: String, Codable, CaseIterable, Identifiable {
             ["deepseek-chat", "deepseek-reasoner"]
         case .volcengine:
             ["doubao-seed-1-8-251228", "doubao-1.5-pro-256k-250115", "doubao-1.5-thinking-pro-250415"]
+        case .zhipuAI:
+            ["glm-4-plus", "glm-4-flash", "glm-4-air"]
         case .aiProxy:
             ["gpt-5", "gpt-5-mini", "gpt-4o"]
         }
@@ -105,6 +110,8 @@ enum OpenRockyProviderKind: String, Codable, CaseIterable, Identifiable {
             "DeepSeek OpenAI-compatible endpoint."
         case .volcengine:
             "Volcengine Doubao OpenAI-compatible endpoint."
+        case .zhipuAI:
+            "Zhipu AI GLM OpenAI-compatible endpoint."
         case .aiProxy:
             "AIProxy-backed OpenAI traffic using partial key plus service URL."
         }
@@ -114,7 +121,7 @@ enum OpenRockyProviderKind: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .appleFoundationModels:
             ""
-        case .openAI, .azureOpenAI, .gemini, .groq, .xAI, .openRouter, .deepSeek:
+        case .openAI, .azureOpenAI, .gemini, .groq, .xAI, .openRouter, .deepSeek, .zhipuAI:
             "sk-..."
         case .anthropic:
             "sk-ant-..."
@@ -137,6 +144,7 @@ enum OpenRockyProviderKind: String, Codable, CaseIterable, Identifiable {
         case .openRouter: "https://openrouter.ai/keys"
         case .deepSeek: "https://platform.deepseek.com/api_keys"
         case .volcengine: "https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey"
+        case .zhipuAI: "https://open.bigmodel.cn/usercenter/apikeys"
         case .aiProxy: nil
         }
     }

@@ -13,6 +13,7 @@ enum OpenRockyRealtimeProviderKind: String, Codable, CaseIterable, Identifiable 
     case openAI
     case doubao
     case gemini
+    case glm
 
     nonisolated var id: String { rawValue }
 
@@ -21,6 +22,7 @@ enum OpenRockyRealtimeProviderKind: String, Codable, CaseIterable, Identifiable 
         case .openAI: String(localized: "OpenAI Realtime")
         case .doubao: String(localized: "Doubao Realtime (Beta)")
         case .gemini: String(localized: "Gemini Live (Beta)")
+        case .glm: String(localized: "GLM Realtime (Zhipu AI)")
         }
     }
 
@@ -29,6 +31,7 @@ enum OpenRockyRealtimeProviderKind: String, Codable, CaseIterable, Identifiable 
         case .openAI: OpenRockyOpenAIServiceFactory.defaultRealtimeModel
         case .doubao: "doubao-e2e-voice"
         case .gemini: "gemini-2.5-flash-native-audio-latest"
+        case .glm: "glm-realtime"
         }
     }
 
@@ -40,6 +43,8 @@ enum OpenRockyRealtimeProviderKind: String, Codable, CaseIterable, Identifiable 
             ["doubao-e2e-voice"]
         case .gemini:
             ["gemini-2.5-flash-native-audio-latest", "gemini-3.1-flash-live-preview"]
+        case .glm:
+            ["glm-realtime", "glm-realtime-flash"]
         }
     }
 
@@ -51,6 +56,8 @@ enum OpenRockyRealtimeProviderKind: String, Codable, CaseIterable, Identifiable 
             "End-to-end realtime voice with natural speech, emotion, tool calling, and audio output. Optimized for Chinese."
         case .gemini:
             "Gemini native multimodal live voice with tool calling. Fast and cost-effective."
+        case .glm:
+            "Zhipu AI end-to-end realtime voice with tool calling. Optimized for Chinese."
         }
     }
 
@@ -59,6 +66,7 @@ enum OpenRockyRealtimeProviderKind: String, Codable, CaseIterable, Identifiable 
         case .openAI: String(localized: "API Key")
         case .doubao: String(localized: "Access Token")
         case .gemini: String(localized: "API Key")
+        case .glm: String(localized: "API Key")
         }
     }
 
@@ -67,6 +75,7 @@ enum OpenRockyRealtimeProviderKind: String, Codable, CaseIterable, Identifiable 
         case .openAI: "sk-..."
         case .doubao: String(localized: "Access Token from console")
         case .gemini: "AIza..."
+        case .glm: "your-api-key..."
         }
     }
 
@@ -75,6 +84,7 @@ enum OpenRockyRealtimeProviderKind: String, Codable, CaseIterable, Identifiable 
         case .openAI: "https://platform.openai.com/api-keys"
         case .doubao: "https://console.volcengine.com/speech/service/10017"
         case .gemini: "https://aistudio.google.com/apikey"
+        case .glm: "https://open.bigmodel.cn/usercenter/apikeys"
         }
     }
 
