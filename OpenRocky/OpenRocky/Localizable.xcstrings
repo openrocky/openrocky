@@ -682,7 +682,7 @@
         }
       }
     },
-    "Continue with OpenAI" : {
+    "Continue with %@" : {
 
     },
     "Conversations" : {
@@ -762,7 +762,7 @@
     "Custom Host" : {
 
     },
-    "Custom host is optional. Use it if you have a proxy or self-hosted endpoint." : {
+    "Custom host (Optional)" : {
 
     },
     "Custom Repository" : {
@@ -1075,6 +1075,7 @@
       }
     },
     "Enter OpenAI API Key" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1217,6 +1218,9 @@
         }
       }
     },
+    "Get Zhipu AI API Key" : {
+
+    },
     "GitHub" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1227,6 +1231,9 @@
           }
         }
       }
+    },
+    "GLM Realtime (Zhipu AI)" : {
+
     },
     "Gmail" : {
       "extractionState" : "stale",
@@ -1301,9 +1308,6 @@
       }
     },
     "https://api.aiproxy.pro/..." : {
-
-    },
-    "https://api.openai.com (Optional)" : {
 
     },
     "https://github.com/username/repo" : {
@@ -1729,9 +1733,6 @@
     "ON" : {
 
     },
-    "One key powers both chat and voice." : {
-
-    },
     "One key powers both chat and voice.\nYou can add other providers in Settings later." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1890,7 +1891,7 @@
         }
       }
     },
-    "Pick how Rocky thinks and speaks.\nYou can change this in Settings anytime." : {
+    "Pick how Rocky thinks and speaks.\nOne API key powers both chat and voice." : {
 
     },
     "Planning" : {
@@ -2366,9 +2367,6 @@
           }
         }
       }
-    },
-    "sk-..." : {
-
     },
     "Skill Name" : {
       "localizations" : {
@@ -3081,6 +3079,15 @@
           }
         }
       }
+    },
+    "your-api-key..." : {
+
+    },
+    "Zhipu AI (GLM)" : {
+
+    },
+    "Zhipu AI Open Platform" : {
+
     },
     "云舟 2.0" : {
 
