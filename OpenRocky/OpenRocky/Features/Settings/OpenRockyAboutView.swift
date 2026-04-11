@@ -45,6 +45,11 @@ struct OpenRockyAboutView: View {
                 linkRow(icon: "bubble.left.and.bubble.right.fill", tint: .purple, title: "Discord", url: "https://discord.gg/SvvsaDA4nE")
             }
 
+            // Feedback
+            Section("Feedback") {
+                linkRow(icon: "exclamationmark.bubble.fill", tint: .red, title: "Feedback", subtitle: "Report issues or suggestions", url: "https://github.com/openrocky/openrocky/issues/new")
+            }
+
             // Open source libraries
             Section("Open Source Libraries") {
                 libraryRow(name: "LanguageModelChatUI", author: "Lakr233", url: "https://github.com/Lakr233/LanguageModelChatUI")

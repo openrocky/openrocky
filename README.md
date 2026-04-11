@@ -122,10 +122,29 @@ This project was developed by [everettjf](https://github.com/everettjf) with the
 
 Uses Swift Testing framework (`@Test`, `#expect`). Tests cover session state machine, tool registration, provider inventory, skill store, and character system prompts.
 
+## Website
+
+[https://openrocky.org](https://openrocky.org)
+
 ## Download
 
-- **iOS** — Join the TestFlight beta: [https://testflight.apple.com/join/GZtbEpXN](https://testflight.apple.com/join/GZtbEpXN)
-- **Android** — See the Android repo: [openrocky/openrocky_android](https://github.com/openrocky/openrocky_android)
+- **iOS TestFlight**: [https://testflight.apple.com/join/GZtbEpXN](https://testflight.apple.com/join/GZtbEpXN)
+- **Android Internal Testing**: [https://play.google.com/apps/testing/com.xnu.rocky](https://play.google.com/apps/testing/com.xnu.rocky)
+
+## Open Source
+
+- **iOS**: [https://github.com/openrocky/openrocky](https://github.com/openrocky/openrocky)
+- **Android**: [https://github.com/openrocky/openrocky_android](https://github.com/openrocky/openrocky_android)
+
+## Community
+
+- **Telegram**: [@openrocky](https://t.me/openrocky)
+- **Discord**: [https://discord.gg/SvvsaDA4nE](https://discord.gg/SvvsaDA4nE)
+
+## Feedback
+
+- **iOS**: [Submit iOS Feedback](https://github.com/openrocky/openrocky/issues/new)
+- **Android**: [Submit Android Feedback](https://github.com/openrocky/openrocky_android/issues/new)
 
 ## WeChat
 

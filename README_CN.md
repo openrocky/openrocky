@@ -122,10 +122,29 @@ ASC_API_KEY_ID=... ASC_API_ISSUER_ID=... ASC_API_KEY_P8_PATH=... scripts/testfli
 
 使用 Swift Testing 框架（`@Test`、`#expect`）。测试覆盖会话状态机、工具注册、服务商清单、技能存储和角色系统提示词。
 
+## 官网
+
+[https://openrocky.org](https://openrocky.org)
+
 ## 下载
 
-- **iOS** — 加入 TestFlight 测试: [https://testflight.apple.com/join/GZtbEpXN](https://testflight.apple.com/join/GZtbEpXN)
-- **Android** — 请前往 Android 仓库: [openrocky/openrocky_android](https://github.com/openrocky/openrocky_android)
+- **iOS TestFlight**: [https://testflight.apple.com/join/GZtbEpXN](https://testflight.apple.com/join/GZtbEpXN)
+- **Android 内部测试**: [https://play.google.com/apps/testing/com.xnu.rocky](https://play.google.com/apps/testing/com.xnu.rocky)
+
+## 开源仓库
+
+- **iOS**: [https://github.com/openrocky/openrocky](https://github.com/openrocky/openrocky)
+- **Android**: [https://github.com/openrocky/openrocky_android](https://github.com/openrocky/openrocky_android)
+
+## 社区
+
+- **Telegram**: [@openrocky](https://t.me/openrocky)
+- **Discord**: [https://discord.gg/SvvsaDA4nE](https://discord.gg/SvvsaDA4nE)
+
+## 反馈
+
+- **iOS**: [提交 iOS 反馈](https://github.com/openrocky/openrocky/issues/new)
+- **Android**: [提交 Android 反馈](https://github.com/openrocky/openrocky_android/issues/new)
 
 ## 微信公众号
 
