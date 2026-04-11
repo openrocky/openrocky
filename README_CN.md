@@ -129,7 +129,6 @@ ASC_API_KEY_ID=... ASC_API_ISSUER_ID=... ASC_API_KEY_P8_PATH=... scripts/testfli
 ## 下载
 
 - **iOS TestFlight**: [https://testflight.apple.com/join/GZtbEpXN](https://testflight.apple.com/join/GZtbEpXN)
-- **Android 内部测试**: [https://play.google.com/apps/testing/com.xnu.rocky](https://play.google.com/apps/testing/com.xnu.rocky)
 
 ## 开源仓库
 
@@ -138,6 +137,7 @@ ASC_API_KEY_ID=... ASC_API_ISSUER_ID=... ASC_API_KEY_P8_PATH=... scripts/testfli
 
 ## 社区
 
+- **作者 X / Twitter**: [@everettjf](https://x.com/everettjf)
 - **Telegram**: [@openrocky](https://t.me/openrocky)
 - **Discord**: [https://discord.gg/SvvsaDA4nE](https://discord.gg/SvvsaDA4nE)
 

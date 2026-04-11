@@ -129,7 +129,6 @@ Uses Swift Testing framework (`@Test`, `#expect`). Tests cover session state mac
 ## Download
 
 - **iOS TestFlight**: [https://testflight.apple.com/join/GZtbEpXN](https://testflight.apple.com/join/GZtbEpXN)
-- **Android Internal Testing**: [https://play.google.com/apps/testing/com.xnu.rocky](https://play.google.com/apps/testing/com.xnu.rocky)
 
 ## Open Source
 
@@ -138,6 +137,7 @@ Uses Swift Testing framework (`@Test`, `#expect`). Tests cover session state mac
 
 ## Community
 
+- **Author X / Twitter**: [@everettjf](https://x.com/everettjf)
 - **Telegram**: [@openrocky](https://t.me/openrocky)
 - **Discord**: [https://discord.gg/SvvsaDA4nE](https://discord.gg/SvvsaDA4nE)
 
