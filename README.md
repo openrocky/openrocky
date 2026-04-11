@@ -5,7 +5,6 @@
 [![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/SvvsaDA4nE)
 [![Telegram](https://img.shields.io/badge/Telegram-@openrocky-26A5E4?logo=telegram&logoColor=white)](https://t.me/openrocky)
 [![License](https://img.shields.io/badge/License-Apache%202.0-yellow)](LICENSE)
-[![Android](https://img.shields.io/badge/Android-Internal%20Testing-green?logo=android&logoColor=white)](https://github.com/openrocky/openrocky_android)
 
 > English | [中文](README_CN.md)
 
