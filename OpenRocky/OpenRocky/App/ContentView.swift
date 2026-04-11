@@ -22,7 +22,6 @@ struct ContentView: View {
     @State private var showsVoiceOverlay = false
     @State private var showsVoiceNotConfiguredAlert = false
     @State private var showsConversationList = false
-    @State private var topChromeHeight: CGFloat = 0
     @State private var conversationID: String = ""
     @State private var chatRefreshToken: UUID = UUID()
     @State private var sidebarVisibility: NavigationSplitViewVisibility = .automatic
@@ -42,7 +41,6 @@ struct ContentView: View {
                 iPhoneLayout
             }
         }
-        .onPreferenceChange(OpenRockyTopChromeHeightPreferenceKey.self) { topChromeHeight = $0 }
         .task {
             if conversationID.isEmpty {
                 startNewConversation()
@@ -121,22 +119,15 @@ struct ContentView: View {
         }
     }
 
-    // MARK: - iPhone Layout (unchanged)
+    // MARK: - iPhone Layout
 
     private var iPhoneLayout: some View {
-        VStack(spacing: 0) {
-            OpenRockyTopChromeView(
-                providerStatus: chatProviderStore.status,
-                isVoiceActive: showsVoiceOverlay,
-                openProviderSettings: { showsProviderSettings = true },
-                openVoiceOverlay: { toggleVoiceSession() },
-                openConversationList: { showsConversationList = true },
-                onNewConversation: { startNewConversation() }
-            )
-
-            if !conversationID.isEmpty {
-                chatExperienceView
-            }
+        NavigationStack {
+            chatContentView
+                .navigationTitle("Rocky")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar { commonToolbarItems }
+                .toolbarBackground(OpenRockyPalette.background, for: .navigationBar)
         }
         .sheet(isPresented: $showsConversationList) {
             OpenRockyConversationListView(
@@ -164,7 +155,7 @@ struct ContentView: View {
                 onNew: { startNewConversation() },
                 onDelete: { id in storage.deleteConversation(id) }
             )
-            .navigationTitle("OpenRocky")
+            .navigationTitle("Rocky")
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { startNewConversation() } label: {
@@ -181,29 +172,26 @@ struct ContentView: View {
             }
             .toolbarBackground(OpenRockyPalette.background, for: .navigationBar)
         } detail: {
-            // Detail: chat experience with top chrome
-            VStack(spacing: 0) {
-                OpenRockyTopChromeView(
-                    providerStatus: chatProviderStore.status,
-                    isVoiceActive: showsVoiceOverlay,
-                    openProviderSettings: { showsProviderSettings = true },
-                    openVoiceOverlay: { toggleVoiceSession() },
-                    openConversationList: {
-                        withAnimation { sidebarVisibility = sidebarVisibility == .all ? .detailOnly : .all }
-                    },
-                    onNewConversation: { startNewConversation() }
-                )
-
-                if !conversationID.isEmpty {
-                    chatExperienceView
-                }
+            NavigationStack {
+                chatContentView
+                    .navigationTitle("Rocky")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar { commonToolbarItems }
+                    .toolbarBackground(OpenRockyPalette.background, for: .navigationBar)
             }
-            .toolbar(.hidden, for: .navigationBar)
         }
         .navigationSplitViewStyle(.balanced)
     }
 
-    // MARK: - Shared Chat View
+    // MARK: - Shared Chat Content
+
+    private var chatContentView: some View {
+        Group {
+            if !conversationID.isEmpty {
+                chatExperienceView
+            }
+        }
+    }
 
     private var chatExperienceView: some View {
         OpenRockyChatExperienceScreen(
@@ -227,6 +215,56 @@ struct ContentView: View {
                 }
             }
         )
+    }
+
+    // MARK: - Common Toolbar
+
+    @ToolbarContentBuilder
+    private var commonToolbarItems: some ToolbarContent {
+        ToolbarItem(placement: .topBarLeading) {
+            HStack(spacing: 8) {
+                if horizontalSizeClass != .regular {
+                    Button(action: { showsConversationList = true }) {
+                        Image(systemName: "list.bullet")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(OpenRockyPalette.muted)
+                    }
+                }
+
+                Button(action: { showsProviderSettings = true }) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(OpenRockyPalette.muted)
+                }
+            }
+        }
+
+        ToolbarItem(placement: .topBarTrailing) {
+            voiceToolbarButton
+        }
+    }
+
+    private var voiceToolbarButton: some View {
+        let tint = showsVoiceOverlay ? Color.red : OpenRockyPalette.accent
+        return Button(action: { toggleVoiceSession() }) {
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [tint, tint.opacity(0.75)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 36, height: 36)
+                    .shadow(color: tint.opacity(0.3), radius: 6, y: 2)
+
+                Image(systemName: showsVoiceOverlay ? "stop.fill" : "waveform")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(.white)
+            }
+        }
+        .buttonStyle(.plain)
     }
 
     /// Hidden buttons that register keyboard shortcuts for iPad external keyboards.
