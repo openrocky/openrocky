@@ -1,12 +1,17 @@
 # OpenRocky
 
+[![Website](https://img.shields.io/badge/Website-openrocky.org-blue)](https://openrocky.org)
+[![TestFlight](https://img.shields.io/badge/TestFlight-Join%20Beta-0D96F6?logo=apple&logoColor=white)](https://testflight.apple.com/join/GZtbEpXN)
+[![Discord](https://img.shields.io/badge/Discord-Join-5865F2?logo=discord&logoColor=white)](https://discord.gg/SvvsaDA4nE)
+[![Telegram](https://img.shields.io/badge/Telegram-@openrocky-26A5E4?logo=telegram&logoColor=white)](https://t.me/openrocky)
+[![License](https://img.shields.io/badge/License-Apache%202.0-yellow)](LICENSE)
+[![Android](https://img.shields.io/badge/Android-Internal%20Testing-green?logo=android&logoColor=white)](https://github.com/openrocky/openrocky_android)
+
 > English | [中文](README_CN.md)
 
-**Rocky** is a voice-first AI Agent app for iPhone. **OpenRocky** is the open-source project behind it.
+**Rocky** is a voice-first AI Agent app for iPhone. Not a chat wrapper. Not a Linux container crammed into a phone. Rocky organizes voice interaction, task execution, system bridging, and result review into a native iPhone agent experience.
 
-Rocky is not a mobile chat wrapper or a Linux container crammed into a phone. It organizes voice interaction, task execution, system bridging, and result review into a native iPhone agent experience.
-
-## Screenshots
+> **Rocky** is the user-facing product name. **OpenRocky** is the open-source project name — like Chrome vs. Chromium.
 
 <p>
 <img src="screenshots/screenshot_ios1.PNG" alt="Screenshot 1" width="200">
@@ -15,18 +20,11 @@ Rocky is not a mobile chat wrapper or a Linux container crammed into a phone. It
 <img src="screenshots/screenshot_ios4.PNG" alt="Screenshot 4" width="200">
 </p>
 
-## Naming Convention
-
-- **Rocky** — the product name, shown on the home screen, Siri, App Store, and all user-facing text
-- **OpenRocky** — the open-source project name, used for the GitHub repo, Xcode project, code prefixes (`OpenRocky*`), and Swift package names
-
-Think of it like Chrome vs. Chromium, or VS Code vs. VS Code OSS.
-
-## Highlights
+## Features
 
 - **Voice-first** — voice is the primary interface, not a chat list
 - **30+ native iOS tools** — contacts, calendar, health, weather, location, reminders, camera, photos, browser, crypto, and more
-- **Multi-provider AI** — supports OpenAI, Anthropic, Gemini, Azure, Groq, xAI, OpenRouter, DeepSeek, Doubao, aiProxy
+- **Multi-provider AI** — OpenAI, Anthropic, Gemini, Azure, Groq, xAI, OpenRouter, DeepSeek, Doubao, aiProxy
 - **Realtime voice** — live voice sessions via OpenAI, Gemini, and Doubao realtime APIs
 - **Custom skills** — built-in skills plus user-importable custom skills
 - **Local execution** — controlled shell and Python runtime on-device via `ios_system`
@@ -38,60 +36,54 @@ Think of it like Chrome vs. Chromium, or VS Code vs. VS Code OSS.
 User Voice → Voice Engine → AI Provider → ROS Runtime → Execution Layer → Results → UI + Voice
 ```
 
-### ROS (Rocky OS) Runtime
+**ROS (Rocky OS) Runtime** is the central execution core:
 
-The central execution core that organizes:
+| Module | Description |
+|--------|-------------|
+| **Sessions** | Conversation and task contexts with state machine management |
+| **Tools** | 30+ iOS native bridge services registered in `OpenRockyToolbox` |
+| **Skills** | Built-in and custom importable skills via `OpenRockySkillStore` |
+| **Voice** | Realtime voice bridges for OpenAI, Gemini, and Doubao |
+| **Characters & Souls** | Personality and voice configuration |
+| **Memory** | Persistent context across sessions |
 
-- **Sessions** — conversation and task contexts with state machine management
-- **Tools** — 30+ iOS native bridge services registered in `OpenRockyToolbox`
-- **Skills** — built-in and custom importable skills via `OpenRockySkillStore`
-- **Voice** — realtime voice bridges for OpenAI, Gemini, and Doubao
-- **Characters & Souls** — personality and voice configuration
-- **Memory** — persistent context across sessions
-
-### Three Execution Layers
+**Three Execution Layers:**
 
 1. **iOS Native Bridge** — Swift code calling system APIs (contacts, calendar, health, etc.)
 2. **AI Tool Layer** — actions dispatched through provider APIs
 3. **Local Execution** — controlled shell/Python in sandbox via `ios_system`
 
-### Provider Architecture
+**Provider Architecture:** Provider → Account → Model (supports 10+ backends)
 
-Three-layer abstraction: **Provider** → **Account** → **Model**. Configured in `OpenRocky/OpenRocky/Providers/`.
+## Getting Started
 
-## Development
+### Try Rocky
 
-See [DEVELOP.md](DEVELOP.md) for build instructions, code style, project structure, and deployment details.
+Download via [TestFlight](https://testflight.apple.com/join/GZtbEpXN) to try the latest beta on your iPhone.
 
-## Website
+### Build from Source
 
-[https://openrocky.org](https://openrocky.org)
+See **[DEVELOP.md](DEVELOP.md)** for requirements, build instructions, project structure, and deployment details.
 
-## Download
+## Related Repositories
 
-- **iOS TestFlight**: [https://testflight.apple.com/join/GZtbEpXN](https://testflight.apple.com/join/GZtbEpXN)
-
-## Open Source
-
-- **iOS**: [https://github.com/openrocky/openrocky](https://github.com/openrocky/openrocky)
-- **Android**: [https://github.com/openrocky/openrocky_android](https://github.com/openrocky/openrocky_android)
+| Platform | Repository |
+|----------|------------|
+| iOS | [openrocky/openrocky](https://github.com/openrocky/openrocky) |
+| Android | [openrocky/openrocky_android](https://github.com/openrocky/openrocky_android) |
 
 ## Community
 
-- **Author X / Twitter**: [@everettjf](https://x.com/everettjf)
-- **Telegram**: [@openrocky](https://t.me/openrocky)
-- **Discord**: [https://discord.gg/SvvsaDA4nE](https://discord.gg/SvvsaDA4nE)
+- **Discord** — [Join server](https://discord.gg/SvvsaDA4nE)
+- **Telegram** — [@openrocky](https://t.me/openrocky)
+- **X / Twitter** — [@everettjf](https://x.com/everettjf)
+- **WeChat** — Scan to follow for updates
 
-## Feedback
+  <img src="wx.png" alt="WeChat" width="150">
 
-- **iOS**: [Submit iOS Feedback](https://github.com/openrocky/openrocky/issues/new)
-- **Android**: [Submit Android Feedback](https://github.com/openrocky/openrocky_android/issues/new)
+## Contributing
 
-## WeChat
-
-Follow our WeChat public account for updates:
-
-<img src="wx.png" alt="WeChat" width="200">
+Found a bug or have a feature request? [Open an issue](https://github.com/openrocky/openrocky/issues/new). See [DEVELOP.md](DEVELOP.md) to set up your development environment.
 
 ## Star History
 
@@ -99,4 +91,4 @@ Follow our WeChat public account for updates:
 
 ## License
 
-See [LICENSE](LICENSE) for details.
+Apache 2.0 — see [LICENSE](LICENSE) for details.
