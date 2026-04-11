@@ -122,6 +122,21 @@ ASC_API_KEY_ID=... ASC_API_ISSUER_ID=... ASC_API_KEY_P8_PATH=... scripts/testfli
 
 使用 Swift Testing 框架（`@Test`、`#expect`）。测试覆盖会话状态机、工具注册、服务商清单、技能存储和角色系统提示词。
 
+## 下载
+
+- **iOS** — 加入 TestFlight 测试: [https://testflight.apple.com/join/GZtbEpXN](https://testflight.apple.com/join/GZtbEpXN)
+- **Android** — 请前往 Android 仓库: [openrocky/openrocky_android](https://github.com/openrocky/openrocky_android)
+
+## 微信公众号
+
+关注微信公众号，获取最新动态：
+
+<img src="wx.png" alt="微信公众号" width="200">
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=openrocky/openrocky&type=Date)](https://star-history.com/#openrocky/openrocky&Date)
+
 ## 许可证
 
 详见 [LICENSE](LICENSE)。

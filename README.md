@@ -122,6 +122,21 @@ This project was developed by [everettjf](https://github.com/everettjf) with the
 
 Uses Swift Testing framework (`@Test`, `#expect`). Tests cover session state machine, tool registration, provider inventory, skill store, and character system prompts.
 
+## Download
+
+- **iOS** — Join the TestFlight beta: [https://testflight.apple.com/join/GZtbEpXN](https://testflight.apple.com/join/GZtbEpXN)
+- **Android** — See the Android repo: [openrocky/openrocky_android](https://github.com/openrocky/openrocky_android)
+
+## WeChat
+
+Follow our WeChat public account for updates:
+
+<img src="wx.png" alt="WeChat" width="200">
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=openrocky/openrocky&type=Date)](https://star-history.com/#openrocky/openrocky&Date)
+
 ## License
 
 See [LICENSE](LICENSE) for details.
