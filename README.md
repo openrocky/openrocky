@@ -6,6 +6,15 @@
 
 Rocky is not a mobile chat wrapper or a Linux container crammed into a phone. It organizes voice interaction, task execution, system bridging, and result review into a native iPhone agent experience.
 
+## Screenshots
+
+<p>
+<img src="screenshots/screenshot_ios1.PNG" alt="Screenshot 1" width="200">
+<img src="screenshots/screenshot_ios2.PNG" alt="Screenshot 2" width="200">
+<img src="screenshots/screenshot_ios3.PNG" alt="Screenshot 3" width="200">
+<img src="screenshots/screenshot_ios4.PNG" alt="Screenshot 4" width="200">
+</p>
+
 ## Naming Convention
 
 - **Rocky** — the product name, shown on the home screen, Siri, App Store, and all user-facing text
@@ -50,77 +59,9 @@ The central execution core that organizes:
 
 Three-layer abstraction: **Provider** → **Account** → **Model**. Configured in `OpenRocky/OpenRocky/Providers/`.
 
-## Project Structure
-
-```
-OpenRocky/                  # iOS app (Xcode project)
-  OpenRocky/OpenRocky/      # App source
-    App/                    # Entry point
-    Features/               # UI screens (Home, Chat, Voice, Settings, Providers)
-    Models/                 # Data models
-    Providers/              # AI provider configuration & clients
-    Runtime/                # ROS runtime core
-      Tools/                # 30+ native bridge services
-      Skills/               # Skill system
-      Voice/                # Realtime voice clients
-    Theme/                  # Visual palette
-  OpenRockyTests/            # Unit tests (Swift Testing)
-  OpenRockyUITests/          # UI tests
-Packages/               # Local Swift packages
-  SwiftOpenAI/          # OpenAI API & Realtime session bridge
-  LanguageModelChatUI/  # UIKit-based chat detail view
-  MarkdownViewLocal/    # Markdown rendering
-  OpenRockyIOSSystem/       # ios_system binary frameworks
-  OpenRockyPython/          # Python runtime on iOS
-scripts/                # Build & deploy scripts
-website/                # Documentation site (Docusaurus)
-```
-
-## Requirements
-
-- Xcode 26+
-- iOS 26.0+ deployment target
-- Swift 6.0 with strict concurrency
-- macOS for building (no iOS Simulator support for `ios_system`)
-
-## Build
-
-```bash
-# Build for device
-xcodebuild build -scheme OpenRocky -project OpenRocky/OpenRocky.xcodeproj -destination 'generic/platform=iOS'
-
-# Run tests (simulator)
-xcodebuild test -scheme OpenRocky -project OpenRocky/OpenRocky.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 16'
-
-# Setup Python runtime (required by OpenRockyPython package)
-scripts/setup_python.sh
-```
-
-## Deploy to TestFlight
-
-```bash
-# Full deploy pipeline
-./scripts/deploy.sh
-
-# Or step by step
-ASC_API_KEY_ID=... ASC_API_ISSUER_ID=... ASC_API_KEY_P8_PATH=... scripts/testflight.sh all
-```
-
 ## Development
 
-This project was developed by [everettjf](https://github.com/everettjf) with the assistance of [Claude Code](https://claude.ai/code) and [Codex](https://openai.com/codex).
-
-### Code Style
-
-- 4-space indentation, opening brace on same line
-- `PascalCase` for types, `camelCase` for properties/methods
-- All app types prefixed with `OpenRocky`
-- SwiftUI + `@Observable` macro, async/await concurrency
-- Early returns, guard statements, composition over inheritance
-
-### Testing
-
-Uses Swift Testing framework (`@Test`, `#expect`). Tests cover session state machine, tool registration, provider inventory, skill store, and character system prompts.
+See [DEVELOP.md](DEVELOP.md) for build instructions, code style, project structure, and deployment details.
 
 ## Website
 
