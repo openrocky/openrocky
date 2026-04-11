@@ -222,20 +222,10 @@ struct ContentView: View {
     @ToolbarContentBuilder
     private var commonToolbarItems: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
-            HStack(spacing: 8) {
-                if horizontalSizeClass != .regular {
-                    Button(action: { showsConversationList = true }) {
-                        Image(systemName: "list.bullet")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(OpenRockyPalette.muted)
-                    }
-                }
-
-                Button(action: { showsProviderSettings = true }) {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(OpenRockyPalette.muted)
-                }
+            Button(action: { showsProviderSettings = true }) {
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(OpenRockyPalette.muted)
             }
         }
 
