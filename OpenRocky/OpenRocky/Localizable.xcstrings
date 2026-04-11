@@ -315,9 +315,6 @@
     "Apple Intelligence is not available on this device." : {
 
     },
-    "Apple Voice (Beta)" : {
-
-    },
     "Avg / Day" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -684,9 +681,6 @@
           }
         }
       }
-    },
-    "Continue with Apple" : {
-
     },
     "Continue with OpenAI" : {
 
@@ -2893,9 +2887,6 @@
           }
         }
       }
-    },
-    "Uses on-device Speech Recognition, Apple Intelligence, and system TTS. No API key required." : {
-
     },
     "v%@ (%@)" : {
       "localizations" : {

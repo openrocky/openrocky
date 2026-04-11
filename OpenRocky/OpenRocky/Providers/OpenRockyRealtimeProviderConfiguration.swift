@@ -41,9 +41,6 @@ struct OpenRockyRealtimeProviderConfiguration: Equatable {
     }
 
     nonisolated var isConfigured: Bool {
-        if provider == .apple {
-            return modelID.isEmpty == false
-        }
         return credential?.isEmpty == false && modelID.isEmpty == false
     }
 

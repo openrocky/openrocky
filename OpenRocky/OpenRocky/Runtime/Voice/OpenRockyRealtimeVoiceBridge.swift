@@ -203,8 +203,6 @@ final class OpenRockyRealtimeVoiceBridge {
         soulInstructions: String
     ) throws -> any OpenRockyRealtimeVoiceClient {
         switch configuration.provider {
-        case .apple:
-            return OpenRockyAppleRealtimeVoiceClient(soulInstructions: soulInstructions)
         case .openAI:
             let chatConfiguration = OpenRockyProviderConfiguration(
                 provider: .openAI,

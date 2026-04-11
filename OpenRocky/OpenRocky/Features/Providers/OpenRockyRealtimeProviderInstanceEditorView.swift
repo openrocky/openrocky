@@ -29,7 +29,6 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
     @State private var previousProvider: OpenRockyRealtimeProviderKind = .openAI
     @State private var testState: VoiceTestConnectionState = .idle
     @State private var nameManuallyEdited: Bool = false
-    @State private var appleModelReady: Bool = false
     @StateObject private var voicePreview = OpenRockyDoubaoVoicePreview()
 
     private var isNew: Bool { editingInstanceID == nil }
@@ -62,28 +61,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 Text("Voice Provider")
             }
 
-            if selectedProvider == .apple {
-                Section {
-                    HStack(spacing: 10) {
-                        if appleModelReady {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundStyle(OpenRockyPalette.success)
-                            Text("Apple Intelligence is available on this device.")
-                                .foregroundStyle(OpenRockyPalette.success)
-                        } else {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundStyle(.red)
-                            Text("Apple Intelligence is not available on this device.")
-                                .foregroundStyle(.red)
-                        }
-                    }
-                    .font(.system(size: 14, weight: .semibold))
-                } header: {
-                    Text("Device Support")
-                } footer: {
-                    Text("Uses on-device Speech Recognition, Apple Intelligence, and system TTS. No API key required.")
-                }
-            } else if selectedProvider == .gemini {
+            if selectedProvider == .gemini {
                 Section {
                     SecureField(
                         "API Key",
@@ -238,8 +216,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 }
             }
 
-            if selectedProvider != .apple {
-                Section {
+            Section {
                     TextField("wss://your-proxy.example.com", text: $customHost)
                         .textInputAutocapitalization(.never)
                         .keyboardType(.URL)
@@ -249,7 +226,6 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 } footer: {
                     Text("Optional. Override the default WebSocket host for this voice provider.")
                 }
-            }
 
             Section {
                 Button {
@@ -315,7 +291,6 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
         .navigationTitle(isNew ? "Add Voice Provider" : "Edit Voice Provider")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { loadExisting() }
-        .task { appleModelReady = OpenRockyAppleFoundationModelsChatClient.checkModelReady() }
         .onChange(of: selectedProvider) { _, newValue in
             if !nameManuallyEdited {
                 name = newValue.displayName
@@ -392,26 +367,11 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
             customHost: customHost
         ).normalized()
 
-        if config.provider == .apple {
-            // Apple voice is on-device — just check availability
-            if OpenRockyAppleFoundationModelsChatClient.checkModelReady() {
-                rlog.info("Apple voice test passed", category: "Test")
-                testState = .success(detail: "Apple Intelligence available")
-            } else {
-                rlog.warning("Apple voice test: not available", category: "Test")
-                testState = .failure(message: "Apple Intelligence is not available on this device.")
-            }
-            return
-        }
-
         Task {
             do {
                 let url: URL
                 let testModelID: String
                 switch config.provider {
-                case .apple:
-                    // Handled above
-                    return
                 case .openAI:
                     testModelID = "gpt-realtime-mini"
                     let openAIHost = config.customHost ?? "wss://api.openai.com"
@@ -544,8 +504,6 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
             } catch {
                 rlog.error("Realtime test error: \(error.localizedDescription)", category: "Test")
                 switch config.provider {
-                case .apple:
-                    break
                 case .doubao:
                     let nsError = error as NSError
                     testState = .failure(message: "WebSocket handshake failed (\(nsError.code)). Check APP ID and Access Token.")
@@ -562,8 +520,6 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
     private func probeEndpointError(config: OpenRockyRealtimeProviderConfiguration) async -> String {
         let httpURL: URL
         switch config.provider {
-        case .apple:
-            return "Apple voice is on-device and does not use a network endpoint."
         case .openAI:
             let host = config.customHost?.replacingOccurrences(of: "wss://", with: "https://") ?? "https://api.openai.com"
             httpURL = URL(string: "\(host)/v1/realtime?model=gpt-realtime-mini")!

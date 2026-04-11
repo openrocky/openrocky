@@ -324,6 +324,15 @@ final class OpenRockyCharacterStore: ObservableObject {
     When the user asks to open a website, call someone, or navigate somewhere, use open-url with the appropriate URL scheme.
     When the user asks for nearby places (restaurants, gas stations, cafes, etc.), use nearby-search. Combine with apple-location first if no coordinates are provided.
     When the user asks about a contact's phone number, email, or details, use apple-contacts-search.
+
+    Data visualization:
+    When showing trends, comparisons, or numeric data, render a chart using a fenced code block with language tag "chart" and JSON content. Supported chart types: bar, line, pie, area.
+    Format:
+    ```chart
+    {"type": "line", "title": "Chart Title", "data": [{"label": "Jan", "value": 10}, {"label": "Feb", "value": 15}]}
+    ```
+    Use "line" for trends over time, "bar" for comparisons, "pie" for proportions, "area" for cumulative trends.
+    Always use chart visualization when the data has 3+ numeric data points and the user asks to see a trend, comparison, or summary.
     """
 
     static let rockyPersonality = """

@@ -37,12 +37,7 @@ struct OpenRockyOnboardingView: View {
     }
 
     private enum OnboardingProvider {
-        case apple
         case openAI
-    }
-
-    private var appleIntelligenceAvailable: Bool {
-        OpenRockyAppleFoundationModelsChatClient.isAvailable
     }
 
     var body: some View {
@@ -209,17 +204,6 @@ struct OpenRockyOnboardingView: View {
                     badgeColor: OpenRockyPalette.accent
                 )
 
-                // Apple Intelligence option — only when available
-                if appleIntelligenceAvailable {
-                    providerOptionCard(
-                        provider: .apple,
-                        icon: "apple.logo",
-                        title: "Apple Intelligence",
-                        subtitle: "On-device, no API key. Privacy-first.",
-                        badge: "Free",
-                        badgeColor: OpenRockyPalette.success
-                    )
-                }
             }
             .padding(.horizontal, 30)
 
@@ -228,17 +212,13 @@ struct OpenRockyOnboardingView: View {
             VStack(spacing: 12) {
                 Button {
                     withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
-                        if selectedProvider == .apple {
-                            submitAppleProvider()
-                        } else {
-                            step = .apiKey
-                        }
+                        step = .apiKey
                     }
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "arrow.right")
                             .font(.system(size: 14, weight: .bold))
-                        Text(selectedProvider == .apple ? "Continue with Apple" : "Continue with OpenAI")
+                        Text("Continue with OpenAI")
                             .font(.system(size: 17, weight: .bold, design: .rounded))
                     }
                     .foregroundStyle(.white)
@@ -505,35 +485,10 @@ struct OpenRockyOnboardingView: View {
     }
 
     private var doneSubtitle: String {
-        switch selectedProvider {
-        case .apple:
-            "Chat and voice are ready with Apple Intelligence.\nExplore more providers in Settings anytime."
-        case .openAI:
-            "Chat and voice are ready.\nExplore more providers and settings anytime."
-        }
+        "Chat and voice are ready.\nExplore more providers and settings anytime."
     }
 
     // MARK: - Submit Helpers
-
-    private func submitAppleProvider() {
-        // Set up chat provider (Apple Foundation Models)
-        let chatConfig = OpenRockyProviderConfiguration(
-            provider: .appleFoundationModels,
-            modelID: OpenRockyProviderKind.appleFoundationModels.defaultModel
-        )
-        providerStore.update(configuration: chatConfig)
-
-        // Set up voice provider (Apple native voice)
-        let voiceConfig = OpenRockyRealtimeProviderConfiguration(
-            provider: .apple,
-            modelID: OpenRockyRealtimeProviderKind.apple.defaultModel
-        )
-        realtimeProviderStore.update(configuration: voiceConfig)
-
-        withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
-            step = .done
-        }
-    }
 
     private func submitOpenAIKey() {
         let key = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
