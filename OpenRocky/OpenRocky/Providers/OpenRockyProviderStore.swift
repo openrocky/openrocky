@@ -44,8 +44,15 @@ final class OpenRockyProviderStore: ObservableObject {
         guard let instance = activeInstance else {
             return OpenRockyProviderConfiguration(provider: .openAI, modelID: OpenRockyProviderKind.openAI.defaultModel)
         }
-        let cred = keychain.value(for: instance.credentialKeychainKey)
-        return instance.toConfiguration(credential: cred).normalized()
+        let manualCredential = keychain.value(for: instance.credentialKeychainKey)
+        let oauthCredential = openAIOAuthCredential(for: instance)
+        let resolvedCredential: String?
+        if instance.kind == .openAI, (manualCredential?.isEmpty ?? true), let oauthCredential {
+            resolvedCredential = oauthCredential.accessToken
+        } else {
+            resolvedCredential = manualCredential
+        }
+        return instance.toConfiguration(credential: resolvedCredential).normalized()
     }
 
     var status: ProviderStatus {
@@ -87,6 +94,7 @@ final class OpenRockyProviderStore: ObservableObject {
         guard let instance = instances.first(where: { $0.id == id }) else { return }
         instances.removeAll { $0.id == id }
         keychain.removeValue(for: instance.credentialKeychainKey)
+        keychain.removeValue(for: openAIOAuthKeychainKey(for: id))
         try? fileManager.removeItem(at: instanceURL(for: id))
         if activeInstanceID == id {
             activeInstanceID = instances.first?.id
@@ -102,6 +110,28 @@ final class OpenRockyProviderStore: ObservableObject {
 
     func credential(for instance: OpenRockyProviderInstance) -> String? {
         keychain.value(for: instance.credentialKeychainKey)
+    }
+
+    func openAIOAuthCredential(for instance: OpenRockyProviderInstance) -> OpenRockyOpenAIOAuthCredential? {
+        guard let json = keychain.value(for: openAIOAuthKeychainKey(for: instance.id)),
+              let data = json.data(using: .utf8),
+              let credential = try? JSONDecoder().decode(OpenRockyOpenAIOAuthCredential.self, from: data) else {
+            return nil
+        }
+        return credential
+    }
+
+    func setOpenAIOAuthCredential(_ credential: OpenRockyOpenAIOAuthCredential?, for instanceID: String) {
+        let key = openAIOAuthKeychainKey(for: instanceID)
+        guard let credential else {
+            keychain.removeValue(for: key)
+            return
+        }
+        guard let data = try? JSONEncoder().encode(credential),
+              let json = String(data: data, encoding: .utf8) else {
+            return
+        }
+        keychain.set(json, for: key)
     }
 
     // MARK: - Legacy compatibility
@@ -143,6 +173,10 @@ final class OpenRockyProviderStore: ObservableObject {
 
     private func instanceURL(for id: String) -> URL {
         baseDirectory.appendingPathComponent("\(id).json")
+    }
+
+    private func openAIOAuthKeychainKey(for instanceID: String) -> String {
+        "rocky.provider-instance.\(instanceID).openai-oauth"
     }
 
     private func saveInstance(_ instance: OpenRockyProviderInstance) {
