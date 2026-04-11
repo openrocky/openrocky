@@ -17,6 +17,7 @@ struct OpenRockyRealtimeProviderConfiguration: Equatable {
     var doubaoAppId: String? = nil
     var doubaoAppKey: String? = nil
     var doubaoSpeaker: String? = nil
+    var doubaoDirectMode: Bool? = nil
     var openaiVoice: String? = nil
     var geminiVoice: String? = nil
     var glmVoice: String? = nil
@@ -35,6 +36,7 @@ struct OpenRockyRealtimeProviderConfiguration: Equatable {
         parts.append(openaiVoice ?? "-")
         parts.append(geminiVoice ?? "-")
         parts.append(glmVoice ?? "-")
+        parts.append(doubaoDirectMode == true ? "direct" : "cascaded")
         parts.append(customHost ?? "-")
         parts.append(characterName ?? "-")
         parts.append(characterSpeakingStyle ?? "-")
@@ -60,6 +62,7 @@ struct OpenRockyRealtimeProviderConfiguration: Equatable {
             doubaoAppId: doubaoAppId?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             doubaoAppKey: doubaoAppKey?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             doubaoSpeaker: doubaoSpeaker?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
+            doubaoDirectMode: doubaoDirectMode,
             openaiVoice: openaiVoice?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             geminiVoice: geminiVoice?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
             glmVoice: glmVoice?.trimmingCharacters(in: .whitespacesAndNewlines).nilIfEmpty,
