@@ -28,23 +28,23 @@ struct OpenRockyChatExperienceScreen: View {
 
     var body: some View {
         ZStack {
-            OpenRockyChatViewControllerRepresentable(
-                transcript: transcript,
-                bootstrap: bootstrap,
-                providerConfiguration: providerConfiguration,
-                skillStore: skillStore,
-                contentTopInset: contentTopInset,
-                conversationID: conversationID,
-                isVoiceActive: isVoiceActive,
-                voiceStatusText: voiceStatusText,
-                onVoiceToggle: onVoiceToggle,
-                onVoiceStop: onVoiceStop,
-                onConversationListTap: onConversationListTap
-            )
-            .id(providerConfiguration.identity + conversationID + refreshToken.uuidString)
-            .ignoresSafeArea()
-
-            if !providerConfiguration.isConfigured {
+            if providerConfiguration.isConfigured {
+                OpenRockyChatViewControllerRepresentable(
+                    transcript: transcript,
+                    bootstrap: bootstrap,
+                    providerConfiguration: providerConfiguration,
+                    skillStore: skillStore,
+                    contentTopInset: contentTopInset,
+                    conversationID: conversationID,
+                    isVoiceActive: isVoiceActive,
+                    voiceStatusText: voiceStatusText,
+                    onVoiceToggle: onVoiceToggle,
+                    onVoiceStop: onVoiceStop,
+                    onConversationListTap: onConversationListTap
+                )
+                .id(providerConfiguration.identity + conversationID + refreshToken.uuidString)
+                .ignoresSafeArea()
+            } else {
                 connectProviderButton
                     .transition(.opacity)
             }
