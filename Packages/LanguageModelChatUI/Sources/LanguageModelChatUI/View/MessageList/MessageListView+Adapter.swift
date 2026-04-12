@@ -200,6 +200,7 @@ extension MessageListView: ListViewAdapter {
                 toolHintView.toolIcon = toolCall.toolIcon
                 toolHintView.text = toolCall.parameters
                 toolHintView.result = toolCall.result
+                toolHintView.duration = toolCall.duration
                 toolHintView.state = toolCall.state
                 toolHintView.clickHandler = { [weak self] in
                     self?.onToolCallTap?(toolCall)

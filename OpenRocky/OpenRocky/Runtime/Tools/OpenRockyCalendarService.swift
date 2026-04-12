@@ -61,17 +61,12 @@ final class OpenRockyCalendarService {
     func createEvent(title: String, startDate: String, endDate: String?, allDay: Bool, location: String?, notes: String?) async throws -> [String: String] {
         try await requestAccess()
 
-        let iso = ISO8601DateFormatter()
-        iso.formatOptions = [.withInternetDateTime]
-        let isoFrac = ISO8601DateFormatter()
-        isoFrac.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-
-        guard let start = isoFrac.date(from: startDate) ?? iso.date(from: startDate) else {
+        guard let start = Self.parseDate(startDate) else {
             throw OpenRockyCalendarError.invalidDate
         }
 
         let end: Date
-        if let endDate, let d = isoFrac.date(from: endDate) ?? iso.date(from: endDate) {
+        if let endDate, let d = Self.parseDate(endDate) {
             end = d
         } else {
             end = start.addingTimeInterval(3600)
@@ -88,13 +83,42 @@ final class OpenRockyCalendarService {
 
         try store.save(event, span: .thisEvent)
 
+        let outFormatter = ISO8601DateFormatter()
+        outFormatter.formatOptions = [.withInternetDateTime]
         return [
             "created": "true",
             "title": title,
-            "start": iso.string(from: start),
-            "end": iso.string(from: end),
+            "start": outFormatter.string(from: start),
+            "end": outFormatter.string(from: end),
             "eventIdentifier": event.eventIdentifier ?? ""
         ]
+    }
+
+    /// Parse dates flexibly: ISO-8601 with timezone, without timezone, or date-only.
+    nonisolated static func parseDate(_ string: String) -> Date? {
+        let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // ISO-8601 with fractional seconds
+        let isoFrac = ISO8601DateFormatter()
+        isoFrac.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let d = isoFrac.date(from: trimmed) { return d }
+
+        // ISO-8601 standard
+        let iso = ISO8601DateFormatter()
+        iso.formatOptions = [.withInternetDateTime]
+        if let d = iso.date(from: trimmed) { return d }
+
+        // Without timezone (e.g. "2026-09-26T09:00:00") — treat as local time
+        let local = DateFormatter()
+        local.locale = Locale(identifier: "en_US_POSIX")
+        local.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        if let d = local.date(from: trimmed) { return d }
+
+        // Date-only (e.g. "2026-09-26")
+        local.dateFormat = "yyyy-MM-dd"
+        if let d = local.date(from: trimmed) { return d }
+
+        return nil
     }
 }
 

@@ -13,6 +13,7 @@ final class ToolCallDetailViewController: UIViewController {
         let parameters: String
         let result: String?
         let state: ToolCallState
+        let duration: TimeInterval
     }
 
     private let content: Content
@@ -154,11 +155,27 @@ final class ToolCallDetailViewController: UIViewController {
         badge.clipsToBounds = true
 
         container.addSubview(badge)
+
+        let durationLabel = UILabel()
+        durationLabel.translatesAutoresizingMaskIntoConstraints = false
+        durationLabel.font = .preferredFont(forTextStyle: .caption1)
+        durationLabel.textColor = .secondaryLabel
+        if content.duration > 0 {
+            if content.duration < 1 {
+                durationLabel.text = String(format: "%.0f ms", content.duration * 1000)
+            } else {
+                durationLabel.text = String(format: "%.1f s", content.duration)
+            }
+        }
+        container.addSubview(durationLabel)
+
         NSLayoutConstraint.activate([
             badge.topAnchor.constraint(equalTo: container.topAnchor),
             badge.leadingAnchor.constraint(equalTo: container.leadingAnchor),
             badge.bottomAnchor.constraint(equalTo: container.bottomAnchor),
             badge.heightAnchor.constraint(equalToConstant: 24),
+            durationLabel.centerYAnchor.constraint(equalTo: badge.centerYAnchor),
+            durationLabel.leadingAnchor.constraint(equalTo: badge.trailingAnchor, constant: 8),
         ])
         return container
     }

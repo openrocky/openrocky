@@ -24,6 +24,8 @@ final class ToolHintView: MessageListRowView {
         }
     }
 
+    var duration: TimeInterval = 0
+
     var clickHandler: (() -> Void)?
 
     private let backgroundGradientLayer = CAGradientLayer()
@@ -212,12 +214,16 @@ final class ToolHintView: MessageListRowView {
                 detailLabel.isHidden = false
             }
         case .succeeded, .failed:
+            let durationText = duration > 0 ? formattedDuration(duration) : nil
             // Prefer a human-readable summary from parameters, fall back to result summary
             if let summary = parametersSummary() {
-                detailLabel.text = summary
+                detailLabel.text = [summary, durationText].compactMap { $0 }.joined(separator: " · ")
                 detailLabel.isHidden = false
             } else if let result, !result.isEmpty {
-                detailLabel.text = resultSummary(result)
+                detailLabel.text = [resultSummary(result), durationText].compactMap { $0 }.joined(separator: " · ")
+                detailLabel.isHidden = false
+            } else if let durationText {
+                detailLabel.text = durationText
                 detailLabel.isHidden = false
             } else {
                 detailLabel.isHidden = true
@@ -275,6 +281,14 @@ final class ToolHintView: MessageListRowView {
             return "\(k): \(s)"
         }.joined(separator: ", ")
         return pairs.isEmpty ? nil : String(pairs.prefix(80))
+    }
+
+    private func formattedDuration(_ seconds: TimeInterval) -> String {
+        if seconds < 1 {
+            return String(format: "%.0fms", seconds * 1000)
+        } else {
+            return String(format: "%.1fs", seconds)
+        }
     }
 
     func invalidateLayout() {

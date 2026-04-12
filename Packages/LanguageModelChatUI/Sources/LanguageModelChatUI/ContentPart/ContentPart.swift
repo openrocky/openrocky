@@ -143,6 +143,7 @@ public struct ToolCallContentPart: Identifiable, Sendable {
     public var parameters: String
     public var state: ToolCallState
     public var result: String?
+    public var duration: TimeInterval
 
     public init(
         id: String = UUID().uuidString,
@@ -151,7 +152,8 @@ public struct ToolCallContentPart: Identifiable, Sendable {
         toolIcon: String? = nil,
         parameters: String = "{}",
         state: ToolCallState = .running,
-        result: String? = nil
+        result: String? = nil,
+        duration: TimeInterval = 0
     ) {
         self.id = id
         self.toolName = toolName
@@ -160,6 +162,7 @@ public struct ToolCallContentPart: Identifiable, Sendable {
         self.parameters = parameters
         self.state = state
         self.result = result
+        self.duration = duration
     }
 }
 

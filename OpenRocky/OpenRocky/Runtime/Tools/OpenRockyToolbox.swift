@@ -437,15 +437,15 @@ final class OpenRockyToolbox {
             .function(
                 .init(
                     name: "apple-calendar-create",
-                    description: "Create a new calendar event. Provide title, start time (ISO-8601), optional end time, location, and notes.",
+                    description: "Create a new calendar event. Use field names exactly: title, start_date, end_date, location, notes, all_day. Date format must be ISO-8601 with timezone, e.g. 2026-04-12T09:00:00+08:00. Call this tool ONCE per event — do NOT batch multiple events in one call.",
                     parameters: [
                         "type": "object",
                         "properties": [
                             "title": ["type": "string", "description": "Event title."],
-                            "start_date": ["type": "string", "description": "Start datetime in ISO-8601 format."],
-                            "end_date": ["type": "string", "description": "Optional end datetime in ISO-8601 format. Defaults to 1 hour after start."],
-                            "all_day": ["type": "boolean", "description": "Whether this is an all-day event."],
-                            "location": ["type": "string", "description": "Optional event location."],
+                            "start_date": ["type": "string", "description": "Start datetime in ISO-8601 format with timezone offset, e.g. 2026-04-12T09:00:00+08:00 or 2026-04-12T09:00:00Z."],
+                            "end_date": ["type": "string", "description": "End datetime in ISO-8601 format with timezone offset. Defaults to 1 hour after start if omitted."],
+                            "all_day": ["type": "boolean", "description": "Whether this is an all-day event. Defaults to false."],
+                            "location": ["type": "string", "description": "Event location (NOT 'address')."],
                             "notes": ["type": "string", "description": "Optional notes."]
                         ],
                         "required": ["title", "start_date"]
@@ -900,15 +900,15 @@ final class OpenRockyToolbox {
             .init(function: .init(
                 name: "apple-calendar-create",
                 strict: nil,
-                description: "Create a new calendar event.",
+                description: "Create a new calendar event. Call once per event. Use exact field names: title, start_date, end_date, location.",
                 parameters: .init(
                     type: .object,
                     properties: [
                         "title": .init(type: .string, description: "Event title."),
-                        "start_date": .init(type: .string, description: "Start datetime ISO-8601."),
-                        "end_date": .init(type: .string, description: "End datetime ISO-8601 (optional)."),
+                        "start_date": .init(type: .string, description: "Start datetime ISO-8601 with timezone, e.g. 2026-04-12T09:00:00+08:00."),
+                        "end_date": .init(type: .string, description: "End datetime ISO-8601 with timezone (optional). Defaults to 1h after start."),
                         "all_day": .init(type: .boolean, description: "All-day event flag."),
-                        "location": .init(type: .string, description: "Event location."),
+                        "location": .init(type: .string, description: "Event location (use this field, not 'address')."),
                         "notes": .init(type: .string, description: "Event notes.")
                     ],
                     required: ["title", "start_date"]
@@ -2056,6 +2056,24 @@ private struct CalendarCreateRequest: Decodable {
         case endDate = "end_date"
         case allDay = "all_day"
         case location, notes
+        // Common model aliases
+        case start, end, address
+        case allDayAlt = "allDay"
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        title = try c.decode(String.self, forKey: .title)
+        startDate = try (c.decodeIfPresent(String.self, forKey: .startDate)
+            ?? c.decodeIfPresent(String.self, forKey: .start))
+            ?? { throw DecodingError.keyNotFound(CodingKeys.startDate, .init(codingPath: [], debugDescription: "Missing start_date or start")) }()
+        endDate = try c.decodeIfPresent(String.self, forKey: .endDate)
+            ?? c.decodeIfPresent(String.self, forKey: .end)
+        allDay = try c.decodeIfPresent(Bool.self, forKey: .allDay)
+            ?? c.decodeIfPresent(Bool.self, forKey: .allDayAlt)
+        location = try c.decodeIfPresent(String.self, forKey: .location)
+            ?? c.decodeIfPresent(String.self, forKey: .address)
+        notes = try c.decodeIfPresent(String.self, forKey: .notes)
     }
 }
 

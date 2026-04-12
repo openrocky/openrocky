@@ -78,6 +78,7 @@ struct OpenRockyChatExperienceScreen: View {
             .buttonStyle(.plain)
         }
         .padding(32)
+        .background(OpenRockyPalette.card, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 }
 

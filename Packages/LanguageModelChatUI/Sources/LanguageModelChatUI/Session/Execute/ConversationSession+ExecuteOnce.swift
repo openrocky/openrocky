@@ -211,20 +211,22 @@ extension ConversationSession {
         await requestUpdate(view: messageListView)
 
         let toolResponseLimit = 64 * 1024
-        var orderedToolResponses = [(text: String, isError: Bool)?](
+        var orderedToolResponses = [(text: String, isError: Bool, elapsed: TimeInterval)?](
             repeating: nil,
             count: toolCallEntries.count
         )
 
-        await withTaskGroup(of: (Int, String, Bool).self) { group in
+        await withTaskGroup(of: (Int, String, Bool, TimeInterval).self) { group in
             for (index, entry) in toolCallEntries.enumerated() {
                 group.addTask { [toolProvider] in
+                    let startTime = CFAbsoluteTimeGetCurrent()
                     do {
                         let result = try await toolProvider.executeTool(
                             entry.tool,
                             parameters: entry.request.arguments,
                             anchor: messageListView
                         )
+                        let elapsed = CFAbsoluteTimeGetCurrent() - startTime
                         var text = result.output
                         if text.count > toolResponseLimit {
                             text = "\(String(text.prefix(toolResponseLimit)))...\n\(String.localized("Output truncated."))"
@@ -232,16 +234,18 @@ extension ConversationSession {
                         return (
                             index,
                             text.isEmpty ? String.localized("Tool executed successfully with no output") : text,
-                            result.isError
+                            result.isError,
+                            elapsed
                         )
                     } catch {
-                        return (index, String.localized("Tool execution failed: \(error.localizedDescription)"), true)
+                        let elapsed = CFAbsoluteTimeGetCurrent() - startTime
+                        return (index, String.localized("Tool execution failed: \(error.localizedDescription)"), true, elapsed)
                     }
                 }
             }
 
-            for await (index, responseText, isError) in group {
-                orderedToolResponses[index] = (responseText, isError)
+            for await (index, responseText, isError, elapsed) in group {
+                orderedToolResponses[index] = (responseText, isError, elapsed)
             }
         }
 
@@ -252,6 +256,7 @@ extension ConversationSession {
                 if case var .toolCall(tc) = part {
                     tc.state = response.isError ? .failed : .succeeded
                     tc.result = response.text
+                    tc.duration = response.elapsed
                     entry.hintMessage.parts[partIndex] = .toolCall(tc)
                     break
                 }

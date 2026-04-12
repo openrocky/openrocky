@@ -517,7 +517,8 @@ extension ChatViewController {
             toolIcon: toolCall.toolIcon,
             parameters: toolCall.parameters,
             result: toolCall.result,
-            state: toolCall.state
+            state: toolCall.state,
+            duration: toolCall.duration
         ))
         let nav = UINavigationController(rootViewController: detailVC)
         nav.modalPresentationStyle = .pageSheet
