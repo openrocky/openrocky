@@ -151,17 +151,53 @@ final class OpenRockyGLMRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
         try await sendJSON(createResponse)
     }
 
+    private var audioChunkCount = 0
+
     func sendAudioChunk(base64Audio: String) async throws {
         guard socket != nil, isReady else { return }
 
-        // GLM expects WAV audio in input_audio_buffer.append
-        // The incoming audio is PCM16 24kHz from the mic; we need to send it as-is
-        // (GLM also accepts raw PCM in practice)
+        // Decode raw PCM16 and wrap as WAV (GLM expects WAV format with header)
+        guard let pcmData = Data(base64Encoded: base64Audio) else { return }
+        let wavData = Self.wrapPCM16AsWAV(pcmData, sampleRate: 24000)
+        let wavBase64 = wavData.base64EncodedString()
+
         let message: [String: Any] = [
             "type": "input_audio_buffer.append",
-            "audio": base64Audio
+            "audio": wavBase64
         ]
         try await sendJSON(message)
+
+        audioChunkCount += 1
+        if audioChunkCount == 1 {
+            rlog.info("GLM: first audio chunk sent, pcm=\(pcmData.count)bytes wav=\(wavData.count)bytes", category: "Voice")
+        }
+    }
+
+    /// Wrap raw PCM16 mono data in a minimal WAV header.
+    private static func wrapPCM16AsWAV(_ pcmData: Data, sampleRate: Int32) -> Data {
+        let channels: Int16 = 1
+        let bitsPerSample: Int16 = 16
+        let byteRate = sampleRate * Int32(channels) * Int32(bitsPerSample / 8)
+        let blockAlign = channels * (bitsPerSample / 8)
+        let dataSize = Int32(pcmData.count)
+        let chunkSize = 36 + dataSize
+
+        var header = Data(capacity: 44 + pcmData.count)
+        header.append(contentsOf: "RIFF".utf8)
+        header.append(contentsOf: withUnsafeBytes(of: chunkSize.littleEndian) { Array($0) })
+        header.append(contentsOf: "WAVE".utf8)
+        header.append(contentsOf: "fmt ".utf8)
+        header.append(contentsOf: withUnsafeBytes(of: Int32(16).littleEndian) { Array($0) })
+        header.append(contentsOf: withUnsafeBytes(of: Int16(1).littleEndian) { Array($0) }) // PCM
+        header.append(contentsOf: withUnsafeBytes(of: channels.littleEndian) { Array($0) })
+        header.append(contentsOf: withUnsafeBytes(of: sampleRate.littleEndian) { Array($0) })
+        header.append(contentsOf: withUnsafeBytes(of: byteRate.littleEndian) { Array($0) })
+        header.append(contentsOf: withUnsafeBytes(of: blockAlign.littleEndian) { Array($0) })
+        header.append(contentsOf: withUnsafeBytes(of: bitsPerSample.littleEndian) { Array($0) })
+        header.append(contentsOf: "data".utf8)
+        header.append(contentsOf: withUnsafeBytes(of: dataSize.littleEndian) { Array($0) })
+        header.append(pcmData)
+        return header
     }
 
     func finishAudioInput() async throws {
@@ -224,7 +260,7 @@ Voice-specific rules:
         var sessionConfig: [String: Any] = [
             "modalities": ["audio", "text"],
             "voice": voice,
-            "input_audio_format": "pcm",
+            "input_audio_format": "wav",
             "output_audio_format": "pcm",
             "instructions": instructions,
             "turn_detection": [
@@ -299,10 +335,12 @@ Voice-specific rules:
             }
 
         case "input_audio_buffer.speech_started":
+            rlog.info("GLM: speech_started detected by server VAD", category: "Voice")
             emit(.inputSpeechStarted)
             emit(.status("Listening..."))
 
         case "input_audio_buffer.speech_stopped":
+            rlog.info("GLM: speech_stopped detected by server VAD", category: "Voice")
             emit(.status("Processing..."))
 
         case "conversation.item.input_audio_transcription.completed":
@@ -350,7 +388,7 @@ Voice-specific rules:
             break
 
         default:
-            rlog.debug("GLM unhandled event: \(eventType)", category: "Voice")
+            rlog.info("GLM event: \(eventType)", category: "Voice")
         }
     }
 
