@@ -13,17 +13,10 @@ import UIKit
 final class OpenRockyAppLifecycleService {
     static let shared = OpenRockyAppLifecycleService()
 
-    func exitApp(afterDelay delay: TimeInterval = 1.5) {
+    func exitApp(afterDelay delay: TimeInterval = 1.0) {
         Task { @MainActor in
             try? await Task.sleep(for: .seconds(delay))
-            // Suspend the app to background by performing the home-button selector.
-            // UIApplication responds to the private `suspend` selector which sends the app
-            // to the background, equivalent to pressing the Home button.
-            let app = UIApplication.shared
-            let selector = NSSelectorFromString("suspend")
-            if app.responds(to: selector) {
-                app.perform(selector)
-            }
+            exit(0)
         }
     }
 }

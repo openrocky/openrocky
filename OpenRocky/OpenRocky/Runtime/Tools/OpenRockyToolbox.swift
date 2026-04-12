@@ -1640,8 +1640,14 @@ final class OpenRockyToolbox {
 
     private func executeAppExit(arguments: String) async throws -> String {
         let request = try decode(AppExitRequest.self, from: arguments)
-        OpenRockyAppLifecycleService.shared.exitApp()
-        return try encode(["status": "exiting", "message": request.farewell_message] as [String: Any])
+        let trimmed = request.farewell_message.trimmingCharacters(in: .whitespacesAndNewlines)
+        let message = trimmed.isEmpty ? "OpenRocky is about to exit." : trimmed
+        OpenRockyAppLifecycleService.shared.exitApp(afterDelay: 1.0)
+        return try encode([
+            "status": "exiting",
+            "message": message,
+            "delay_seconds": 1
+        ] as [String: Any])
     }
 
     // MARK: - Email
