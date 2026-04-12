@@ -353,9 +353,12 @@ Voice-specific rules:
             ] as [String: Any]
         ]
 
-        if !tools.isEmpty {
-            sessionConfig["tools"] = tools
-        }
+        // TODO: Re-enable tools once GLM null-parameter validation is resolved
+        // GLM returns 422 for tools with null properties/required even after sanitization.
+        // For now, skip tools to allow basic voice to work.
+        // if !tools.isEmpty {
+        //     sessionConfig["tools"] = tools
+        // }
 
         let message: [String: Any] = [
             "type": "session.update",
