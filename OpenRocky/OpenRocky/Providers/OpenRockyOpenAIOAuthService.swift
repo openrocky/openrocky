@@ -34,9 +34,9 @@ enum OpenRockyOpenAIOAuthService {
     private static let clientID = "app_EMoamEEZ73f0CkXaXp7hrann"
     private static let authorizeURL = "https://auth.openai.com/oauth/authorize"
     private static let tokenURL = "https://auth.openai.com/oauth/token"
-    private static let redirectURI = "http://127.0.0.1:1455/auth/callback"
+    private static let redirectURI = "http://localhost:1455/auth/callback"
     private static let callbackPort: UInt16 = 1455
-    private static let scope = "openid profile email offline_access"
+    private static let scope = "openid profile email offline_access api.connectors.read api.connectors.invoke"
     nonisolated private static let jwtAuthClaimPath = "https://api.openai.com/auth"
 
     static func signIn(originator: String = "openrocky") async throws -> OpenRockyOpenAIOAuthCredential {
