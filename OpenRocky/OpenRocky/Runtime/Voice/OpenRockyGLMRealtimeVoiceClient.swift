@@ -490,22 +490,18 @@ Voice-specific rules:
             switch tool {
             case .function(let fn):
                 var params = convertJSONValueDict(fn.parameters)
-                // GLM requires properties to be a dict and required to be a list, never null
-                if params["properties"] == nil || params["properties"] is NSNull {
-                    params["properties"] = [String: Any]()
-                }
-                if params["required"] == nil || params["required"] is NSNull {
-                    params["required"] = [String]()
-                }
+                // GLM strictly requires: properties must be dict, required must be list, never null
+                params = Self.sanitizeForGLM(params)
 
-                // GLM expects OpenAI nested format: {type: "function", function: {name, description, parameters}}
                 var funcDef: [String: Any] = [
                     "name": fn.name,
-                    "description": fn.description
+                    "description": fn.description,
+                    "parameters": params.isEmpty ? [
+                        "type": "object",
+                        "properties": [String: Any](),
+                        "required": [String]()
+                    ] as [String: Any] : params
                 ]
-                if !params.isEmpty {
-                    funcDef["parameters"] = params
-                }
                 tools.append([
                     "type": "function",
                     "function": funcDef
@@ -516,6 +512,36 @@ Voice-specific rules:
         }
 
         return tools
+    }
+
+    /// Recursively replace NSNull with appropriate empty defaults for GLM.
+    private static func sanitizeForGLM(_ dict: [String: Any]) -> [String: Any] {
+        var result = [String: Any]()
+        for (key, value) in dict {
+            if value is NSNull {
+                // Replace null with empty dict/list based on expected GLM schema
+                switch key {
+                case "properties": result[key] = [String: Any]()
+                case "required": result[key] = [String]()
+                default: continue // Skip other null fields entirely
+                }
+            } else if let nested = value as? [String: Any] {
+                result[key] = sanitizeForGLM(nested)
+            } else if let arr = value as? [Any] {
+                result[key] = arr.map { item -> Any in
+                    if let d = item as? [String: Any] { return sanitizeForGLM(d) }
+                    return item
+                }
+            } else {
+                result[key] = value
+            }
+        }
+        // Ensure properties and required always exist at the parameters level
+        if result["type"] as? String == "object" {
+            if result["properties"] == nil { result["properties"] = [String: Any]() }
+            if result["required"] == nil { result["required"] = [String]() }
+        }
+        return result
     }
 
     private func convertJSONValueDict(_ dict: [String: OpenAIJSONValue]) -> [String: Any] {
