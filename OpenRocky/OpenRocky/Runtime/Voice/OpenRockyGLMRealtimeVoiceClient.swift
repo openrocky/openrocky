@@ -497,15 +497,19 @@ Voice-specific rules:
                 if params["required"] == nil || params["required"] is NSNull {
                     params["required"] = [String]()
                 }
-                var toolDef: [String: Any] = [
-                    "type": "function",
+
+                // GLM expects OpenAI nested format: {type: "function", function: {name, description, parameters}}
+                var funcDef: [String: Any] = [
                     "name": fn.name,
                     "description": fn.description
                 ]
                 if !params.isEmpty {
-                    toolDef["parameters"] = params
+                    funcDef["parameters"] = params
                 }
-                tools.append(toolDef)
+                tools.append([
+                    "type": "function",
+                    "function": funcDef
+                ])
             case .mcp:
                 break
             }
