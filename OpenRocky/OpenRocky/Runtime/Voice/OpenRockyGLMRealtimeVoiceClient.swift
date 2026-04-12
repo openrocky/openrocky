@@ -156,9 +156,10 @@ final class OpenRockyGLMRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
     func sendAudioChunk(base64Audio: String) async throws {
         guard socket != nil, isReady else { return }
 
-        // Decode raw PCM16 and wrap as WAV (GLM expects WAV format with header)
-        guard let pcmData = Data(base64Encoded: base64Audio) else { return }
-        let wavData = Self.wrapPCM16AsWAV(pcmData, sampleRate: 24000)
+        // Decode raw PCM16 24kHz, downsample to 16kHz, wrap as WAV
+        guard let pcm24k = Data(base64Encoded: base64Audio) else { return }
+        let pcm16k = Self.downsample24kTo16k(pcm24k)
+        let wavData = Self.wrapPCM16AsWAV(pcm16k, sampleRate: 16000)
         let wavBase64 = wavData.base64EncodedString()
 
         let message: [String: Any] = [
@@ -169,8 +170,40 @@ final class OpenRockyGLMRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
 
         audioChunkCount += 1
         if audioChunkCount == 1 {
-            rlog.info("GLM: first audio chunk sent, pcm=\(pcmData.count)bytes wav=\(wavData.count)bytes", category: "Voice")
+            rlog.info("GLM: first audio chunk sent, pcm24k=\(pcm24k.count)bytes pcm16k=\(pcm16k.count)bytes wav=\(wavData.count)bytes", category: "Voice")
         }
+    }
+
+    /// Downsample PCM16 from 24kHz to 16kHz (ratio 3:2) using linear interpolation.
+    private static func downsample24kTo16k(_ data: Data) -> Data {
+        let sampleCount = data.count / 2
+        guard sampleCount > 0 else { return data }
+
+        let inputSamples: [Int16] = data.withUnsafeBytes { raw in
+            let buffer = raw.bindMemory(to: Int16.self)
+            return Array(buffer)
+        }
+
+        // 24kHz → 16kHz: for every 3 input samples, produce 2 output samples
+        let outputCount = (sampleCount * 2) / 3
+        var output = [Int16](repeating: 0, count: outputCount)
+
+        for i in 0..<outputCount {
+            // Map output index to fractional input index
+            let srcPos = Double(i) * 3.0 / 2.0
+            let srcIndex = Int(srcPos)
+            let frac = srcPos - Double(srcIndex)
+
+            if srcIndex + 1 < sampleCount {
+                let a = Double(inputSamples[srcIndex])
+                let b = Double(inputSamples[srcIndex + 1])
+                output[i] = Int16(clamping: Int(a + frac * (b - a)))
+            } else if srcIndex < sampleCount {
+                output[i] = inputSamples[srcIndex]
+            }
+        }
+
+        return output.withUnsafeBytes { Data($0) }
     }
 
     /// Wrap raw PCM16 mono data in a minimal WAV header.
