@@ -297,10 +297,7 @@ Voice-specific rules:
             "output_audio_format": "pcm",
             "instructions": instructions,
             "turn_detection": [
-                "type": "server_vad",
-                "prefix_padding_ms": 400,
-                "silence_duration_ms": 900,
-                "threshold": 0.8
+                "type": "server_vad"
             ] as [String: Any],
             "beta_fields": [
                 "chat_mode": "audio",
@@ -324,15 +321,20 @@ Voice-specific rules:
 
     private func receiveLoop() async {
         guard let socket else { return }
+        rlog.info("GLM receive loop started", category: "Voice")
+        var messageCount = 0
         do {
             while !Task.isCancelled {
                 let message = try await socket.receive()
+                messageCount += 1
                 switch message {
                 case .string(let text):
                     handleServerMessage(text)
                 case .data(let data):
                     if let text = String(data: data, encoding: .utf8) {
                         handleServerMessage(text)
+                    } else {
+                        rlog.info("GLM: received binary data, \(data.count) bytes", category: "Voice")
                     }
                 @unknown default:
                     break
@@ -340,10 +342,11 @@ Voice-specific rules:
             }
         } catch {
             if !Task.isCancelled {
-                rlog.error("GLM connection error: \(error)", category: "Voice")
+                rlog.error("GLM connection error after \(messageCount) messages: \(error)", category: "Voice")
                 emit(.error("Voice connection lost. Please try again."))
             }
         }
+        rlog.info("GLM receive loop ended, total messages: \(messageCount)", category: "Voice")
     }
 
     private func handleServerMessage(_ text: String) {
@@ -391,13 +394,17 @@ Voice-specific rules:
                 emit(.assistantTranscriptFinal(transcript))
             }
 
+        case "response.created":
+            rlog.info("GLM: response.created - model is generating", category: "Voice")
+
         case "response.audio.delta":
             if let audioData = json["delta"] as? String, !audioData.isEmpty {
+                rlog.debug("GLM: audio.delta \(audioData.count) chars", category: "Voice")
                 emit(.assistantAudioChunk(audioData))
             }
 
         case "response.audio.done":
-            // Audio stream for this response is complete
+            rlog.info("GLM: response.audio.done", category: "Voice")
             break
 
         case "response.function_call_arguments.done":
