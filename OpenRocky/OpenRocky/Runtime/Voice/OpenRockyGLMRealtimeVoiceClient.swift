@@ -152,6 +152,11 @@ final class OpenRockyGLMRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
     }
 
     private var audioChunkCount = 0
+    /// Client-side VAD: track consecutive silence chunks to auto-commit.
+    private var isSpeaking = false
+    private var silenceChunkCount = 0
+    /// Number of consecutive silent chunks before triggering commit (~800ms at 100ms/chunk).
+    private let silenceThreshold = 8
 
     func sendAudioChunk(base64Audio: String) async throws {
         guard socket != nil, isReady else { return }
@@ -172,6 +177,48 @@ final class OpenRockyGLMRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
         if audioChunkCount == 1 {
             rlog.info("GLM: first audio chunk sent, pcm24k=\(pcm24k.count)bytes pcm16k=\(pcm16k.count)bytes wav=\(wavData.count)bytes", category: "Voice")
         }
+
+        // Client-side VAD: detect silence to auto-commit
+        let rms = Self.computeRMS(pcm16k)
+        let isSilent = rms < 500 // Threshold for silence (PCM16 range 0-32768)
+
+        if isSilent {
+            if isSpeaking {
+                silenceChunkCount += 1
+                if silenceChunkCount >= silenceThreshold {
+                    // Speech ended — commit and request response
+                    isSpeaking = false
+                    silenceChunkCount = 0
+                    rlog.info("GLM: client VAD detected speech end, committing (rms=\(rms))", category: "Voice")
+                    emit(.status("Processing..."))
+
+                    let commitMsg: [String: Any] = ["type": "input_audio_buffer.commit"]
+                    try await sendJSON(commitMsg)
+
+                    let responseMsg: [String: Any] = ["type": "response.create"]
+                    try await sendJSON(responseMsg)
+                }
+            }
+        } else {
+            if !isSpeaking {
+                isSpeaking = true
+                rlog.info("GLM: client VAD detected speech start (rms=\(rms))", category: "Voice")
+                emit(.inputSpeechStarted)
+                emit(.status("Listening..."))
+            }
+            silenceChunkCount = 0
+        }
+    }
+
+    /// Compute RMS energy of PCM16 data.
+    private static func computeRMS(_ data: Data) -> Double {
+        let samples: [Int16] = data.withUnsafeBytes { raw in
+            let buffer = raw.bindMemory(to: Int16.self)
+            return Array(buffer)
+        }
+        guard !samples.isEmpty else { return 0 }
+        let sumSquares = samples.reduce(0.0) { $0 + Double($1) * Double($1) }
+        return (sumSquares / Double(samples.count)).squareRoot()
     }
 
     /// Downsample PCM16 from 24kHz to 16kHz (ratio 3:2) using linear interpolation.
@@ -297,7 +344,7 @@ Voice-specific rules:
             "output_audio_format": "pcm",
             "instructions": instructions,
             "turn_detection": [
-                "type": "server_vad"
+                "type": "client_vad"
             ] as [String: Any],
             "beta_fields": [
                 "chat_mode": "audio",
