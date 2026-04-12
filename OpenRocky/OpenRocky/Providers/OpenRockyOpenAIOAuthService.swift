@@ -123,6 +123,7 @@ enum OpenRockyOpenAIOAuthService {
             .init(name: "response_type", value: "code"),
             .init(name: "client_id", value: clientID),
             .init(name: "redirect_uri", value: redirectURI),
+            .init(name: "audience", value: "https://api.openai.com/v1"),
             .init(name: "scope", value: scope),
             .init(name: "code_challenge", value: challenge),
             .init(name: "code_challenge_method", value: "S256"),

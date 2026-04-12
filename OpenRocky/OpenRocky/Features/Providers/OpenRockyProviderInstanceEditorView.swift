@@ -471,7 +471,7 @@ struct OpenRockyProviderInstanceEditorView: View {
             } catch {
                 let nsError = error as NSError
                 rlog.error("Chat test failed: [\(nsError.domain)/\(nsError.code)] \(error.localizedDescription)", category: "Test")
-                testState = .failure(message: "[\(nsError.code)] \(error.localizedDescription)")
+                testState = .failure(message: "[\(nsError.code)] \(chatTestUserFacingMessage(for: error))")
             }
         }
     }
@@ -567,11 +567,32 @@ struct OpenRockyProviderInstanceEditorView: View {
                 rlog.info("OpenAI OAuth sign-in completed for account \(oauthCredential.accountID)", category: "Provider")
             } catch {
                 let nsError = error as NSError
-                let message = "[\(nsError.code)] \(error.localizedDescription)"
+                let message = "[\(nsError.code)] \(oauthUserFacingMessage(for: error))"
                 oauthState = .failed(message: message)
                 rlog.error("OpenAI OAuth sign-in failed: \(message)", category: "Provider")
             }
         }
+    }
+
+    private func oauthUserFacingMessage(for error: Error) -> String {
+        let message = error.localizedDescription
+        let lower = message.lowercased()
+
+        if lower.contains("scope 'model.request'"),
+           lower.contains("not allowed to request") {
+            return "OAuth login failed: this OAuth client cannot request model.request. Use API Key or Manual Token."
+        }
+        return message
+    }
+
+    private func chatTestUserFacingMessage(for error: Error) -> String {
+        let message = error.localizedDescription
+        let lower = message.lowercased()
+
+        if lower.contains("missing scopes: model.request") {
+            return "Current credential is missing model.request. Switch to API Key auth or set a Manual Token with model access."
+        }
+        return message
     }
 
     private func saveInstance() {
