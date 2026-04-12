@@ -26,6 +26,8 @@ final class OpenRockyGLMRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
     /// Track pending function call IDs for tool output routing.
     private var pendingToolCallID: String?
     private var pendingToolCallName: String?
+    /// Buffer transcript until response.done to avoid premature mic resume.
+    private var pendingTranscript: String?
 
     init(configuration: OpenRockyRealtimeProviderConfiguration, soulInstructions: String, realtimeTools: [OpenAIRealtimeSessionConfiguration.RealtimeTool] = []) {
         self.configuration = configuration.normalized()
@@ -440,8 +442,11 @@ Voice-specific rules:
             }
 
         case "response.audio_transcript.done":
-            if let transcript = json["transcript"] as? String {
-                emit(.assistantTranscriptFinal(transcript))
+            // Don't emit assistantTranscriptFinal here — GLM sends text.done BEFORE audio.delta,
+            // so emitting final transcript here triggers mic resume before audio playback starts.
+            // Instead, buffer it and emit in response.done.
+            if let transcript = json["transcript"] as? String, !transcript.isEmpty {
+                pendingTranscript = transcript
             }
 
         case "response.created":
@@ -465,6 +470,23 @@ Voice-specific rules:
             emit(.toolCallRequested(name: name, arguments: arguments, callID: callID))
 
         case "response.done":
+            // Emit final transcript AFTER all audio has been delivered
+            if let transcript = pendingTranscript {
+                emit(.assistantTranscriptFinal(transcript))
+                pendingTranscript = nil
+            } else {
+                // Extract transcript from response output if available
+                let resp = json["response"] as? [String: Any]
+                let output = resp?["output"] as? [[String: Any]]
+                for item in output ?? [] {
+                    for content in item["content"] as? [[String: Any]] ?? [] {
+                        if let t = content["transcript"] as? String, !t.isEmpty {
+                            emit(.assistantTranscriptFinal(t))
+                            break
+                        }
+                    }
+                }
+            }
             emit(.status("Ready for next input."))
 
         case "error":
