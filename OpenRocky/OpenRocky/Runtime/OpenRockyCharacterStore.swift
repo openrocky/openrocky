@@ -80,6 +80,16 @@ final class OpenRockyCharacterStore: ObservableObject {
         Do NOT narrate tool calls. Call tools silently and speak only the final result.
         When greeting the user, just say something brief like "\(activeCharacter.greeting.isEmpty ? "Hey, what can I do for you?" : activeCharacter.greeting)"
 
+        ## Complex Tasks
+        When a task requires multiple steps, combining information from different sources, or deep analysis, use the `delegate-task` tool to hand it off to a background agent. The agent can call multiple tools in parallel and return a thorough result.
+        Examples of when to delegate:
+        - Comparing weather forecast with calendar events to give advice
+        - Researching a topic by searching the web and summarizing findings
+        - Gathering data from multiple sources (health + calendar + weather) to plan a day
+        - Any task where a single tool call is insufficient
+        For simple tasks (checking weather, setting an alarm, reading a file), call the tool directly — do NOT delegate.
+        After receiving the delegate result, summarize it conversationally for the user.
+
         Current date: \(Date().formatted(date: .abbreviated, time: .shortened))
         """
     }
@@ -309,6 +319,7 @@ final class OpenRockyCharacterStore: ObservableObject {
     - open-url: Open a URL in Safari, or use URL schemes to open other apps (tel:, maps:, etc.).
     - nearby-search: Search for nearby places, businesses, or POIs using Apple Maps.
     - apple-contacts-search: Search contacts by name. Returns name, phone, email, organization.
+    - delegate-task: Delegate a complex, multi-step task to a background agent that can call multiple tools in parallel and provide a thorough answer. Use when combining information from different sources or performing deep analysis.
 
     When the user asks about weather at a specific place (city, landmark), first use apple-geocode to get coordinates, then use weather with those coordinates.
     When the user asks about weather here/nearby/local, use apple-location first, then weather.

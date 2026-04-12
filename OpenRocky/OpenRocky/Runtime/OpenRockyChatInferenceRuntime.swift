@@ -15,7 +15,7 @@ import LanguageModelChatUI
 @MainActor
 final class OpenRockyChatInferenceRuntime {
     private let characterStore = OpenRockyCharacterStore.shared
-    private let toolbox = OpenRockyToolbox()
+    let toolbox = OpenRockyToolbox()
     private var conversationHistory: [ChatCompletionParameters.Message] = []
 
     /// Tool calls completed during the most recent `run()`. Reset at the start of each run.
@@ -35,7 +35,7 @@ final class OpenRockyChatInferenceRuntime {
     ) async throws {
         completedToolCalls = []
         rlog.info("Chat inference starting: provider=\(configuration.provider.rawValue) model=\(configuration.modelID)", category: "Chat")
-        let service = try OpenRockyOpenAIServiceFactory.makeService(configuration: configuration)
+        let service = try await OpenRockyOpenAIServiceFactory.makeService(configuration: configuration)
         let usageService = OpenRockyUsageService.shared
 
         // Remove any trailing tool messages that lack a preceding tool_use context

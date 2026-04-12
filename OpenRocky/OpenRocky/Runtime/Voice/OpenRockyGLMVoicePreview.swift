@@ -14,6 +14,7 @@ import Foundation
 @MainActor
 final class OpenRockyGLMVoicePreview: ObservableObject {
     @Published var playingVoice: String?
+    @Published var isLoading = false
     @Published var error: String?
 
     private var socket: URLSessionWebSocketTask?
@@ -24,6 +25,7 @@ final class OpenRockyGLMVoicePreview: ObservableObject {
     func play(voice: String, credential: String, customHost: String? = nil) {
         stop()
         playingVoice = voice
+        isLoading = true
         error = nil
 
         task = Task { [weak self] in
@@ -38,6 +40,7 @@ final class OpenRockyGLMVoicePreview: ObservableObject {
         player = nil
         socket?.cancel(with: .goingAway, reason: nil)
         socket = nil
+        isLoading = false
         playingVoice = nil
         audioChunks = []
     }
@@ -115,6 +118,7 @@ final class OpenRockyGLMVoicePreview: ObservableObject {
             ws.cancel(with: .goingAway, reason: nil)
             self.socket = nil
 
+            isLoading = false
             guard !audioChunks.isEmpty, !Task.isCancelled else {
                 playingVoice = nil
                 return
@@ -136,6 +140,7 @@ final class OpenRockyGLMVoicePreview: ObservableObject {
             if !Task.isCancelled {
                 self.error = error.localizedDescription
             }
+            isLoading = false
             playingVoice = nil
             ws.cancel(with: .goingAway, reason: nil)
             self.socket = nil

@@ -13,16 +13,20 @@ import Foundation
 enum OpenRockyOpenAIServiceFactory {
     nonisolated static let defaultRealtimeModel = "gpt-realtime-mini"
 
-    nonisolated static func makeService(configuration: OpenRockyProviderConfiguration) throws -> any OpenAIService {
+    nonisolated static func makeService(configuration: OpenRockyProviderConfiguration) async throws -> any OpenAIService {
         let normalized = configuration.normalized()
 
         guard normalized.provider != .appleFoundationModels else {
             throw OpenRockyOpenAIServiceError.unsupportedProvider
         }
 
-        guard let credential = normalized.credential, credential.isEmpty == false else {
+        guard let rawCredential = normalized.credential, rawCredential.isEmpty == false else {
             throw OpenRockyOpenAIServiceError.missingCredential
         }
+        let credential = try await resolvedCredential(
+            provider: normalized.provider,
+            rawCredential: rawCredential
+        )
 
         let host = normalized.customHost
 
@@ -125,6 +129,16 @@ enum OpenRockyOpenAIServiceFactory {
 
     nonisolated static func supportsRealtime(configuration: OpenRockyProviderConfiguration) -> Bool {
         configuration.normalized().provider == .openAI
+    }
+
+    private nonisolated static func resolvedCredential(
+        provider: OpenRockyProviderKind,
+        rawCredential: String
+    ) async throws -> String {
+        guard provider == .openAI else {
+            return rawCredential
+        }
+        return try await OpenRockyOpenAIOAuthVault.resolvedAccessToken(from: rawCredential)
     }
 }
 

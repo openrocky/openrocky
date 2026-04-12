@@ -32,6 +32,11 @@ final class OpenRockyToolbox {
     private let nearbySearchService = OpenRockyNearbySearchService.shared
     private let urlService = OpenRockyURLService.shared
 
+    /// Chat provider configuration for subagent execution. Set by the session runtime.
+    var subagentChatConfiguration: OpenRockyProviderConfiguration?
+    /// Callback for subagent status updates (forwarded to session runtime's statusText).
+    var subagentStatusHandler: (@MainActor (String) -> Void)?
+
     init() {
         if #available(iOS 26.0, *) {
             alarmService = OpenRockyAlarmService()
@@ -570,6 +575,45 @@ final class OpenRockyToolbox {
                         "properties": [:]
                     ]
                 )
+            ),
+            .function(
+                .init(
+                    name: "delegate-task",
+                    description: "Delegate a complex task to a background agent that can use multiple tools and perform deep analysis in parallel. Use this when the task requires multiple steps, combining information from different sources (e.g. weather + calendar), research, or multi-step data gathering. Do NOT use for simple single-tool tasks.",
+                    parameters: [
+                        "type": "object",
+                        "properties": [
+                            "task": [
+                                "type": "string",
+                                "description": "Detailed description of the overall task to accomplish."
+                            ],
+                            "subtasks": [
+                                "type": "array",
+                                "description": "Optional list of parallel subtasks. Each subtask runs independently.",
+                                "items": [
+                                    "type": "object",
+                                    "properties": [
+                                        "description": [
+                                            "type": "string",
+                                            "description": "What this subtask should accomplish."
+                                        ],
+                                        "tools": [
+                                            "type": "array",
+                                            "description": "Optional allowlist of tool names this subtask can use.",
+                                            "items": ["type": "string"]
+                                        ]
+                                    ],
+                                    "required": ["description"]
+                                ]
+                            ],
+                            "context": [
+                                "type": "string",
+                                "description": "Relevant conversation context to help the agent understand the task."
+                            ]
+                        ],
+                        "required": ["task"]
+                    ]
+                )
             )
         ]
     }
@@ -978,12 +1022,50 @@ final class OpenRockyToolbox {
                     properties: [:],
                     required: []
                 )
+            )),
+            .init(function: .init(
+                name: "delegate-task",
+                strict: nil,
+                description: "Delegate a complex task to a background agent that can use multiple tools and perform deep analysis in parallel. Use when the task requires multiple steps, combining information from different sources, research, or multi-step data gathering.",
+                parameters: .init(
+                    type: .object,
+                    properties: [
+                        "task": .init(type: .string, description: "Detailed description of the overall task."),
+                        "subtasks": .init(
+                            type: .array,
+                            description: "Optional parallel subtasks.",
+                            items: .init(
+                                type: .object,
+                                properties: [
+                                    "description": .init(type: .string, description: "What this subtask should accomplish."),
+                                    "tools": .init(type: .array, description: "Optional tool name allowlist.", items: .init(type: .string))
+                                ],
+                                required: ["description"]
+                            )
+                        ),
+                        "context": .init(type: .string, description: "Relevant conversation context.")
+                    ],
+                    required: ["task"]
+                )
             ))
         ]
     }
 
+    /// Returns realtime tool definitions plus any enabled custom skills.
     func realtimeTools() -> [OpenAIRealtimeSessionConfiguration.RealtimeTool] {
-        Self.realtimeToolDefinitions()
+        var tools = Self.realtimeToolDefinitions()
+        // Append enabled skills so voice providers can call them directly
+        let skills = OpenRockyCustomSkillStore.shared.skills.filter(\.isEnabled)
+        for skill in skills {
+            let toolName = "skill-\(OpenRockyCustomSkillStore.sanitizeToolName(skill.name))"
+            let desc = skill.description + (skill.triggerConditions.isEmpty ? "" : " Trigger: \(skill.triggerConditions)")
+            tools.append(.function(.init(
+                name: toolName,
+                description: desc,
+                parameters: ["type": "object", "properties": [:]]
+            )))
+        }
+        return tools
     }
 
     // MARK: - Execution
@@ -1072,6 +1154,8 @@ final class OpenRockyToolbox {
             return try await executeAppExit(arguments: arguments)
         case "email-send":
             return try await executeEmailSend(arguments: arguments)
+        case "delegate-task":
+            return try await executeDelegateTask(arguments: arguments)
         default:
             // Check if it's a custom skill tool (skill-*)
             if let skill = OpenRockyCustomSkillStore.shared.skill(forToolName: name) {
@@ -1640,8 +1724,14 @@ final class OpenRockyToolbox {
 
     private func executeAppExit(arguments: String) async throws -> String {
         let request = try decode(AppExitRequest.self, from: arguments)
-        OpenRockyAppLifecycleService.shared.exitApp()
-        return try encode(["status": "exiting", "message": request.farewell_message] as [String: Any])
+        let trimmed = request.farewell_message.trimmingCharacters(in: .whitespacesAndNewlines)
+        let message = trimmed.isEmpty ? "OpenRocky is about to exit." : trimmed
+        OpenRockyAppLifecycleService.shared.exitApp(afterDelay: 1.0)
+        return try encode([
+            "status": "exiting",
+            "message": message,
+            "delay_seconds": 1
+        ] as [String: Any])
     }
 
     // MARK: - Email
@@ -1659,6 +1749,59 @@ final class OpenRockyToolbox {
         let ccList = request.cc?.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) } ?? []
         let messageID = try await OpenRockyEmailService.shared.send(to: toList, subject: request.subject, body: request.body, cc: ccList)
         return try encode(["status": "sent", "message_id": messageID, "to": request.to] as [String: Any])
+    }
+
+    // MARK: - Delegate Task (Subagent)
+
+    private func executeDelegateTask(arguments: String) async throws -> String {
+        guard let config = subagentChatConfiguration else {
+            throw OpenRockyToolboxError.missingParameter("subagent chat configuration")
+        }
+
+        let request = try decode(OpenRockyDelegateTaskRequest.self, from: arguments)
+
+        let subtasks: [OpenRockySubagentTask]
+        if let requestedSubtasks = request.subtasks, !requestedSubtasks.isEmpty {
+            subtasks = requestedSubtasks.map { sub in
+                OpenRockySubagentTask(
+                    description: sub.description,
+                    allowedTools: sub.tools
+                )
+            }
+        } else {
+            subtasks = []
+        }
+
+        let runtime = OpenRockySubagentRuntime(
+            toolbox: self,
+            configuration: config,
+            timeout: OpenRockySubagentRuntime.defaultTimeout,
+            onStatusUpdate: subagentStatusHandler
+        )
+
+        let result = await runtime.execute(
+            taskDescription: request.task,
+            subtasks: subtasks,
+            context: request.context ?? ""
+        )
+
+        let response = OpenRockyDelegateTaskResponse(
+            status: "completed",
+            taskDescription: result.taskDescription,
+            subtaskCount: result.results.count,
+            results: result.results.map { sub in
+                OpenRockyDelegateTaskResponse.SubtaskResult(
+                    summary: sub.summary,
+                    details: sub.details,
+                    toolsUsed: sub.toolCalls.map(\.name),
+                    succeeded: sub.succeeded,
+                    elapsedSeconds: sub.elapsedSeconds
+                )
+            },
+            totalElapsedSeconds: result.totalElapsedSeconds
+        )
+
+        return try encode(response)
     }
 
     // MARK: - Encoding/Decoding

@@ -33,7 +33,7 @@ final class OpenRockyDoubaoRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
     /// Text queued for TTS while the dialog model was still active.
     private var pendingSpeakText: String?
 
-    init(configuration: OpenRockyRealtimeProviderConfiguration, soulInstructions: String = "") {
+    init(configuration: OpenRockyRealtimeProviderConfiguration, soulInstructions: String = "", realtimeTools: [OpenAIRealtimeSessionConfiguration.RealtimeTool] = []) {
         self.configuration = configuration.normalized()
         self.modelID = "doubao-e2e-voice"
         self.soulInstructions = soulInstructions

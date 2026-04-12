@@ -73,8 +73,8 @@ struct OpenRockyOnboardingView: View {
         var badge: String {
             switch self {
             case .openAI: "Recommended"
-            case .gemini: "New"
-            case .glm: "New"
+            case .gemini: "Beta"
+            case .glm: "Beta"
             case .doubao: "Beta"
             }
         }
@@ -456,6 +456,31 @@ struct OpenRockyOnboardingView: View {
                     .font(.system(size: 15, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
+            }
+
+            if selectedProvider == .openAI {
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: "info.circle.fill")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(OpenRockyPalette.accent)
+                        .padding(.top, 1)
+                    Text("Want to use OpenAI OAuth instead of API key? Finish onboarding first, then go to Settings → Chat Providers → OpenAI and choose OAuth.")
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(OpenRockyPalette.card)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(OpenRockyPalette.accent.opacity(0.25), lineWidth: 1)
+                        )
+                )
+                .padding(.horizontal, 30)
             }
 
             // API key input

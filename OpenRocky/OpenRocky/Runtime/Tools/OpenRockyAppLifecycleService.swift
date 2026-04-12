@@ -13,11 +13,10 @@ import UIKit
 final class OpenRockyAppLifecycleService {
     static let shared = OpenRockyAppLifecycleService()
 
-    func exitApp(afterDelay delay: TimeInterval = 1.5) {
+    func exitApp(afterDelay delay: TimeInterval = 1.0) {
         Task { @MainActor in
             try? await Task.sleep(for: .seconds(delay))
-            // Suspend the app to background (iOS-friendly approach)
-            UIControl().sendAction(#selector(URLSessionTask.suspend), to: UIApplication.shared, for: nil)
+            exit(0)
         }
     }
 }

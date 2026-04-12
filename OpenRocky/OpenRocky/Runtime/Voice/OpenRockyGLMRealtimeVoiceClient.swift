@@ -17,6 +17,7 @@ final class OpenRockyGLMRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
 
     private let configuration: OpenRockyRealtimeProviderConfiguration
     private let soulInstructions: String
+    private let realtimeTools: [OpenAIRealtimeSessionConfiguration.RealtimeTool]
     private var socket: URLSessionWebSocketTask?
     private var receiveTask: Task<Void, Never>?
     private var eventSink: (@Sendable (OpenRockyRealtimeEvent) -> Void)?
@@ -26,10 +27,11 @@ final class OpenRockyGLMRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
     private var pendingToolCallID: String?
     private var pendingToolCallName: String?
 
-    init(configuration: OpenRockyRealtimeProviderConfiguration, soulInstructions: String) {
+    init(configuration: OpenRockyRealtimeProviderConfiguration, soulInstructions: String, realtimeTools: [OpenAIRealtimeSessionConfiguration.RealtimeTool] = []) {
         self.configuration = configuration.normalized()
         self.modelID = configuration.modelID.isEmpty ? "glm-realtime" : configuration.modelID
         self.soulInstructions = soulInstructions
+        self.realtimeTools = realtimeTools
         self.features = OpenRockyRealtimeVoiceFeatures(
             supportsTextInput: true,
             supportsAssistantStreaming: true,
@@ -315,10 +317,9 @@ Voice-specific rules:
     /// Convert OpenAI realtime tool definitions to GLM format.
     /// GLM uses the same format as OpenAI for function definitions.
     private func buildGLMTools() -> [[String: Any]] {
-        let openAITools = OpenRockyToolbox.realtimeToolDefinitions()
         var tools: [[String: Any]] = []
 
-        for tool in openAITools {
+        for tool in realtimeTools {
             switch tool {
             case .function(let fn):
                 let params = convertJSONValueDict(fn.parameters)

@@ -47,6 +47,14 @@ final class OpenRockySessionRuntime: ObservableObject {
             isConnected: false
         )
         session = .liveSeed(provider: provider)
+
+        // Wire up subagent status updates from toolbox → session statusText
+        let statusHandler: @MainActor (String) -> Void = { [weak self] status in
+            self?.statusText = status
+            self?.appendTimeline(kind: .tool, text: status)
+        }
+        toolbox.subagentStatusHandler = statusHandler
+        chatRuntime.toolbox.subagentStatusHandler = statusHandler
     }
 
     func syncProviders(
@@ -55,6 +63,10 @@ final class OpenRockySessionRuntime: ObservableObject {
     ) {
         self.chatConfiguration = chatConfiguration.normalized()
         self.voiceConfiguration = voiceConfiguration.normalized()
+        // Keep the toolbox's subagent chat configuration in sync
+        let normalizedChat = chatConfiguration.normalized()
+        toolbox.subagentChatConfiguration = normalizedChat
+        chatRuntime.toolbox.subagentChatConfiguration = normalizedChat
         session.provider = ProviderStatus(
             name: voiceConfiguration.provider.displayName,
             model: voiceConfiguration.modelID,
@@ -101,6 +113,7 @@ final class OpenRockySessionRuntime: ObservableObject {
                     configuration: config,
                     voiceInputEnabled: true,
                     soulInstructions: characterStore.voiceSystemPrompt,
+                    realtimeTools: toolbox.realtimeTools(),
                     eventSink: makeEventSink()
                 )
             } catch {
@@ -340,7 +353,7 @@ final class OpenRockySessionRuntime: ObservableObject {
                 let displayName: String
                 let icon: String?
                 if let skill = OpenRockyCustomSkillStore.shared.skill(forToolName: tc.name) {
-                    displayName = skill.name
+                    displayName = "Skill: \(skill.name)"
                     icon = "sparkles"
                 } else {
                     displayName = def?.displayName ?? tc.name

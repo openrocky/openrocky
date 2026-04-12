@@ -21,6 +21,9 @@ struct OpenRockyProviderInstanceEditorView: View {
     @State private var selectedProvider: OpenRockyProviderKind = .openAI
     @State private var modelID: String = ""
     @State private var credential: String = ""
+    @State private var openAIAuthMethod: OpenAIAuthMethod = .apiKey
+    @State private var openAIOAuthCredential: OpenRockyOpenAIOAuthCredential?
+    @State private var oauthState: OpenAIOAuthState = .idle
     @State private var azureResourceName: String = ""
     @State private var azureAPIVersion: String = ""
     @State private var aiProxyServiceURL: String = ""
@@ -61,7 +64,99 @@ struct OpenRockyProviderInstanceEditorView: View {
                 Text("Provider")
             }
 
-            if selectedProvider.requiresCredential {
+            if selectedProvider == .openAI {
+                Section {
+                    Picker("Auth Method", selection: $openAIAuthMethod) {
+                        Text("API Key").tag(OpenAIAuthMethod.apiKey)
+                        Text("OAuth").tag(OpenAIAuthMethod.oauth)
+                    }
+                    .pickerStyle(.segmented)
+                } header: {
+                    Text("Authentication")
+                } footer: {
+                    Text("Use an API key, or sign in with your ChatGPT account for Codex-style OAuth.")
+                }
+
+                if openAIAuthMethod == .oauth {
+                    Section {
+                        if let oauthCredential = openAIOAuthCredential {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(spacing: 8) {
+                                    Image(systemName: oauthCredential.isExpired ? "exclamationmark.triangle.fill" : "checkmark.circle.fill")
+                                        .foregroundStyle(oauthCredential.isExpired ? OpenRockyPalette.warning : OpenRockyPalette.success)
+                                    Text(oauthCredential.isExpired ? "OAuth Expired" : "Authenticated")
+                                        .font(.system(size: 14, weight: .semibold))
+                                }
+                                Text("Token: \(oauthCredential.maskedAccessToken)")
+                                    .font(.system(.caption, design: .monospaced))
+                                    .foregroundStyle(.secondary)
+                                Text("Account: \(oauthCredential.accountID)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text("Authorized: \(oauthCredential.authorizedAt.formatted(date: .abbreviated, time: .shortened))")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                Text("Expires: \(oauthCredential.expiresAt.formatted(date: .abbreviated, time: .shortened))")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Button("Sign Out", role: .destructive) {
+                                openAIOAuthCredential = nil
+                                oauthState = .idle
+                            }
+                        } else {
+                            Button {
+                                signInWithOpenAI()
+                            } label: {
+                                HStack {
+                                    if oauthState == .authenticating {
+                                        ProgressView()
+                                            .controlSize(.small)
+                                        Text("Signing in...")
+                                    } else {
+                                        Image(systemName: "person.badge.key.fill")
+                                        Text("Sign in with OpenAI")
+                                    }
+                                }
+                            }
+                            .disabled(oauthState == .authenticating)
+                        }
+
+                        if case let .failed(message) = oauthState {
+                            Text(message)
+                                .font(.footnote)
+                                .foregroundStyle(.red)
+                        }
+                    } header: {
+                        Text("OpenAI OAuth")
+                    } footer: {
+                        Text("OAuth tokens are stored per provider instance in iOS Keychain.")
+                    }
+
+                    Section {
+                        SecureField(
+                            "Bearer Token Override",
+                            text: $credential,
+                            prompt: Text("sk-...")
+                        )
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .textContentType(.init(rawValue: ""))
+
+                        if !credential.isEmpty {
+                            Button("Clear Manual Token", role: .destructive) {
+                                credential = ""
+                            }
+                        }
+                    } header: {
+                        Text("Manual Token")
+                    } footer: {
+                        Text("Optional. If provided, this token overrides OAuth for API calls.")
+                    }
+                } else {
+                    apiKeySection(provider: selectedProvider)
+                }
+            } else if selectedProvider.requiresCredential {
                 Section {
                     SecureField(
                         "Credential",
@@ -233,7 +328,7 @@ struct OpenRockyProviderInstanceEditorView: View {
             } header: {
                 Text("Connection Test")
             } footer: {
-                Text("Sends a minimal request to verify your API key and model are working.")
+                Text("Sends a minimal request to verify your credentials and model are working.")
             }
 
             if let id = editingInstanceID, id != providerStore.activeInstanceID {
@@ -266,6 +361,11 @@ struct OpenRockyProviderInstanceEditorView: View {
             if newValue == .azureOpenAI, azureAPIVersion.isEmpty {
                 azureAPIVersion = newValue.defaultAzureAPIVersion ?? ""
             }
+            if newValue != .openAI {
+                openAIAuthMethod = .apiKey
+            } else if openAIOAuthCredential != nil {
+                openAIAuthMethod = .oauth
+            }
             if !nameManuallyEdited {
                 name = newValue.displayName
             }
@@ -289,6 +389,9 @@ struct OpenRockyProviderInstanceEditorView: View {
             // New instance defaults
             name = selectedProvider.displayName
             modelID = selectedProvider.defaultModel
+            credential = ""
+            openAIOAuthCredential = nil
+            openAIAuthMethod = .apiKey
             nameManuallyEdited = false
             return
         }
@@ -297,6 +400,8 @@ struct OpenRockyProviderInstanceEditorView: View {
         selectedProvider = instance.kind
         modelID = instance.modelID
         credential = providerStore.credential(for: instance) ?? ""
+        openAIOAuthCredential = providerStore.openAIOAuthCredential(for: instance)
+        openAIAuthMethod = openAIOAuthCredential != nil ? .oauth : .apiKey
         azureResourceName = instance.azureResourceName ?? ""
         azureAPIVersion = instance.azureAPIVersion ?? ""
         aiProxyServiceURL = instance.aiProxyServiceURL ?? ""
@@ -305,10 +410,14 @@ struct OpenRockyProviderInstanceEditorView: View {
     }
 
     private var draftIsConfigured: Bool {
+        if selectedProvider == .openAI && openAIAuthMethod == .oauth {
+            let hasResolvedToken = resolvedCredential().isEmpty == false
+            return hasResolvedToken && modelID.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false
+        }
         let config = OpenRockyProviderConfiguration(
             provider: selectedProvider,
             modelID: modelID,
-            credential: credential,
+            credential: resolvedCredential(),
             azureResourceName: azureResourceName,
             azureAPIVersion: azureAPIVersion,
             aiProxyServiceURL: aiProxyServiceURL,
@@ -322,7 +431,7 @@ struct OpenRockyProviderInstanceEditorView: View {
         let config = OpenRockyProviderConfiguration(
             provider: selectedProvider,
             modelID: modelID,
-            credential: credential,
+            credential: resolvedCredential(),
             azureResourceName: azureResourceName,
             azureAPIVersion: azureAPIVersion,
             aiProxyServiceURL: aiProxyServiceURL,
@@ -338,7 +447,7 @@ struct OpenRockyProviderInstanceEditorView: View {
 
         Task {
             do {
-                let service = try OpenRockyOpenAIServiceFactory.makeService(configuration: config)
+                let service = try await OpenRockyOpenAIServiceFactory.makeService(configuration: config)
                 var parameters = ChatCompletionParameters(
                     messages: [.init(role: .user, content: .text("Hi, I am OpenRocky. Now it is \(ISO8601DateFormatter().string(from: Date()))"))],
                     model: .custom(config.modelID)
@@ -403,9 +512,71 @@ struct OpenRockyProviderInstanceEditorView: View {
         }
     }
 
+    @ViewBuilder
+    private func apiKeySection(provider: OpenRockyProviderKind) -> some View {
+        Section {
+            SecureField(
+                "Credential",
+                text: $credential,
+                prompt: Text(provider.apiKeyPlaceholder)
+            )
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
+            .textContentType(.init(rawValue: ""))
+
+            if !credential.isEmpty {
+                Button("Clear Credential", role: .destructive) {
+                    credential = ""
+                }
+            }
+            if let guideURL = provider.apiKeyGuideURL, let url = URL(string: guideURL) {
+                Link(destination: url) {
+                    HStack {
+                        Image(systemName: "arrow.up.forward.square")
+                        Text("Get \(provider.displayName) API Key")
+                    }
+                    .font(.subheadline)
+                }
+            }
+        } header: {
+            Text(provider == .aiProxy ? "Partial Key" : "API Key")
+        } footer: {
+            Text("Stored in the iOS Keychain on this device.")
+        }
+    }
+
+    private func resolvedCredential() -> String {
+        let manual = credential.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !manual.isEmpty {
+            return manual
+        }
+        if selectedProvider == .openAI, openAIAuthMethod == .oauth {
+            return openAIOAuthCredential?.accessToken ?? ""
+        }
+        return manual
+    }
+
+    private func signInWithOpenAI() {
+        oauthState = .authenticating
+        Task {
+            do {
+                let oauthCredential = try await OpenRockyOpenAIOAuthService.signIn(originator: "openrocky")
+                openAIOAuthCredential = oauthCredential
+                openAIAuthMethod = .oauth
+                oauthState = .authenticated
+                rlog.info("OpenAI OAuth sign-in completed for account \(oauthCredential.accountID)", category: "Provider")
+            } catch {
+                let nsError = error as NSError
+                let message = "[\(nsError.code)] \(error.localizedDescription)"
+                oauthState = .failed(message: message)
+                rlog.error("OpenAI OAuth sign-in failed: \(message)", category: "Provider")
+            }
+        }
+    }
+
     private func saveInstance() {
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
-        let cred = credential.trimmingCharacters(in: .whitespacesAndNewlines)
+        let manualCredential = credential.trimmingCharacters(in: .whitespacesAndNewlines)
 
         if let id = editingInstanceID {
             var instance = providerStore.instances.first(where: { $0.id == id })!
@@ -416,7 +587,12 @@ struct OpenRockyProviderInstanceEditorView: View {
             instance.azureAPIVersion = azureAPIVersion.isEmpty ? nil : azureAPIVersion
             instance.aiProxyServiceURL = aiProxyServiceURL.isEmpty ? nil : aiProxyServiceURL
             instance.customHost = customHost.isEmpty ? nil : customHost
-            providerStore.update(instance, credential: cred.isEmpty ? nil : cred)
+            providerStore.update(instance, credential: manualCredential.isEmpty ? nil : manualCredential)
+            if selectedProvider == .openAI {
+                providerStore.setOpenAIOAuthCredential(openAIAuthMethod == .oauth ? openAIOAuthCredential : nil, for: id)
+            } else {
+                providerStore.setOpenAIOAuthCredential(nil, for: id)
+            }
         } else {
             let instance = OpenRockyProviderInstance(
                 id: UUID().uuidString,
@@ -431,7 +607,12 @@ struct OpenRockyProviderInstanceEditorView: View {
                 customHost: customHost.isEmpty ? nil : customHost,
                 isBuiltIn: false
             )
-            providerStore.add(instance, credential: cred.isEmpty ? nil : cred)
+            providerStore.add(instance, credential: manualCredential.isEmpty ? nil : manualCredential)
+            if selectedProvider == .openAI && openAIAuthMethod == .oauth {
+                providerStore.setOpenAIOAuthCredential(openAIOAuthCredential, for: instance.id)
+            } else {
+                providerStore.setOpenAIOAuthCredential(nil, for: instance.id)
+            }
             providerStore.setActive(id: instance.id)
         }
     }
@@ -444,4 +625,16 @@ private enum TestConnectionState: Equatable {
     case testing
     case success(model: String)
     case failure(message: String)
+}
+
+private enum OpenAIAuthMethod: String, Equatable {
+    case apiKey
+    case oauth
+}
+
+private enum OpenAIOAuthState: Equatable {
+    case idle
+    case authenticating
+    case authenticated
+    case failed(message: String)
 }

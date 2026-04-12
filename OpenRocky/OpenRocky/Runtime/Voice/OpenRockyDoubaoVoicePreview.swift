@@ -15,6 +15,7 @@ import Foundation
 @MainActor
 final class OpenRockyDoubaoVoicePreview: ObservableObject {
     @Published var playingSpeaker: String?
+    @Published var isLoading = false
     @Published var error: String?
 
     private var socket: URLSessionWebSocketTask?
@@ -31,6 +32,7 @@ final class OpenRockyDoubaoVoicePreview: ObservableObject {
         }
 
         playingSpeaker = speaker
+        isLoading = true
         error = nil
         audioData = Data()
         sessionID = UUID().uuidString
@@ -40,6 +42,7 @@ final class OpenRockyDoubaoVoicePreview: ObservableObject {
                 try await connectAndSpeak(speaker: speaker, appId: appId, credential: credential)
             } catch {
                 self.error = error.localizedDescription
+                self.isLoading = false
                 self.playingSpeaker = nil
             }
         }
@@ -52,6 +55,7 @@ final class OpenRockyDoubaoVoicePreview: ObservableObject {
         audioPlayer = nil
         socket?.cancel(with: .goingAway, reason: nil)
         socket = nil
+        isLoading = false
         playingSpeaker = nil
     }
 
@@ -131,6 +135,7 @@ final class OpenRockyDoubaoVoicePreview: ObservableObject {
     }
 
     private func playCollectedAudio() {
+        isLoading = false
         guard !audioData.isEmpty else {
             playingSpeaker = nil
             return

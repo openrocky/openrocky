@@ -161,6 +161,9 @@
         }
       }
     },
+    "Account: %@" : {
+
+    },
     "Activate" : {
 
     },
@@ -315,6 +318,18 @@
     "Apple Intelligence is not available on this device." : {
 
     },
+    "Auth Method" : {
+
+    },
+    "Authenticated" : {
+
+    },
+    "Authentication" : {
+
+    },
+    "Authorized: %@" : {
+
+    },
     "Avg / Day" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -333,6 +348,9 @@
 
     },
     "Back" : {
+
+    },
+    "Bearer Token Override" : {
 
     },
     "Bootstrapping runtime..." : {
@@ -558,6 +576,9 @@
           }
         }
       }
+    },
+    "Clear Manual Token" : {
+
     },
     "Close" : {
       "localizations" : {
@@ -1108,6 +1129,9 @@
     "exit %d" : {
 
     },
+    "Expires: %@" : {
+
+    },
     "Export" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1232,7 +1256,7 @@
         }
       }
     },
-    "GLM Realtime (Zhipu AI)" : {
+    "GLM Realtime (Beta)" : {
 
     },
     "Gmail" : {
@@ -1503,6 +1527,9 @@
         }
       }
     },
+    "Manual Token" : {
+
+    },
     "Media" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1706,6 +1733,15 @@
         }
       }
     },
+    "OAuth" : {
+
+    },
+    "OAuth Expired" : {
+
+    },
+    "OAuth tokens are stored per provider instance in iOS Keychain." : {
+
+    },
     "OFF" : {
 
     },
@@ -1795,6 +1831,9 @@
     "OpenAI" : {
 
     },
+    "OpenAI OAuth" : {
+
+    },
     "OpenAI Realtime" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1848,6 +1887,9 @@
       }
     },
     "Optional resource ID" : {
+
+    },
+    "Optional. If provided, this token overrides OAuth for API calls." : {
 
     },
     "Optional. Override the default API host for this provider." : {
@@ -2262,6 +2304,7 @@
       }
     },
     "Sends a minimal request to verify your API key and model are working." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2270,6 +2313,9 @@
           }
         }
       }
+    },
+    "Sends a minimal request to verify your credentials and model are working." : {
+
     },
     "Set the Volcengine resource ID if your gateway requires it." : {
 
@@ -2316,6 +2362,15 @@
           }
         }
       }
+    },
+    "Sign in with OpenAI" : {
+
+    },
+    "Sign Out" : {
+
+    },
+    "Signing in..." : {
+
     },
     "Siri & Search Settings" : {
       "localizations" : {
@@ -2367,6 +2422,9 @@
           }
         }
       }
+    },
+    "sk-..." : {
+
     },
     "Skill Name" : {
       "localizations" : {
@@ -2703,6 +2761,9 @@
         }
       }
     },
+    "Token: %@" : {
+
+    },
     "Tokens" : {
 
     },
@@ -2866,6 +2927,9 @@
         }
       }
     },
+    "Use an API key, or sign in with your ChatGPT account for Codex-style OAuth." : {
+
+    },
     "Use QQ Mail authorization code (not your QQ password). Get it from QQ Mail Settings → Account → POP3/SMTP." : {
       "localizations" : {
         "zh-Hans" : {
@@ -2974,6 +3038,9 @@
           }
         }
       }
+    },
+    "Want to use OpenAI OAuth instead of API key? Finish onboarding first, then go to Settings → Chat Providers → OpenAI and choose OAuth." : {
+
     },
     "Warm and engaging" : {
       "localizations" : {

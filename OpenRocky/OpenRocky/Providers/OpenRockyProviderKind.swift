@@ -93,7 +93,7 @@ enum OpenRockyProviderKind: String, Codable, CaseIterable, Identifiable {
         case .appleFoundationModels:
             "On-device Apple Intelligence model. No API key required. Requires a supported device with iOS 26+."
         case .openAI:
-            "Direct OpenAI API key access."
+            "Direct OpenAI access via API key or OAuth (ChatGPT/Codex-style sign-in)."
         case .azureOpenAI:
             "Azure-hosted OpenAI deployment. Requires resource name and API version."
         case .anthropic:

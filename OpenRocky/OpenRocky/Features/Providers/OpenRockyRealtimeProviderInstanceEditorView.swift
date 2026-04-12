@@ -118,9 +118,14 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                                         )
                                     }
                                 } label: {
-                                    Image(systemName: geminiVoicePreview.playingVoice == voice.rawValue ? "stop.circle.fill" : "play.circle.fill")
-                                        .font(.system(size: 26))
-                                        .foregroundStyle(geminiVoicePreview.playingVoice == voice.rawValue ? .orange : .accentColor)
+                                    if geminiVoicePreview.playingVoice == voice.rawValue && geminiVoicePreview.isLoading {
+                                        ProgressView()
+                                            .controlSize(.small)
+                                    } else {
+                                        Image(systemName: geminiVoicePreview.playingVoice == voice.rawValue ? "stop.circle.fill" : "play.circle.fill")
+                                            .font(.system(size: 26))
+                                            .foregroundStyle(geminiVoicePreview.playingVoice == voice.rawValue ? .orange : .accentColor)
+                                    }
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -187,9 +192,14 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                                         )
                                     }
                                 } label: {
-                                    Image(systemName: glmVoicePreview.playingVoice == voice.rawValue ? "stop.circle.fill" : "play.circle.fill")
-                                        .font(.system(size: 26))
-                                        .foregroundStyle(glmVoicePreview.playingVoice == voice.rawValue ? .orange : .accentColor)
+                                    if glmVoicePreview.playingVoice == voice.rawValue && glmVoicePreview.isLoading {
+                                        ProgressView()
+                                            .controlSize(.small)
+                                    } else {
+                                        Image(systemName: glmVoicePreview.playingVoice == voice.rawValue ? "stop.circle.fill" : "play.circle.fill")
+                                            .font(.system(size: 26))
+                                            .foregroundStyle(glmVoicePreview.playingVoice == voice.rawValue ? .orange : .accentColor)
+                                    }
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -258,9 +268,14 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                                         voicePreview.play(speaker: speaker.rawValue, appId: doubaoAppId, credential: credential)
                                     }
                                 } label: {
-                                    Image(systemName: voicePreview.playingSpeaker == speaker.rawValue ? "stop.circle.fill" : "play.circle.fill")
-                                        .font(.system(size: 26))
-                                        .foregroundStyle(voicePreview.playingSpeaker == speaker.rawValue ? .orange : .accentColor)
+                                    if voicePreview.playingSpeaker == speaker.rawValue && voicePreview.isLoading {
+                                        ProgressView()
+                                            .controlSize(.small)
+                                    } else {
+                                        Image(systemName: voicePreview.playingSpeaker == speaker.rawValue ? "stop.circle.fill" : "play.circle.fill")
+                                            .font(.system(size: 26))
+                                            .foregroundStyle(voicePreview.playingSpeaker == speaker.rawValue ? .orange : .accentColor)
+                                    }
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -330,9 +345,14 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                                         )
                                     }
                                 } label: {
-                                    Image(systemName: openaiVoicePreview.playingVoice == voice.rawValue ? "stop.circle.fill" : "play.circle.fill")
-                                        .font(.system(size: 26))
-                                        .foregroundStyle(openaiVoicePreview.playingVoice == voice.rawValue ? .orange : .accentColor)
+                                    if openaiVoicePreview.playingVoice == voice.rawValue && openaiVoicePreview.isLoading {
+                                        ProgressView()
+                                            .controlSize(.small)
+                                    } else {
+                                        Image(systemName: openaiVoicePreview.playingVoice == voice.rawValue ? "stop.circle.fill" : "play.circle.fill")
+                                            .font(.system(size: 26))
+                                            .foregroundStyle(openaiVoicePreview.playingVoice == voice.rawValue ? .orange : .accentColor)
+                                    }
                                 }
                                 .buttonStyle(.plain)
                             }
