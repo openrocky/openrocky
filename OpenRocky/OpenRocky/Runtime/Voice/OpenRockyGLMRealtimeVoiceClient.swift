@@ -63,27 +63,59 @@ final class OpenRockyGLMRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
         socket.resume()
         rlog.info("GLM WebSocket connecting model=\(modelID)", category: "Voice")
 
-        // Start receive loop before sending session.update
+        // Wait for session.created before sending session.update
+        let createdTimeout: UInt64 = 5_000_000_000 // 5 seconds
+        let createdDeadline = ContinuousClock.now + .nanoseconds(Int64(createdTimeout))
+        var gotCreated = false
+        while ContinuousClock.now < createdDeadline {
+            let message = try await socket.receive()
+            if case .string(let text) = message {
+                handleServerMessage(text)
+                if let data = text.data(using: .utf8),
+                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   json["type"] as? String == "session.created" {
+                    gotCreated = true
+                    break
+                }
+            }
+        }
+
+        guard gotCreated else {
+            rlog.error("GLM: did not receive session.created", category: "Voice")
+            throw OpenRockyRealtimeVoiceClientError.notConnected
+        }
+
+        // Now send session.update
+        try await sendSessionUpdate()
+        rlog.info("GLM session.update sent, waiting for session.updated", category: "Voice")
+
+        // Wait for session.updated
+        let updateTimeout: UInt64 = 5_000_000_000
+        let updateDeadline = ContinuousClock.now + .nanoseconds(Int64(updateTimeout))
+        var gotUpdated = false
+        while ContinuousClock.now < updateDeadline {
+            let message = try await socket.receive()
+            if case .string(let text) = message {
+                handleServerMessage(text)
+                if let data = text.data(using: .utf8),
+                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   json["type"] as? String == "session.updated" {
+                    gotUpdated = true
+                    break
+                }
+            }
+        }
+
+        if !gotUpdated {
+            rlog.warning("GLM: did not receive session.updated, proceeding anyway", category: "Voice")
+        }
+
+        isReady = true
+        emit(.sessionReady(model: modelID, features: features))
+
+        // Start receive loop for ongoing events
         receiveTask?.cancel()
         receiveTask = Task { await self.receiveLoop() }
-
-        // Send session.update to configure the session
-        try await sendSessionUpdate()
-
-        // Wait briefly for session.created / session.updated
-        // The receive loop handles these events asynchronously
-        try await Task.sleep(nanoseconds: 500_000_000)
-
-        if !isReady {
-            // Give it a bit more time
-            try await Task.sleep(nanoseconds: 1_500_000_000)
-        }
-
-        if !isReady {
-            rlog.warning("GLM session not confirmed ready yet, proceeding anyway", category: "Voice")
-            isReady = true
-            emit(.sessionReady(model: modelID, features: features))
-        }
 
         emit(.status("GLM Realtime session is ready."))
     }
@@ -252,10 +284,17 @@ Voice-specific rules:
         let eventType = json["type"] as? String ?? ""
 
         switch eventType {
-        case "session.created", "session.updated":
+        case "session.created":
+            rlog.info("GLM session.created received", category: "Voice")
             if !isReady {
                 isReady = true
-                rlog.info("GLM session ready: \(eventType)", category: "Voice")
+                emit(.sessionReady(model: modelID, features: features))
+            }
+
+        case "session.updated":
+            rlog.info("GLM session.updated received - configuration accepted", category: "Voice")
+            if !isReady {
+                isReady = true
                 emit(.sessionReady(model: modelID, features: features))
             }
 
