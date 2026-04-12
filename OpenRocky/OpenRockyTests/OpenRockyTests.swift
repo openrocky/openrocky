@@ -29,7 +29,8 @@ private let kRealtimeToolNames: Set<String> = [
     "apple-reminder-list", "apple-reminder-create",
     "notification-schedule", "open-url",
     "nearby-search", "apple-contacts-search",
-    "camera-capture", "photo-pick"
+    "camera-capture", "photo-pick",
+    "delegate-task"
 ]
 
 /// Tools registered only via OpenRockyToolProvider (conditionally enabled, not in realtime definitions).
@@ -74,7 +75,8 @@ private let kMinimalArgs: [String: String] = [
     "photo-pick": "{}",
     "file-pick": "{}",
     "app-exit": #"{"farewell_message":"test"}"#,
-    "email-send": #"{"to":"test@test.com","subject":"test","body":"test"}"#
+    "email-send": #"{"to":"test@test.com","subject":"test","body":"test"}"#,
+    "delegate-task": #"{"task":"test task"}"#
 ]
 
 @MainActor

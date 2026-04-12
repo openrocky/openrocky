@@ -24,13 +24,15 @@ final class OpenRockyOpenAIRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
     private var isReady = false
 
     private let soulInstructions: String
+    private let realtimeTools: [OpenAIRealtimeSessionConfiguration.RealtimeTool]
 
-    init(configuration: OpenRockyProviderConfiguration, realtimeConfiguration: OpenRockyRealtimeProviderConfiguration, soulInstructions: String) {
+    init(configuration: OpenRockyProviderConfiguration, realtimeConfiguration: OpenRockyRealtimeProviderConfiguration, soulInstructions: String, realtimeTools: [OpenAIRealtimeSessionConfiguration.RealtimeTool]) {
         self.configuration = configuration.normalized()
         self.realtimeConfiguration = realtimeConfiguration
         self.injectedService = nil
         self.modelID = "gpt-realtime-mini"
         self.soulInstructions = soulInstructions
+        self.realtimeTools = realtimeTools
         features = OpenRockyRealtimeVoiceFeatures(
             supportsTextInput: true,
             supportsAssistantStreaming: true,
@@ -41,12 +43,13 @@ final class OpenRockyOpenAIRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
     }
 
     /// Initialize with a pre-built service (for OpenAI-compatible providers).
-    init(service: any OpenAIService, modelID: String, features: OpenRockyRealtimeVoiceFeatures, realtimeConfiguration: OpenRockyRealtimeProviderConfiguration, soulInstructions: String) {
+    init(service: any OpenAIService, modelID: String, features: OpenRockyRealtimeVoiceFeatures, realtimeConfiguration: OpenRockyRealtimeProviderConfiguration, soulInstructions: String, realtimeTools: [OpenAIRealtimeSessionConfiguration.RealtimeTool] = []) {
         self.configuration = nil
         self.injectedService = service
         self.realtimeConfiguration = realtimeConfiguration
         self.modelID = modelID
         self.soulInstructions = soulInstructions
+        self.realtimeTools = realtimeTools
         self.features = features
     }
 
@@ -204,7 +207,7 @@ Voice-specific rules:
             modalities: [.audio, .text],
             outputAudioFormat: .pcm16,
             temperature: 0.6,
-            tools: OpenRockyToolbox.realtimeToolDefinitions(),
+            tools: realtimeTools,
             toolChoice: .auto,
             turnDetection: .init(type: .serverVAD(prefixPaddingMs: 400, silenceDurationMs: 900, threshold: 0.8)),
             voice: voice

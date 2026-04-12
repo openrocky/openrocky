@@ -17,15 +17,17 @@ final class OpenRockyGeminiRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
 
     private let configuration: OpenRockyRealtimeProviderConfiguration
     private let soulInstructions: String
+    private let realtimeTools: [OpenAIRealtimeSessionConfiguration.RealtimeTool]
     private var socket: URLSessionWebSocketTask?
     private var receiveTask: Task<Void, Never>?
     private var eventSink: (@Sendable (OpenRockyRealtimeEvent) -> Void)?
     private var isReady = false
 
-    init(configuration: OpenRockyRealtimeProviderConfiguration, soulInstructions: String) {
+    init(configuration: OpenRockyRealtimeProviderConfiguration, soulInstructions: String, realtimeTools: [OpenAIRealtimeSessionConfiguration.RealtimeTool] = []) {
         self.configuration = configuration.normalized()
         self.modelID = "gemini-2.5-flash-native-audio-latest"
         self.soulInstructions = soulInstructions
+        self.realtimeTools = realtimeTools
         features = OpenRockyRealtimeVoiceFeatures(
             supportsTextInput: true,
             supportsAssistantStreaming: true,
@@ -352,10 +354,9 @@ Voice-specific rules:
 
     /// Convert OpenAI realtime tool definitions to Gemini functionDeclarations format.
     private func buildGeminiTools() -> [[String: Any]] {
-        let openAITools = OpenRockyToolbox.realtimeToolDefinitions()
         var declarations: [[String: Any]] = []
 
-        for tool in openAITools {
+        for tool in realtimeTools {
             switch tool {
             case .function(let fn):
                 var decl: [String: Any] = [

@@ -29,6 +29,7 @@ final class OpenRockyRealtimeVoiceBridge {
         configuration: OpenRockyRealtimeProviderConfiguration,
         voiceInputEnabled: Bool,
         soulInstructions: String,
+        realtimeTools: [OpenAIRealtimeSessionConfiguration.RealtimeTool],
         eventSink: @escaping @Sendable (OpenRockyRealtimeEvent) -> Void
     ) async throws {
         self.eventSink = eventSink
@@ -40,7 +41,7 @@ final class OpenRockyRealtimeVoiceBridge {
                 await stop()
             }
 
-            let client = try Self.makeClient(configuration: normalized, soulInstructions: soulInstructions)
+            let client = try Self.makeClient(configuration: normalized, soulInstructions: soulInstructions, realtimeTools: realtimeTools)
             try await client.connect(eventSink: eventSink)
             self.client = client
             activeConfiguration = normalized
@@ -200,7 +201,8 @@ final class OpenRockyRealtimeVoiceBridge {
 
     private static func makeClient(
         configuration: OpenRockyRealtimeProviderConfiguration,
-        soulInstructions: String
+        soulInstructions: String,
+        realtimeTools: [OpenAIRealtimeSessionConfiguration.RealtimeTool]
     ) throws -> any OpenRockyRealtimeVoiceClient {
         switch configuration.provider {
         case .openAI:
@@ -212,13 +214,13 @@ final class OpenRockyRealtimeVoiceBridge {
             guard OpenRockyOpenAIServiceFactory.supportsRealtime(configuration: chatConfiguration) else {
                 throw OpenRockyRealtimeVoiceBridgeError.unsupportedProvider
             }
-            return OpenRockyOpenAIRealtimeVoiceClient(configuration: chatConfiguration, realtimeConfiguration: configuration, soulInstructions: soulInstructions)
+            return OpenRockyOpenAIRealtimeVoiceClient(configuration: chatConfiguration, realtimeConfiguration: configuration, soulInstructions: soulInstructions, realtimeTools: realtimeTools)
         case .doubao:
-            return OpenRockyDoubaoRealtimeVoiceClient(configuration: configuration, soulInstructions: soulInstructions)
+            return OpenRockyDoubaoRealtimeVoiceClient(configuration: configuration, soulInstructions: soulInstructions, realtimeTools: realtimeTools)
         case .gemini:
-            return OpenRockyGeminiRealtimeVoiceClient(configuration: configuration, soulInstructions: soulInstructions)
+            return OpenRockyGeminiRealtimeVoiceClient(configuration: configuration, soulInstructions: soulInstructions, realtimeTools: realtimeTools)
         case .glm:
-            return OpenRockyGLMRealtimeVoiceClient(configuration: configuration, soulInstructions: soulInstructions)
+            return OpenRockyGLMRealtimeVoiceClient(configuration: configuration, soulInstructions: soulInstructions, realtimeTools: realtimeTools)
         }
     }
 }

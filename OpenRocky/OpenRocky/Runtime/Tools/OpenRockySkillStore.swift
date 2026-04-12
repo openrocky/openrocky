@@ -166,5 +166,8 @@ final class OpenRockyBuiltInToolStore: ObservableObject {
         .init(id: "notification-schedule", displayName: "Notification", description: "Schedule local notifications.", icon: "bell.fill", group: .system),
         .init(id: "open-url", displayName: "Open URL", description: "Open URLs and deep links in other apps.", icon: "arrow.up.forward.app.fill", group: .system),
         .init(id: "app-exit", displayName: "Exit App", description: "Exit the OpenRocky app when the user explicitly requests.", icon: "power", group: .system),
+
+        // Agent
+        .init(id: "delegate-task", displayName: "Delegate Task", description: "Delegate complex tasks to a background agent for parallel multi-tool execution.", icon: "person.2.fill", group: .system),
     ]
 }

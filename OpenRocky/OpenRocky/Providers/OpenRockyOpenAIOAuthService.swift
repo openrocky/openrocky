@@ -10,6 +10,7 @@
 import CryptoKit
 import Foundation
 import Security
+import UIKit
 
 struct OpenRockyOpenAIOAuthCredential: Codable, Equatable {
     var accessToken: String
@@ -34,27 +35,41 @@ enum OpenRockyOpenAIOAuthService {
     private static let authorizeURL = "https://auth.openai.com/oauth/authorize"
     private static let tokenURL = "https://auth.openai.com/oauth/token"
     private static let redirectURI = "http://127.0.0.1:1455/auth/callback"
+    private static let callbackPort: UInt16 = 1455
     private static let scope = "openid profile email offline_access"
     nonisolated private static let jwtAuthClaimPath = "https://api.openai.com/auth"
 
     static func signIn(originator: String = "openrocky") async throws -> OpenRockyOpenAIOAuthCredential {
         let flow = try makeAuthorizationFlow(originator: originator)
-        let callback = try await OpenRockyOAuthService.shared.authenticate(
-            authURL: flow.url,
-            callbackScheme: "http"
-        )
 
-        let returnedState = callback.parameters["state"] ?? parseQueryItem("state", from: callback.callbackURL)
-        guard returnedState == flow.state else {
+        // Start a local HTTP server to receive the OAuth callback,
+        // mirroring how Codex CLI handles the redirect to 127.0.0.1:1455.
+        let server = OpenRockyLocalOAuthServer(port: callbackPort)
+
+        // Open the authorization URL in the system browser
+        guard let authURL = URL(string: flow.url) else {
+            throw OpenAIOAuthError.invalidAuthorizeURL
+        }
+        let opened = await UIApplication.shared.open(authURL)
+        guard opened else {
+            await server.stop()
+            throw OpenAIOAuthError.invalidAuthorizeURL
+        }
+
+        // Wait for the callback on the local server
+        let callback: OpenRockyLocalOAuthServer.OAuthCallbackResult
+        do {
+            callback = try await server.waitForCallback(timeout: 300)
+        } catch {
+            await server.stop()
+            throw error
+        }
+
+        guard callback.state == flow.state else {
             throw OpenAIOAuthError.stateMismatch
         }
 
-        guard let code = callback.parameters["code"] ?? parseQueryItem("code", from: callback.callbackURL),
-              !code.isEmpty else {
-            throw OpenAIOAuthError.missingAuthorizationCode
-        }
-
-        let token = try await exchangeAuthorizationCode(code: code, verifier: flow.verifier)
+        let token = try await exchangeAuthorizationCode(code: callback.code, verifier: flow.verifier)
         guard let accountID = extractAccountID(from: token.accessToken) else {
             throw OpenAIOAuthError.missingAccountID
         }
@@ -200,14 +215,6 @@ enum OpenRockyOpenAIOAuthService {
             return nil
         }
         return accountID
-    }
-
-    private static func parseQueryItem(_ name: String, from callbackURL: String) -> String? {
-        guard let url = URL(string: callbackURL),
-              let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
-            return nil
-        }
-        return components.queryItems?.first(where: { $0.name == name })?.value
     }
 
     private static func randomData(count: Int) throws -> Data {

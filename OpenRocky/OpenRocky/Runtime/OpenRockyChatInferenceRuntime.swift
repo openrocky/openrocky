@@ -15,7 +15,7 @@ import LanguageModelChatUI
 @MainActor
 final class OpenRockyChatInferenceRuntime {
     private let characterStore = OpenRockyCharacterStore.shared
-    private let toolbox = OpenRockyToolbox()
+    let toolbox = OpenRockyToolbox()
     private var conversationHistory: [ChatCompletionParameters.Message] = []
 
     /// Tool calls completed during the most recent `run()`. Reset at the start of each run.
