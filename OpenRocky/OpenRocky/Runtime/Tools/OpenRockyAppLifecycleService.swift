@@ -16,8 +16,14 @@ final class OpenRockyAppLifecycleService {
     func exitApp(afterDelay delay: TimeInterval = 1.5) {
         Task { @MainActor in
             try? await Task.sleep(for: .seconds(delay))
-            // Suspend the app to background (iOS-friendly approach)
-            UIControl().sendAction(#selector(URLSessionTask.suspend), to: UIApplication.shared, for: nil)
+            // Suspend the app to background by performing the home-button selector.
+            // UIApplication responds to the private `suspend` selector which sends the app
+            // to the background, equivalent to pressing the Home button.
+            let app = UIApplication.shared
+            let selector = NSSelectorFromString("suspend")
+            if app.responds(to: selector) {
+                app.perform(selector)
+            }
         }
     }
 }

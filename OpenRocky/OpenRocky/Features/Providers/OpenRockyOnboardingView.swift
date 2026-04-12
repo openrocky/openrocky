@@ -73,8 +73,8 @@ struct OpenRockyOnboardingView: View {
         var badge: String {
             switch self {
             case .openAI: "Recommended"
-            case .gemini: "New"
-            case .glm: "New"
+            case .gemini: "Beta"
+            case .glm: "Beta"
             case .doubao: "Beta"
             }
         }

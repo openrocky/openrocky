@@ -15,6 +15,7 @@ import Foundation
 @MainActor
 final class OpenRockyGeminiVoicePreview: ObservableObject {
     @Published var playingVoice: String?
+    @Published var isLoading = false
     @Published var error: String?
 
     private var socket: URLSessionWebSocketTask?
@@ -30,6 +31,7 @@ final class OpenRockyGeminiVoicePreview: ObservableObject {
         }
 
         playingVoice = voice
+        isLoading = true
         error = nil
         audioData = Data()
 
@@ -38,6 +40,7 @@ final class OpenRockyGeminiVoicePreview: ObservableObject {
                 try await connectAndSpeak(voice: voice, credential: credential, customHost: customHost)
             } catch {
                 self.error = error.localizedDescription
+                self.isLoading = false
                 self.playingVoice = nil
             }
         }
@@ -50,6 +53,7 @@ final class OpenRockyGeminiVoicePreview: ObservableObject {
         audioPlayer = nil
         socket?.cancel(with: .goingAway, reason: nil)
         socket = nil
+        isLoading = false
         playingVoice = nil
     }
 
@@ -169,6 +173,7 @@ final class OpenRockyGeminiVoicePreview: ObservableObject {
     }
 
     private func playCollectedAudio() {
+        isLoading = false
         guard !audioData.isEmpty else {
             playingVoice = nil
             return

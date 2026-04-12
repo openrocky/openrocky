@@ -45,19 +45,6 @@ struct OpenRockyProviderSettingsView: View {
                     }
                 }
 
-                Section {
-                    Button {
-                        showsOnboarding = true
-                    } label: {
-                        settingsRow(
-                            icon: "wand.and.stars",
-                            tint: OpenRockyPalette.accent,
-                            title: "Setup Wizard",
-                            subtitle: "Configure unified chat + voice provider"
-                        )
-                    }
-                }
-
                 Section("Analytics") {
                     NavigationLink {
                         OpenRockyUsageSettingsView()
@@ -166,6 +153,17 @@ struct OpenRockyProviderSettingsView: View {
                             tint: .gray,
                             title: "Logs",
                             subtitle: "View & share runtime logs"
+                        )
+                    }
+
+                    Button {
+                        showsOnboarding = true
+                    } label: {
+                        settingsRow(
+                            icon: "wand.and.stars",
+                            tint: .gray,
+                            title: "Setup Wizard",
+                            subtitle: "Configure unified chat + voice provider"
                         )
                     }
                 }

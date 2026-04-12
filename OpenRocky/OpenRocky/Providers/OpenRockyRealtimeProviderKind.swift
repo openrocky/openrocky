@@ -22,7 +22,7 @@ enum OpenRockyRealtimeProviderKind: String, Codable, CaseIterable, Identifiable 
         case .openAI: String(localized: "OpenAI Realtime")
         case .doubao: String(localized: "Doubao Realtime (Beta)")
         case .gemini: String(localized: "Gemini Live (Beta)")
-        case .glm: String(localized: "GLM Realtime (Zhipu AI)")
+        case .glm: String(localized: "GLM Realtime (Beta)")
         }
     }
 
