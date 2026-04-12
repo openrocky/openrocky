@@ -489,7 +489,14 @@ Voice-specific rules:
         for tool in realtimeTools {
             switch tool {
             case .function(let fn):
-                let params = convertJSONValueDict(fn.parameters)
+                var params = convertJSONValueDict(fn.parameters)
+                // GLM requires properties to be a dict and required to be a list, never null
+                if params["properties"] == nil || params["properties"] is NSNull {
+                    params["properties"] = [String: Any]()
+                }
+                if params["required"] == nil || params["required"] is NSNull {
+                    params["required"] = [String]()
+                }
                 var toolDef: [String: Any] = [
                     "type": "function",
                     "name": fn.name,
