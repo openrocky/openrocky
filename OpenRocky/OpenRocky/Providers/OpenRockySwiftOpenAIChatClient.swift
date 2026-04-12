@@ -29,7 +29,7 @@ final class OpenRockySwiftOpenAIChatClient: ChatClient, @unchecked Sendable {
     }
 
     nonisolated func streamingChat(body: ChatRequestBody) async throws -> AnyAsyncSequence<ChatResponseChunk> {
-        let service = try makeService()
+        let service = try await makeService()
         let parameters = try makeParameters(from: body.mergingAdjacentAssistantMessages())
         let upstream = try await service.startStreamedChat(parameters: parameters)
         let config = configuration
@@ -53,8 +53,8 @@ final class OpenRockySwiftOpenAIChatClient: ChatClient, @unchecked Sendable {
         return AnyAsyncSequence(stream)
     }
 
-    private nonisolated func makeService() throws -> any OpenAIService {
-        try OpenRockyOpenAIServiceFactory.makeService(configuration: configuration)
+    private nonisolated func makeService() async throws -> any OpenAIService {
+        try await OpenRockyOpenAIServiceFactory.makeService(configuration: configuration)
     }
 
     private nonisolated func makeParameters(from body: ChatRequestBody) throws -> ChatCompletionParameters {

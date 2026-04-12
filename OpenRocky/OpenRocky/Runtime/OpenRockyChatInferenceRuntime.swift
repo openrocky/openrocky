@@ -35,7 +35,7 @@ final class OpenRockyChatInferenceRuntime {
     ) async throws {
         completedToolCalls = []
         rlog.info("Chat inference starting: provider=\(configuration.provider.rawValue) model=\(configuration.modelID)", category: "Chat")
-        let service = try OpenRockyOpenAIServiceFactory.makeService(configuration: configuration)
+        let service = try await OpenRockyOpenAIServiceFactory.makeService(configuration: configuration)
         let usageService = OpenRockyUsageService.shared
 
         // Remove any trailing tool messages that lack a preceding tool_use context

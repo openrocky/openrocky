@@ -58,7 +58,7 @@ final class OpenRockyOpenAIRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
         if let injectedService {
             service = injectedService
         } else if let configuration {
-            service = try OpenRockyOpenAIServiceFactory.makeService(configuration: configuration)
+            service = try await OpenRockyOpenAIServiceFactory.makeService(configuration: configuration)
         } else {
             throw OpenRockyRealtimeVoiceClientError.notConnected
         }

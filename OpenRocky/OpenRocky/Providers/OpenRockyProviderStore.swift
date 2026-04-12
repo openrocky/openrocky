@@ -125,6 +125,7 @@ final class OpenRockyProviderStore: ObservableObject {
         let key = openAIOAuthKeychainKey(for: instanceID)
         guard let credential else {
             keychain.removeValue(for: key)
+            objectWillChange.send()
             return
         }
         guard let data = try? JSONEncoder().encode(credential),
@@ -132,6 +133,8 @@ final class OpenRockyProviderStore: ObservableObject {
             return
         }
         keychain.set(json, for: key)
+        OpenRockyOpenAIOAuthVault.save(credential)
+        objectWillChange.send()
     }
 
     // MARK: - Legacy compatibility

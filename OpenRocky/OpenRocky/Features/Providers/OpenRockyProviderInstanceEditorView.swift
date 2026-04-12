@@ -447,7 +447,7 @@ struct OpenRockyProviderInstanceEditorView: View {
 
         Task {
             do {
-                let service = try OpenRockyOpenAIServiceFactory.makeService(configuration: config)
+                let service = try await OpenRockyOpenAIServiceFactory.makeService(configuration: config)
                 var parameters = ChatCompletionParameters(
                     messages: [.init(role: .user, content: .text("Hi, I am OpenRocky. Now it is \(ISO8601DateFormatter().string(from: Date()))"))],
                     model: .custom(config.modelID)

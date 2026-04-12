@@ -35,7 +35,7 @@ enum OpenRockyOpenAIOAuthService {
     private static let tokenURL = "https://auth.openai.com/oauth/token"
     private static let redirectURI = "http://127.0.0.1:1455/auth/callback"
     private static let scope = "openid profile email offline_access"
-    private static let jwtAuthClaimPath = "https://api.openai.com/auth"
+    nonisolated private static let jwtAuthClaimPath = "https://api.openai.com/auth"
 
     static func signIn(originator: String = "openrocky") async throws -> OpenRockyOpenAIOAuthCredential {
         let flow = try makeAuthorizationFlow(originator: originator)
@@ -66,6 +66,35 @@ enum OpenRockyOpenAIOAuthService {
             accountID: accountID,
             authorizedAt: Date()
         )
+    }
+
+    static func refresh(_ credential: OpenRockyOpenAIOAuthCredential) async throws -> OpenRockyOpenAIOAuthCredential {
+        let token = try await refreshAccessToken(refreshToken: credential.refreshToken)
+        guard let accountID = extractAccountID(from: token.accessToken) else {
+            throw OpenAIOAuthError.missingAccountID
+        }
+
+        return OpenRockyOpenAIOAuthCredential(
+            accessToken: token.accessToken,
+            refreshToken: token.refreshToken,
+            expiresAt: Date().addingTimeInterval(Double(token.expiresIn)),
+            accountID: accountID,
+            authorizedAt: credential.authorizedAt
+        )
+    }
+
+    static func refreshIfNeeded(
+        _ credential: OpenRockyOpenAIOAuthCredential,
+        leeway: TimeInterval = 60
+    ) async throws -> OpenRockyOpenAIOAuthCredential {
+        if credential.expiresAt.timeIntervalSinceNow > leeway {
+            return credential
+        }
+        return try await refresh(credential)
+    }
+
+    nonisolated static func accountID(fromAccessToken accessToken: String) -> String? {
+        extractAccountID(from: accessToken)
     }
 
     private static func makeAuthorizationFlow(originator: String) throws -> AuthorizationFlow {
@@ -128,7 +157,39 @@ enum OpenRockyOpenAIOAuthService {
         return decoded
     }
 
-    private static func extractAccountID(from accessToken: String) -> String? {
+    private static func refreshAccessToken(refreshToken: String) async throws -> OpenAIOAuthTokenResponse {
+        guard let url = URL(string: tokenURL) else {
+            throw OpenAIOAuthError.invalidTokenURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.httpBody = URLQueryEncoder.encode([
+            "grant_type": "refresh_token",
+            "client_id": clientID,
+            "refresh_token": refreshToken
+        ])
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let http = response as? HTTPURLResponse else {
+            throw OpenAIOAuthError.invalidTokenResponse
+        }
+
+        guard (200 ... 299).contains(http.statusCode) else {
+            let message = String(data: data, encoding: .utf8) ?? "unknown error"
+            throw OpenAIOAuthError.tokenExchangeFailed(statusCode: http.statusCode, message: message)
+        }
+
+        let decoded = try JSONDecoder().decode(OpenAIOAuthTokenResponse.self, from: data)
+        guard !decoded.accessToken.isEmpty, !decoded.refreshToken.isEmpty else {
+            throw OpenAIOAuthError.invalidTokenResponse
+        }
+        return decoded
+    }
+
+    nonisolated private static func extractAccountID(from accessToken: String) -> String? {
         let segments = accessToken.split(separator: ".")
         guard segments.count == 3 else { return nil }
         guard let payloadData = decodeBase64URL(String(segments[1])),
@@ -167,7 +228,7 @@ enum OpenRockyOpenAIOAuthService {
             .replacingOccurrences(of: "=", with: "")
     }
 
-    private static func decodeBase64URL(_ value: String) -> Data? {
+    nonisolated private static func decodeBase64URL(_ value: String) -> Data? {
         var base64 = value
             .replacingOccurrences(of: "-", with: "+")
             .replacingOccurrences(of: "_", with: "/")
