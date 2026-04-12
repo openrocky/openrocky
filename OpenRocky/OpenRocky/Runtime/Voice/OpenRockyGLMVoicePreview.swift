@@ -64,11 +64,16 @@ final class OpenRockyGLMVoicePreview: ObservableObject {
             let sessionUpdate: [String: Any] = [
                 "type": "session.update",
                 "session": [
-                    "model": "glm-realtime",
                     "voice": voice,
                     "modalities": ["audio", "text"],
+                    "input_audio_format": "pcm",
                     "output_audio_format": "pcm",
-                    "turn_detection": ["type": "server_vad"] as [String: Any]
+                    "turn_detection": ["type": "server_vad"] as [String: Any],
+                    "beta_fields": [
+                        "chat_mode": "audio",
+                        "tts_source": "e2e",
+                        "auto_search": false
+                    ] as [String: Any]
                 ] as [String: Any]
             ]
             try await sendJSON(ws, sessionUpdate)

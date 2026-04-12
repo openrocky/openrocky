@@ -190,10 +190,9 @@ Voice-specific rules:
         let tools = buildGLMTools()
 
         var sessionConfig: [String: Any] = [
-            "model": modelID,
-            "voice": voice,
             "modalities": ["audio", "text"],
-            "input_audio_format": "pcm16",
+            "voice": voice,
+            "input_audio_format": "pcm",
             "output_audio_format": "pcm",
             "instructions": instructions,
             "turn_detection": [
@@ -201,12 +200,16 @@ Voice-specific rules:
                 "prefix_padding_ms": 400,
                 "silence_duration_ms": 900,
                 "threshold": 0.8
+            ] as [String: Any],
+            "beta_fields": [
+                "chat_mode": "audio",
+                "tts_source": "e2e",
+                "auto_search": false
             ] as [String: Any]
         ]
 
         if !tools.isEmpty {
             sessionConfig["tools"] = tools
-            sessionConfig["tool_choice"] = "auto"
         }
 
         let message: [String: Any] = [

@@ -101,7 +101,10 @@ extension Endpoint {
     guard var components = URLComponents(string: base) else {
       fatalError("Invalid base URL: \(base)")
     }
-    components.path = path
+    // Append the endpoint path to the existing base path (e.g. "/api/paas" + "/v4/chat/completions")
+    // instead of replacing it, so providers whose base URL includes a path component work correctly.
+    let basePath = components.path.hasSuffix("/") ? String(components.path.dropLast()) : components.path
+    components.path = basePath + path
     if !queryItems.isEmpty {
       components.queryItems = queryItems
     }

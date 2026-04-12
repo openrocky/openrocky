@@ -54,7 +54,7 @@ enum OpenRockyProviderKind: String, Codable, CaseIterable, Identifiable {
         case .openRouter: "anthropic/claude-sonnet-4.5"
         case .deepSeek: "deepseek-chat"
         case .volcengine: "doubao-seed-1-8-251228"
-        case .zhipuAI: "glm-4-plus"
+        case .zhipuAI: "glm-4.7"
         case .aiProxy: "gpt-5"
         }
     }
@@ -82,7 +82,7 @@ enum OpenRockyProviderKind: String, Codable, CaseIterable, Identifiable {
         case .volcengine:
             ["doubao-seed-1-8-251228", "doubao-1.5-pro-256k-250115", "doubao-1.5-thinking-pro-250415"]
         case .zhipuAI:
-            ["glm-4-plus", "glm-4-flash", "glm-4-air"]
+            ["glm-4.7", "glm-5", "glm-5-turbo", "glm-5.1", "glm-4.5"]
         case .aiProxy:
             ["gpt-5", "gpt-5-mini", "gpt-4o"]
         }
