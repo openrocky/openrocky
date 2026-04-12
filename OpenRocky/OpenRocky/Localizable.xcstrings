@@ -3039,6 +3039,9 @@
         }
       }
     },
+    "Want to use OpenAI OAuth instead of API key? Finish onboarding first, then go to Settings → Chat Providers → OpenAI and choose OAuth." : {
+
+    },
     "Warm and engaging" : {
       "localizations" : {
         "zh-Hans" : {

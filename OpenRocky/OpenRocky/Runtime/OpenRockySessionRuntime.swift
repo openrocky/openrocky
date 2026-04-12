@@ -353,7 +353,7 @@ final class OpenRockySessionRuntime: ObservableObject {
                 let displayName: String
                 let icon: String?
                 if let skill = OpenRockyCustomSkillStore.shared.skill(forToolName: tc.name) {
-                    displayName = skill.name
+                    displayName = "Skill: \(skill.name)"
                     icon = "sparkles"
                 } else {
                     displayName = def?.displayName ?? tc.name
