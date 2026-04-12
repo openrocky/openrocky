@@ -84,6 +84,9 @@ struct ContentView: View {
                 chatConfiguration: chatProviderStore.configuration,
                 voiceConfiguration: voiceProviderStore.configuration
             )
+            // Force chat controller/client recreation when provider config changes,
+            // even if high-level identity fields stay the same.
+            chatRefreshToken = UUID()
         }
         .onChange(of: voiceProviderStore.configuration) { _, _ in
             sessionRuntime.syncProviders(

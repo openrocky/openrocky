@@ -608,7 +608,7 @@ struct OpenRockyProviderInstanceEditorView: View {
             instance.azureAPIVersion = azureAPIVersion.isEmpty ? nil : azureAPIVersion
             instance.aiProxyServiceURL = aiProxyServiceURL.isEmpty ? nil : aiProxyServiceURL
             instance.customHost = customHost.isEmpty ? nil : customHost
-            providerStore.update(instance, credential: manualCredential.isEmpty ? nil : manualCredential)
+            providerStore.update(instance, credential: manualCredential)
             if selectedProvider == .openAI {
                 providerStore.setOpenAIOAuthCredential(openAIAuthMethod == .oauth ? openAIOAuthCredential : nil, for: id)
             } else {
