@@ -28,6 +28,8 @@ final class OpenRockyGLMRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
     private var pendingToolCallName: String?
     /// Buffer transcript until response.done to avoid premature mic resume.
     private var pendingTranscript: String?
+    /// Whether the next audio.delta is the first chunk in a new response.
+    private var isFirstAudioChunk = true
 
     init(configuration: OpenRockyRealtimeProviderConfiguration, soulInstructions: String, realtimeTools: [OpenAIRealtimeSessionConfiguration.RealtimeTool] = []) {
         self.configuration = configuration.normalized()
@@ -451,17 +453,23 @@ Voice-specific rules:
 
         case "response.created":
             rlog.info("GLM: response.created - model is generating", category: "Voice")
+            isFirstAudioChunk = true
 
         case "response.audio.delta":
             if let audioData = json["delta"] as? String, !audioData.isEmpty {
-                // Log first chunk details to diagnose audio format
-                if let rawData = Data(base64Encoded: audioData) {
-                    let firstBytes = rawData.prefix(16).map { String(format: "%02X", $0) }.joined(separator: " ")
-                    let header = rawData.prefix(4).map { Character(UnicodeScalar($0)) }
-                    let isWAV = String(header).hasPrefix("RIFF")
-                    rlog.info("GLM: audio.delta \(rawData.count)bytes first16=[\(firstBytes)] isWAV=\(isWAV)", category: "Voice")
+                if isFirstAudioChunk, let rawData = Data(base64Encoded: audioData) {
+                    isFirstAudioChunk = false
+                    // GLM prepends a fixed audio preamble (~100ms tone) to every response.
+                    // Skip the first 4800 bytes (2400 samples = 100ms at 24kHz) to remove it.
+                    let skipBytes = min(4800, rawData.count / 4) // Don't skip more than 25% of chunk
+                    let trimmed = rawData.dropFirst(skipBytes)
+                    rlog.info("GLM: audio.delta first chunk \(rawData.count)bytes, trimmed \(skipBytes)bytes", category: "Voice")
+                    if trimmed.count > 0 {
+                        emit(.assistantAudioChunk(trimmed.base64EncodedString()))
+                    }
+                } else {
+                    emit(.assistantAudioChunk(audioData))
                 }
-                emit(.assistantAudioChunk(audioData))
             }
 
         case "response.audio.done":
