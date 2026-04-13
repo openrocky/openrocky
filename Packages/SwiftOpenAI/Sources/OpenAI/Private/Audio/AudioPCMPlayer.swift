@@ -73,12 +73,62 @@ final class AudioPCMPlayer {
   /// Called on the RealtimeActor when the last pending buffer finishes playing.
   public var onPlaybackDrained: (() -> Void)?
 
+  // MARK: - Initial Buffering
+  // Accumulate the first few audio chunks before starting playback to prevent
+  // buffer underruns that cause clicking/beeping artifacts. Once enough data is
+  // buffered, all accumulated chunks are scheduled at once for gapless playback.
+
+  /// Accumulated PCM buffers waiting to be flushed.
+  private var accumulatedBuffers: [AVAudioPCMBuffer] = []
+  /// Total raw byte count of accumulated audio data.
+  private var accumulatedByteCount: Int = 0
+  /// Whether initial buffering has completed and playback has started.
+  private var hasStartedPlayback: Bool = false
+  /// Byte threshold before flushing initial buffer (~300ms at 24kHz mono 16-bit).
+  private let initialBufferThreshold: Int = 14_400
+
   public func playPCM16Audio(from base64String: String) {
     guard let audioData = Data(base64Encoded: base64String) else {
       logger.error("Could not decode base64 string for audio playback")
       return
     }
 
+    guard let outPCMBuf = convertToPCM32(audioData: audioData) else { return }
+
+    if hasStartedPlayback {
+      scheduleBuffer(outPCMBuf)
+    } else {
+      accumulatedBuffers.append(outPCMBuf)
+      accumulatedByteCount += audioData.count
+      if accumulatedByteCount >= initialBufferThreshold {
+        flushAccumulatedBuffers()
+      }
+    }
+  }
+
+  /// Force-flush any accumulated audio buffers and start playback.
+  /// Call this when the server signals no more audio is coming (response.audio.done)
+  /// to handle responses shorter than the buffer threshold.
+  public func flushBufferedAudio() {
+    guard !hasStartedPlayback, !accumulatedBuffers.isEmpty else { return }
+    flushAccumulatedBuffers()
+  }
+
+  public func interruptPlayback() {
+    // Clear any accumulated buffers that haven't started playing yet
+    accumulatedBuffers.removeAll()
+    accumulatedByteCount = 0
+    hasStartedPlayback = false
+
+    guard pendingBufferCount > 0 else { return }
+    logger.debug("Interrupting playback")
+    playerNode.stop()
+    pendingBufferCount = 0
+  }
+
+  // MARK: - Private Helpers
+
+  private func convertToPCM32(audioData: Data) -> AVAudioPCMBuffer? {
     var bufferList = AudioBufferList(
       mNumberBuffers: 1,
       mBuffers:
@@ -93,7 +143,7 @@ final class AudioPCMPlayer {
         bufferListNoCopy: &bufferList)
     else {
       logger.error("Could not create input buffer for audio playback")
-      return
+      return nil
     }
 
     guard
@@ -102,44 +152,51 @@ final class AudioPCMPlayer {
         frameCapacity: AVAudioFrameCount(UInt32(audioData.count) * 2))
     else {
       logger.error("Could not create output buffer for audio playback")
-      return
+      return nil
     }
 
     guard let converter = AVAudioConverter(from: inputFormat, to: playableFormat) else {
       logger.error("Could not create audio converter needed to map from pcm16int to pcm32float")
-      return
+      return nil
     }
 
     do {
       try converter.convert(to: outPCMBuf, from: inPCMBuf)
     } catch {
       logger.error("Could not map from pcm16int to pcm32float: \(error.localizedDescription)")
-      return
+      return nil
     }
 
-    if audioEngine.isRunning {
-      pendingBufferCount += 1
-      playerNode.scheduleBuffer(outPCMBuf, at: nil, options: []) { [weak self] in
-        Task { @RealtimeActor [weak self] in
-          guard let self else { return }
-          self.pendingBufferCount -= 1
-          if self.pendingBufferCount <= 0 {
-            self.pendingBufferCount = 0
-            self.onPlaybackDrained?()
-          }
+    return outPCMBuf
+  }
+
+  private func scheduleBuffer(_ buffer: AVAudioPCMBuffer) {
+    guard audioEngine.isRunning else { return }
+    pendingBufferCount += 1
+    playerNode.scheduleBuffer(buffer, at: nil, options: []) { [weak self] in
+      Task { @RealtimeActor [weak self] in
+        guard let self else { return }
+        self.pendingBufferCount -= 1
+        if self.pendingBufferCount <= 0 {
+          self.pendingBufferCount = 0
+          self.hasStartedPlayback = false
+          self.onPlaybackDrained?()
         }
       }
-      if !playerNode.isPlaying {
-        playerNode.play()
-      }
+    }
+    if !playerNode.isPlaying {
+      playerNode.play()
     }
   }
 
-  public func interruptPlayback() {
-    guard pendingBufferCount > 0 else { return }
-    logger.debug("Interrupting playback")
-    playerNode.stop()
-    pendingBufferCount = 0
+  private func flushAccumulatedBuffers() {
+    logger.debug("Flushing \(self.accumulatedBuffers.count) buffered audio chunks (\(self.accumulatedByteCount) bytes)")
+    for buffer in accumulatedBuffers {
+      scheduleBuffer(buffer)
+    }
+    accumulatedBuffers.removeAll()
+    accumulatedByteCount = 0
+    hasStartedPlayback = true
   }
 
   let audioEngine: AVAudioEngine

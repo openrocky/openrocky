@@ -258,6 +258,10 @@ final class OpenRockySessionRuntime: ObservableObject {
             Task {
                 await bridge.handlePlaybackEvent(event)
             }
+        case .assistantAudioDone:
+            Task {
+                await bridge.flushBufferedAudio()
+            }
         case .toolCallRequested(let name, let arguments, let callID):
             lastToolName = name
             session.mode = .executing

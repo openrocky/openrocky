@@ -364,6 +364,9 @@ Voice-specific rules:
             "input_audio_format": "wav",
             "output_audio_format": "pcm",
             "instructions": instructions,
+            "input_audio_noise_reduction": [
+                "type": "near_field"
+            ] as [String: Any],
             "turn_detection": [
                 "type": "client_vad"
             ] as [String: Any],
@@ -483,7 +486,7 @@ Voice-specific rules:
 
         case "response.audio.done":
             rlog.info("GLM: response.audio.done", category: "Voice")
-            break
+            emit(.assistantAudioDone)
 
         case "response.function_call_arguments.done":
             let rawName = json["name"] as? String ?? ""
