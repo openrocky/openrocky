@@ -1156,6 +1156,10 @@ final class OpenRockyToolbox {
             return try await executeEmailSend(arguments: arguments)
         case "delegate-task":
             return try await executeDelegateTask(arguments: arguments)
+        case "icloud-read":
+            return try executeICloudRead(arguments: arguments)
+        case "icloud-list":
+            return try executeICloudList(arguments: arguments)
         default:
             // Check if it's a custom skill tool (skill-*)
             if let skill = OpenRockyCustomSkillStore.shared.skill(forToolName: name) {
@@ -1505,6 +1509,107 @@ final class OpenRockyToolbox {
         let encodedPath = request.path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? request.path
         let link = "rocky://workspace/\(encodedPath)"
         return try encode(["path": request.path, "written": true, "bytes": request.content.utf8.count, "link": link, "markdown_link": "[\(request.path)](\(link))"])
+    }
+
+    // MARK: - iCloud Drive
+
+    private static func resolveICloudContainerURL(container: String) -> URL? {
+        let fm = FileManager.default
+        // Try well-known container identifiers
+        let containerName: String
+        switch container.lowercased() {
+        case "obsidian", "md.obsidian", "icloud~md~obsidian":
+            containerName = "iCloud~md~obsidian"
+        default:
+            // Try as-is, or with iCloud~ prefix
+            containerName = container.hasPrefix("iCloud~") ? container : "iCloud~\(container)"
+        }
+
+        // iCloud Drive app containers are at ~/Library/Mobile Documents/{containerName}/
+        guard let mobileDocsURL = fm.url(forUbiquityContainerIdentifier: nil) else {
+            // Fallback: try the Mobile Documents path directly
+            let home = fm.urls(for: .documentDirectory, in: .userDomainMask).first!
+                .deletingLastPathComponent()
+                .deletingLastPathComponent()
+            let mobileDocs = home.appendingPathComponent("Library/Mobile Documents")
+            let containerURL = mobileDocs.appendingPathComponent(containerName)
+            if fm.fileExists(atPath: containerURL.path) {
+                return containerURL
+            }
+            // Also try "Documents" subfolder pattern
+            let documentsURL = containerURL.appendingPathComponent("Documents")
+            if fm.fileExists(atPath: documentsURL.path) {
+                return documentsURL
+            }
+            return nil
+        }
+
+        // ubiquity container root — navigate to specific app folder
+        let baseURL = mobileDocsURL.deletingLastPathComponent()
+        let containerURL = baseURL.appendingPathComponent(containerName)
+        if fm.fileExists(atPath: containerURL.path) {
+            return containerURL
+        }
+        let documentsURL = containerURL.appendingPathComponent("Documents")
+        if fm.fileExists(atPath: documentsURL.path) {
+            return documentsURL
+        }
+        return nil
+    }
+
+    private func executeICloudRead(arguments: String) throws -> String {
+        let request = try decode(ICloudReadRequest.self, from: arguments)
+        guard let containerURL = Self.resolveICloudContainerURL(container: request.container) else {
+            return try encode(["error": "iCloud container '\(request.container)' not found. Make sure the app is installed and synced to iCloud."])
+        }
+        let fileURL = containerURL.appendingPathComponent(request.path)
+        guard FileManager.default.fileExists(atPath: fileURL.path) else {
+            return try encode(["error": "File not found: \(request.path) in \(request.container)"])
+        }
+        // Start accessing security-scoped resource
+        let accessing = fileURL.startAccessingSecurityScopedResource()
+        defer { if accessing { fileURL.stopAccessingSecurityScopedResource() } }
+
+        let content = try String(contentsOf: fileURL, encoding: .utf8)
+        return try encode(["container": request.container, "path": request.path, "content": String(content.prefix(16000))])
+    }
+
+    private func executeICloudList(arguments: String) throws -> String {
+        let request = try decode(ICloudListRequest.self, from: arguments)
+        guard let containerURL = Self.resolveICloudContainerURL(container: request.container) else {
+            return try encode(["error": "iCloud container '\(request.container)' not found. Make sure the app is installed and synced to iCloud."])
+        }
+        let targetURL: URL
+        if let path = request.path, !path.isEmpty, path != "/" {
+            targetURL = containerURL.appendingPathComponent(path)
+        } else {
+            targetURL = containerURL
+        }
+
+        let accessing = targetURL.startAccessingSecurityScopedResource()
+        defer { if accessing { targetURL.stopAccessingSecurityScopedResource() } }
+
+        guard FileManager.default.fileExists(atPath: targetURL.path) else {
+            return try encode(["error": "Path not found: \(request.path ?? "/") in \(request.container)"])
+        }
+        let items = try FileManager.default.contentsOfDirectory(at: targetURL, includingPropertiesForKeys: [.isDirectoryKey, .fileSizeKey])
+        let entries: [[String: Any]] = items.prefix(200).compactMap { url in
+            let isDir = (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
+            let size = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+            return [
+                "name": url.lastPathComponent,
+                "type": isDir ? "directory" : "file",
+                "size": size
+            ] as [String: Any]
+        }
+        let result: [String: Any] = [
+            "container": request.container,
+            "path": request.path ?? "/",
+            "count": entries.count,
+            "items": entries
+        ]
+        let data = try JSONSerialization.data(withJSONObject: result, options: [.sortedKeys])
+        return String(data: data, encoding: .utf8) ?? "{}"
     }
 
     // MARK: - Web Search
@@ -2026,6 +2131,16 @@ private struct FileReadRequest: Decodable {
 private struct FileWriteRequest: Decodable {
     let path: String
     let content: String
+}
+
+private struct ICloudReadRequest: Decodable {
+    let container: String
+    let path: String
+}
+
+private struct ICloudListRequest: Decodable {
+    let container: String
+    let path: String?
 }
 
 private struct WebSearchRequest: Decodable {

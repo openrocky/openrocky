@@ -64,6 +64,13 @@ struct ContentView: View {
             }
         }
         .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .background {
+                // Stop voice session when app goes to background
+                if showsVoiceOverlay {
+                    endVoiceSession()
+                }
+                return
+            }
             guard newPhase == .active else { return }
             // Check if Siri set the voice-start flag while the app was in the background
             if UserDefaults.standard.bool(forKey: "rocky.launch.startVoice") {

@@ -326,6 +326,14 @@ final class OpenRockyGLMRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
         // GLM handles TTS natively via the realtime session, no external injection needed
     }
 
+    func cancelResponse() async throws {
+        guard socket != nil, isReady else { return }
+        isResponseInProgress = false
+        let message: [String: Any] = ["type": "response.cancel"]
+        try await sendJSON(message)
+        rlog.info("GLM: sent response.cancel for interruption", category: "Voice")
+    }
+
     // MARK: - Session Configuration
 
     private func sendSessionUpdate() async throws {
@@ -592,6 +600,8 @@ Voice-specific rules:
         "files_memory": [
             "read_file": "file-read",
             "write_file": "file-write",
+            "icloud_read": "icloud-read",
+            "icloud_list": "icloud-list",
             "memory_get": "memory_get",
             "memory_write": "memory_write",
             "todo": "todo"
@@ -697,13 +707,14 @@ Voice-specific rules:
         [
             "type": "function",
             "name": "files_memory",
-            "description": "File operations, memory and todo. Actions: read_file (needs: path), write_file (needs: path, content), memory_get (needs: key), memory_write (needs: key, value), todo (needs: action: list/add/complete/delete; optional: title, id)",
+            "description": "File operations, iCloud, memory and todo. Actions: read_file (needs: path), write_file (needs: path, content), icloud_read (needs: container e.g. 'Obsidian', path), icloud_list (needs: container; optional: path), memory_get (needs: key), memory_write (needs: key, value), todo (needs: action: list/add/complete/delete; optional: title, id)",
             "parameters": [
                 "type": "object",
                 "properties": [
-                    "action": ["type": "string", "description": "One of: read_file, write_file, memory_get, memory_write, todo"] as [String: Any],
+                    "action": ["type": "string", "description": "One of: read_file, write_file, icloud_read, icloud_list, memory_get, memory_write, todo"] as [String: Any],
                     "path": ["type": "string", "description": "File path"] as [String: Any],
                     "content": ["type": "string", "description": "File content to write"] as [String: Any],
+                    "container": ["type": "string", "description": "iCloud container name, e.g. 'Obsidian'"] as [String: Any],
                     "key": ["type": "string", "description": "Memory key"] as [String: Any],
                     "value": ["type": "string", "description": "Memory value"] as [String: Any],
                     "title": ["type": "string", "description": "Todo title"] as [String: Any],

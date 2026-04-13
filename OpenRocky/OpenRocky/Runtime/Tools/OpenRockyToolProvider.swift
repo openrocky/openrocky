@@ -223,6 +223,22 @@ final class OpenRockyToolProvider: ToolProvider, @unchecked Sendable {
         .function(name: "camera-capture", description: "Take a photo using the device camera and save it to the workspace.", parameters: ["type": "object", "properties": [:] as AnyCodingValue], strict: nil),
         .function(name: "photo-pick", description: "Pick a photo from the device photo library and save it to the workspace.", parameters: ["type": "object", "properties": [:] as AnyCodingValue], strict: nil),
         .function(name: "file-pick", description: "Pick a file from the device and save it to the workspace.", parameters: ["type": "object", "properties": [:] as AnyCodingValue], strict: nil),
+        .function(name: "icloud-read", description: "Read a file from iCloud Drive (e.g. Obsidian vault). Specify the app container and relative path.", parameters: [
+            "type": "object",
+            "properties": [
+                "container": ["type": "string", "description": "iCloud app container name, e.g. 'Obsidian' or 'iCloud~md~obsidian'. Use 'Obsidian' as shorthand."],
+                "path": ["type": "string", "description": "Relative file path within the container, e.g. 'MyVault/note.md'."]
+            ],
+            "required": ["container", "path"]
+        ], strict: nil),
+        .function(name: "icloud-list", description: "List files and folders in an iCloud Drive container (e.g. Obsidian vault).", parameters: [
+            "type": "object",
+            "properties": [
+                "container": ["type": "string", "description": "iCloud app container name, e.g. 'Obsidian'."],
+                "path": ["type": "string", "description": "Relative folder path within the container. Use '' or '/' for root."]
+            ],
+            "required": ["container"]
+        ], strict: nil),
         .function(name: "apple-calendar-list", description: "List events from Apple Calendar for a date range.", parameters: [
             "type": "object",
             "properties": [
@@ -354,6 +370,8 @@ private struct OpenRockyToolExecutor: ToolExecutor {
         case "open-url": "Open URL"
         case "app-exit": "Exit App"
         case "email-send": "Send Email"
+        case "icloud-read": "iCloud Read"
+        case "icloud-list": "iCloud List"
         default: name
         }
     }
@@ -396,6 +414,8 @@ private struct OpenRockyToolExecutor: ToolExecutor {
         case "open-url": "link"
         case "app-exit": "power"
         case "email-send": "envelope.fill"
+        case "icloud-read": "icloud.fill"
+        case "icloud-list": "icloud.and.arrow.down.fill"
         default: "wrench.fill"
         }
     }

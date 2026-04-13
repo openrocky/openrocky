@@ -622,24 +622,29 @@ struct OpenRockyOnboardingView: View {
             h.hasPrefix("https://") ? h.replacingOccurrences(of: "https://", with: "wss://") : h
         }
 
-        // Set up chat provider
-        var chatConfig = OpenRockyProviderConfiguration(
-            provider: selectedProvider.chatProviderKind,
+        // Always add new chat provider instance (append, not overwrite)
+        let chatInstance = OpenRockyProviderInstance(
+            id: UUID().uuidString,
+            name: selectedProvider.displayName,
+            kind: selectedProvider.chatProviderKind,
             modelID: selectedProvider.chatProviderKind.defaultModel,
-            credential: key
+            customHost: chatHost,
+            isBuiltIn: false
         )
-        chatConfig.customHost = chatHost
-        providerStore.update(configuration: chatConfig)
+        providerStore.add(chatInstance, credential: key)
+        providerStore.setActive(id: chatInstance.id)
 
-        // Set up voice provider with the same key
-        var voiceConfig = OpenRockyRealtimeProviderConfiguration(
-            provider: selectedProvider.voiceProviderKind,
+        // Always add new voice provider instance (append, not overwrite)
+        let voiceInstance = OpenRockyRealtimeProviderInstance(
+            id: UUID().uuidString,
+            name: "\(selectedProvider.displayName) Voice",
+            kind: selectedProvider.voiceProviderKind,
             modelID: selectedProvider.voiceProviderKind.defaultModel,
-            credential: key
+            customHost: voiceHost,
+            isBuiltIn: false
         )
-        voiceConfig.customHost = voiceHost
-
-        realtimeProviderStore.update(configuration: voiceConfig)
+        realtimeProviderStore.add(voiceInstance, credential: key)
+        realtimeProviderStore.setActive(id: voiceInstance.id)
 
         isSubmitting = false
         withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {

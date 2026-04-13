@@ -49,10 +49,8 @@ struct OpenRockyAboutView: View {
                 linkRow(icon: "bubble.left.and.bubble.right.fill", tint: .purple, title: "Discord", url: "https://discord.gg/SvvsaDA4nE")
             }
 
-            // Feedback
-            Section("Feedback") {
-                linkRow(icon: "exclamationmark.bubble.fill", tint: .red, title: "Feedback", subtitle: "Report issues or suggestions", url: "https://github.com/openrocky/openrocky/issues/new")
-
+            // Setup
+            Section {
                 Button {
                     showsOnboarding = true
                 } label: {

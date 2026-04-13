@@ -29,6 +29,17 @@ public enum AudioUtils {
     #endif
   }
 
+  /// Compute RMS energy of raw PCM16 data (for voice activity detection).
+  nonisolated public static func computeRMS(_ data: Data) -> Double {
+    let samples: [Int16] = data.withUnsafeBytes { raw in
+      let buffer = raw.bindMemory(to: Int16.self)
+      return Array(buffer)
+    }
+    guard !samples.isEmpty else { return 0 }
+    let sumSquares = samples.reduce(0.0) { $0 + Double($1) * Double($1) }
+    return (sumSquares / Double(samples.count)).squareRoot()
+  }
+
   /// Encodes an AVAudioPCMBuffer to base64 string for transmission to OpenAI
   nonisolated public static func base64EncodeAudioPCMBuffer(from buffer: AVAudioPCMBuffer) -> String? {
     guard buffer.format.channelCount == 1 else {

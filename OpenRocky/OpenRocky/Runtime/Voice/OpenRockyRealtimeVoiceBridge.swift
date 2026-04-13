@@ -135,9 +135,20 @@ final class OpenRockyRealtimeVoiceBridge {
                 for await buffer in micStream {
                     guard Task.isCancelled == false else { break }
                     micBufferCount += 1
-                    // Skip sending mic data while assistant is playing audio (echo suppression)
-                    guard !isMicSuspended else {
+                    // When mic is suspended (echo suppression), still check for user speech
+                    // to allow interrupting assistant playback
+                    if isMicSuspended {
                         skippedCount += 1
+                        // Check if the user is speaking loudly enough to interrupt
+                        if let base64 = AudioUtils.base64EncodeAudioPCMBuffer(from: buffer),
+                           let pcmData = Data(base64Encoded: base64) {
+                            let rms = AudioUtils.computeRMS(pcmData)
+                            if rms > 2000 { // User is speaking — interrupt playback
+                                rlog.info("Mic interrupt detected during suspension (rms=\(rms))", category: "Audio")
+                                interruptPlayback()
+                                emit(.inputSpeechStarted)
+                            }
+                        }
                         if skippedCount % 50 == 1 {
                             rlog.debug("Mic buffer skipped (suspended), skipped=\(skippedCount)", category: "Audio")
                         }
@@ -178,6 +189,10 @@ final class OpenRockyRealtimeVoiceBridge {
         // Resume mic immediately when playback is interrupted (user wants to speak)
         pendingMicResume = false
         isMicSuspended = false
+        // Tell the server to cancel any in-progress response
+        Task { @RealtimeActor in
+            try? await client?.cancelResponse()
+        }
     }
 
     /// Called when the assistant finishes its response (transcript final).
