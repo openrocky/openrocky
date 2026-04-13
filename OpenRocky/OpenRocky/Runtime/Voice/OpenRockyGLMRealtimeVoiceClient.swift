@@ -370,8 +370,12 @@ Voice-specific rules:
             ] as [String: Any]
         ]
 
+        // GLM realtime has issues with many tools (responses hang or 422).
+        // Limit to a small subset of essential tools.
+        let maxTools = 10
         if !tools.isEmpty {
-            sessionConfig["tools"] = tools
+            sessionConfig["tools"] = Array(tools.prefix(maxTools))
+            rlog.info("GLM: sending \(min(tools.count, maxTools))/\(tools.count) tools", category: "Voice")
         }
 
         let message: [String: Any] = [
@@ -469,19 +473,13 @@ Voice-specific rules:
 
         case "response.audio.delta":
             if let audioData = json["delta"] as? String, !audioData.isEmpty {
-                if isFirstAudioChunk, let rawData = Data(base64Encoded: audioData) {
+                if isFirstAudioChunk {
                     isFirstAudioChunk = false
-                    // GLM prepends a fixed audio preamble tone to every response.
-                    // Skip the first 28800 bytes (14400 samples = 600ms at 24kHz) to remove it.
-                    let skipBytes = min(28800, rawData.count / 4) // Don't skip more than 25% of chunk
-                    let trimmed = rawData.dropFirst(skipBytes)
-                    rlog.info("GLM: audio.delta first chunk \(rawData.count)bytes, trimmed \(skipBytes)bytes", category: "Voice")
-                    if trimmed.count > 0 {
-                        emit(.assistantAudioChunk(trimmed.base64EncodedString()))
+                    if let rawData = Data(base64Encoded: audioData) {
+                        rlog.info("GLM: audio.delta first chunk \(rawData.count)bytes", category: "Voice")
                     }
-                } else {
-                    emit(.assistantAudioChunk(audioData))
                 }
+                emit(.assistantAudioChunk(audioData))
             }
 
         case "response.audio.done":
