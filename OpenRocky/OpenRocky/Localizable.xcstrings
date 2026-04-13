@@ -21,6 +21,9 @@
         }
       }
     },
+    "/ (root)" : {
+
+    },
     "%@" : {
 
     },
@@ -121,6 +124,9 @@
     "2024-10-21" : {
 
     },
+    "A short name the AI will use to reference this folder." : {
+
+    },
     "About" : {
       "localizations" : {
         "zh-Hans" : {
@@ -211,6 +217,9 @@
           }
         }
       }
+    },
+    "Add Mount" : {
+
     },
     "Add Provider" : {
       "localizations" : {
@@ -327,6 +336,15 @@
     "Authorized: %@" : {
 
     },
+    "Auto Greeting" : {
+
+    },
+    "Auto-save Conversations" : {
+
+    },
+    "Available" : {
+
+    },
     "Avg / Day" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -345,6 +363,9 @@
 
     },
     "Back" : {
+
+    },
+    "Bailian Coding Plan" : {
 
     },
     "Bearer Token Override" : {
@@ -474,7 +495,6 @@
       }
     },
     "Chat" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -511,6 +531,12 @@
           }
         }
       }
+    },
+    "Choose Provider" : {
+
+    },
+    "Choose Voice Provider" : {
+
     },
     "Choose Your Provider" : {
 
@@ -629,6 +655,9 @@
       }
     },
     "Configure unified chat + voice provider" : {
+
+    },
+    "Configure voice session behavior." : {
 
     },
     "Configured" : {
@@ -970,6 +999,9 @@
         }
       }
     },
+    "Edit Mount" : {
+
+    },
     "Edit Provider" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1140,6 +1172,9 @@
         }
       }
     },
+    "External Folders" : {
+
+    },
     "Features" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1210,6 +1245,9 @@
     "Gemini" : {
 
     },
+    "General" : {
+
+    },
     "Gentle" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1278,6 +1316,9 @@
     "Group" : {
 
     },
+    "Haptic Feedback" : {
+
+    },
     "Health & Fitness" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1327,6 +1368,12 @@
 
     },
     "https://your-proxy.example.com" : {
+
+    },
+    "iCloud Container" : {
+
+    },
+    "iCloud~md~obsidian" : {
 
     },
     "Import from GitHub" : {
@@ -1573,6 +1620,25 @@
     "Model ID" : {
 
     },
+    "Mount External Folders" : {
+
+    },
+    "Mount iCloud Drive folders so the AI can read and write files. Supports Obsidian vaults and other iCloud apps." : {
+
+    },
+    "Mount name (e.g. obsidian)" : {
+
+    },
+    "Mounted Folders %lld / %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Mounted Folders %1$lld / %2$lld"
+          }
+        }
+      }
+    },
     "my-resource" : {
 
     },
@@ -1662,6 +1728,9 @@
         }
       }
     },
+    "No folders mounted. Tap + to add one." : {
+
+    },
     "No Logs" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1722,6 +1791,9 @@
         }
       }
     },
+    "Not Found" : {
+
+    },
     "OAuth" : {
 
     },
@@ -1756,6 +1828,9 @@
       }
     },
     "ON" : {
+
+    },
+    "Onboarding Page" : {
 
     },
     "One key powers both chat and voice.\nYou can add other providers in Settings later." : {
@@ -1898,6 +1973,9 @@
     "Partial Key" : {
 
     },
+    "Permissions" : {
+
+    },
     "Persistent key-value store" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1944,6 +2022,9 @@
           }
         }
       }
+    },
+    "Preferences" : {
+
     },
     "Preferred speaker when using Doubao realtime." : {
       "extractionState" : "stale",
@@ -2052,6 +2133,15 @@
         }
       }
     },
+    "Read & Write" : {
+
+    },
+    "Read Only" : {
+
+    },
+    "Read/Write" : {
+
+    },
     "Ready" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2151,6 +2241,9 @@
           }
         }
       }
+    },
+    "Report issues or suggestions" : {
+
     },
     "req" : {
       "extractionState" : "stale",
@@ -2327,9 +2420,6 @@
         }
       }
     },
-    "Setup Wizard" : {
-
-    },
     "Share This File" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2349,6 +2439,9 @@
           }
         }
       }
+    },
+    "Show Transcript" : {
+
     },
     "Sign in with OpenAI" : {
 
@@ -2534,6 +2627,9 @@
         }
       }
     },
+    "Status" : {
+
+    },
     "Stop" : {
 
     },
@@ -2556,6 +2652,12 @@
           }
         }
       }
+    },
+    "Subfolder within the container's Documents directory. Leave empty for root." : {
+
+    },
+    "Subpath (Optional)" : {
+
     },
     "Supported Phrases" : {
       "localizations" : {
@@ -2677,6 +2779,9 @@
           }
         }
       }
+    },
+    "The iCloud container identifier. Pick a preset or enter a custom one." : {
+
     },
     "The instructions that will be appended to the system prompt when this skill is active." : {
       "localizations" : {
@@ -2995,6 +3100,9 @@
     "VOICE FIRST" : {
 
     },
+    "Voice Interruption" : {
+
+    },
     "VOICE LIVE" : {
 
     },
@@ -3023,6 +3131,9 @@
           }
         }
       }
+    },
+    "Voice Session" : {
+
     },
     "Want to use OpenAI OAuth instead of API key? Finish onboarding first, then go to Settings → Chat Providers → OpenAI and choose OAuth." : {
 
@@ -3078,6 +3189,9 @@
           }
         }
       }
+    },
+    "When enabled, speaking while the assistant is talking will interrupt playback." : {
+
     },
     "Workspace" : {
       "extractionState" : "stale",
