@@ -132,6 +132,7 @@
       }
     },
     "Access Token" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -142,6 +143,7 @@
       }
     },
     "Access Token from console" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -233,9 +235,6 @@
     "AIProxy" : {
 
     },
-    "AIza..." : {
-
-    },
     "All" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -283,10 +282,8 @@
         }
       }
     },
-    "APP ID" : {
-
-    },
     "APP ID and Access Token are found in the Volcengine speech console." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -364,6 +361,7 @@
       }
     },
     "Bright" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -830,6 +828,7 @@
 
     },
     "Deep, authoritative" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -908,9 +907,6 @@
     "Done" : {
 
     },
-    "Doubao" : {
-
-    },
     "Doubao (Volcengine)" : {
       "localizations" : {
         "zh-Hans" : {
@@ -932,10 +928,8 @@
         }
       }
     },
-    "Doubao Realtime (Beta)" : {
-
-    },
     "Doubao Speaker" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -946,6 +940,7 @@
       }
     },
     "Doubao Speech" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1191,6 +1186,7 @@
       }
     },
     "Firm" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1201,6 +1197,7 @@
       }
     },
     "Firm, professional" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1213,10 +1210,8 @@
     "Gemini" : {
 
     },
-    "Gemini Live (Beta)" : {
-
-    },
     "Gentle" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1227,12 +1222,6 @@
       }
     },
     "Get %@ API Key" : {
-
-    },
-    "Get Gemini API Key" : {
-
-    },
-    "Get Real-Time API Access Token" : {
 
     },
     "Get Started" : {
@@ -1259,7 +1248,7 @@
         }
       }
     },
-    "GLM Realtime (Beta)" : {
+    "GLM Realtime" : {
 
     },
     "Gmail" : {
@@ -1272,9 +1261,6 @@
           }
         }
       }
-    },
-    "Google AI Studio" : {
-
     },
     "Greeting" : {
       "localizations" : {
@@ -1847,7 +1833,7 @@
         }
       }
     },
-    "OpenAI uses realtime models. Doubao expects the transcription model ID." : {
+    "OpenAI uses realtime models. GLM uses glm-realtime." : {
 
     },
     "OpenAI Voice" : {
@@ -1888,9 +1874,6 @@
           }
         }
       }
-    },
-    "Optional resource ID" : {
-
     },
     "Optional. If provided, this token overrides OAuth for API calls." : {
 
@@ -1963,6 +1946,7 @@
       }
     },
     "Preferred speaker when using Doubao realtime." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2318,9 +2302,6 @@
       }
     },
     "Sends a minimal request to verify your credentials and model are working." : {
-
-    },
-    "Set the Volcengine resource ID if your gateway requires it." : {
 
     },
     "Set this instance as the active chat provider." : {
@@ -2894,6 +2875,7 @@
       }
     },
     "Upbeat, conversational" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2990,9 +2972,6 @@
         }
       }
     },
-    "Vivi 2.0" : {
-
-    },
     "Voice" : {
       "localizations" : {
         "zh-Hans" : {
@@ -3059,6 +3038,7 @@
       }
     },
     "Warm, approachable" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -3162,28 +3142,7 @@
     "Zhipu AI Open Platform" : {
 
     },
-    "云舟 2.0" : {
-
-    },
-    "声线甜美有活力的妹妹，活泼开朗，笑容明媚" : {
-
-    },
-    "声音磁性的男生，成熟理性，做事有条理" : {
-
-    },
-    "小何 2.0" : {
-
-    },
-    "小天 2.0" : {
-
-    },
-    "眉目清朗男大，清澈温润有朝气，开朗真诚" : {
-
-    },
     "简洁明了，语速适中，语调自然。" : {
-
-    },
-    "语调平稳、咬字柔和、自带治愈安抚力的女声音色" : {
 
     }
   },
