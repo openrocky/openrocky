@@ -475,8 +475,9 @@ Voice-specific rules:
             if let audioData = json["delta"] as? String, !audioData.isEmpty {
                 if isFirstAudioChunk, let rawData = Data(base64Encoded: audioData) {
                     isFirstAudioChunk = false
-                    // GLM e2e TTS prepends a ~1200ms preamble tone to every response.
-                    let skipBytes = min(57600, rawData.count / 4)
+                    // GLM e2e TTS prepends a preamble tone to every response.
+                    // Skip first 2 seconds to fully remove it.
+                    let skipBytes = min(96000, rawData.count / 4)
                     let trimmed = rawData.dropFirst(skipBytes)
                     rlog.info("GLM: audio.delta first chunk \(rawData.count)bytes, trimmed \(skipBytes)bytes", category: "Voice")
                     if trimmed.count > 0 {
