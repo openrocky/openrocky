@@ -21,9 +21,6 @@
         }
       }
     },
-    "/ (root)" : {
-
-    },
     "%@" : {
 
     },
@@ -124,9 +121,6 @@
     "2024-10-21" : {
 
     },
-    "A short name the AI will use to reference this folder." : {
-
-    },
     "About" : {
       "localizations" : {
         "zh-Hans" : {
@@ -217,9 +211,6 @@
           }
         }
       }
-    },
-    "Add Mount" : {
-
     },
     "Add Provider" : {
       "localizations" : {
@@ -340,9 +331,6 @@
 
     },
     "Auto-save Conversations" : {
-
-    },
-    "Available" : {
 
     },
     "Avg / Day" : {
@@ -979,6 +967,9 @@
         }
       }
     },
+    "e.g. obsidian" : {
+
+    },
     "Each skill should be in a subdirectory with a SKILL.md file. Already imported skills will be skipped." : {
       "localizations" : {
         "zh-Hans" : {
@@ -998,9 +989,6 @@
           }
         }
       }
-    },
-    "Edit Mount" : {
-
     },
     "Edit Provider" : {
       "localizations" : {
@@ -1124,6 +1112,9 @@
           }
         }
       }
+    },
+    "Enter a short name the AI will use to reference this folder." : {
+
     },
     "Enter OpenAI API Key" : {
       "extractionState" : "stale",
@@ -1370,12 +1361,6 @@
     "https://your-proxy.example.com" : {
 
     },
-    "iCloud Container" : {
-
-    },
-    "iCloud~md~obsidian" : {
-
-    },
     "Import from GitHub" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1620,13 +1605,13 @@
     "Model ID" : {
 
     },
+    "Mount" : {
+
+    },
     "Mount External Folders" : {
 
     },
-    "Mount iCloud Drive folders so the AI can read and write files. Supports Obsidian vaults and other iCloud apps." : {
-
-    },
-    "Mount name (e.g. obsidian)" : {
+    "Mount Name" : {
 
     },
     "Mounted Folders %lld / %lld" : {
@@ -1790,9 +1775,6 @@
           }
         }
       }
-    },
-    "Not Found" : {
-
     },
     "OAuth" : {
 
@@ -1973,9 +1955,6 @@
     "Partial Key" : {
 
     },
-    "Permissions" : {
-
-    },
     "Persistent key-value store" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2133,9 +2112,6 @@
         }
       }
     },
-    "Read & Write" : {
-
-    },
     "Read Only" : {
 
     },
@@ -2241,9 +2217,6 @@
           }
         }
       }
-    },
-    "Report issues or suggestions" : {
-
     },
     "req" : {
       "extractionState" : "stale",
@@ -2361,6 +2334,9 @@
           }
         }
       }
+    },
+    "Select folders from iCloud Drive (e.g. Obsidian vault) so the AI can read and write files." : {
+
     },
     "Send Email" : {
       "extractionState" : "stale",
@@ -2627,9 +2603,6 @@
         }
       }
     },
-    "Status" : {
-
-    },
     "Stop" : {
 
     },
@@ -2652,12 +2625,6 @@
           }
         }
       }
-    },
-    "Subfolder within the container's Documents directory. Leave empty for root." : {
-
-    },
-    "Subpath (Optional)" : {
-
     },
     "Supported Phrases" : {
       "localizations" : {
@@ -2779,9 +2746,6 @@
           }
         }
       }
-    },
-    "The iCloud container identifier. Pick a preset or enter a custom one." : {
-
     },
     "The instructions that will be appended to the system prompt when this skill is active." : {
       "localizations" : {
