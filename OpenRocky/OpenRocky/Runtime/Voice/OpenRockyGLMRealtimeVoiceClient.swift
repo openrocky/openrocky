@@ -473,13 +473,18 @@ Voice-specific rules:
 
         case "response.audio.delta":
             if let audioData = json["delta"] as? String, !audioData.isEmpty {
-                if isFirstAudioChunk {
+                if isFirstAudioChunk, let rawData = Data(base64Encoded: audioData) {
                     isFirstAudioChunk = false
-                    if let rawData = Data(base64Encoded: audioData) {
-                        rlog.info("GLM: audio.delta first chunk \(rawData.count)bytes", category: "Voice")
+                    // GLM e2e TTS prepends a ~600ms preamble tone to every response.
+                    let skipBytes = min(28800, rawData.count / 4)
+                    let trimmed = rawData.dropFirst(skipBytes)
+                    rlog.info("GLM: audio.delta first chunk \(rawData.count)bytes, trimmed \(skipBytes)bytes", category: "Voice")
+                    if trimmed.count > 0 {
+                        emit(.assistantAudioChunk(trimmed.base64EncodedString()))
                     }
+                } else {
+                    emit(.assistantAudioChunk(audioData))
                 }
-                emit(.assistantAudioChunk(audioData))
             }
 
         case "response.audio.done":
