@@ -357,18 +357,17 @@ Voice-specific rules:
             ] as [String: Any]
         ]
 
-        // TODO: Re-enable tools once GLM null-parameter validation is resolved
-        // GLM returns 422 for tools with null properties/required even after sanitization.
-        // For now, skip tools to allow basic voice to work.
-        // if !tools.isEmpty {
-        //     sessionConfig["tools"] = tools
-        // }
+        if !tools.isEmpty {
+            sessionConfig["tools"] = tools
+        }
 
         let message: [String: Any] = [
             "type": "session.update",
             "session": sessionConfig
         ]
-        try await sendJSON(message)
+        // GLM strictly validates tool parameters — null properties/required cause 422.
+        // Serialize to JSON string and fix nulls before sending.
+        try await sendSanitizedJSON(message)
     }
 
     // MARK: - Receive Loop
@@ -609,6 +608,18 @@ Voice-specific rules:
         guard let socket else { throw OpenRockyRealtimeVoiceClientError.notConnected }
         let data = try JSONSerialization.data(withJSONObject: object)
         guard let text = String(data: data, encoding: .utf8) else { return }
+        try await socket.send(.string(text))
+    }
+
+    /// Send JSON with null sanitization for GLM tool parameters.
+    /// Replaces `"properties":null` → `"properties":{}` and `"required":null` → `"required":[]`
+    /// because GLM strictly rejects null values in tool parameter schemas.
+    private func sendSanitizedJSON(_ object: [String: Any]) async throws {
+        guard let socket else { throw OpenRockyRealtimeVoiceClientError.notConnected }
+        let data = try JSONSerialization.data(withJSONObject: object)
+        guard var text = String(data: data, encoding: .utf8) else { return }
+        text = text.replacingOccurrences(of: "\"properties\":null", with: "\"properties\":{}")
+        text = text.replacingOccurrences(of: "\"required\":null", with: "\"required\":[]")
         try await socket.send(.string(text))
     }
 
