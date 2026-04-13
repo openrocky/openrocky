@@ -134,6 +134,7 @@ final class AudioPCMPlayer {
   }
 
   public func interruptPlayback() {
+    guard pendingBufferCount > 0 else { return }
     logger.debug("Interrupting playback")
     playerNode.stop()
     pendingBufferCount = 0
