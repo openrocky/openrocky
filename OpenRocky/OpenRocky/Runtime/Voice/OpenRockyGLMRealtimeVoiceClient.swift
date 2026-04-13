@@ -30,6 +30,8 @@ final class OpenRockyGLMRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
     private var pendingTranscript: String?
     /// Whether the next audio.delta is the first chunk in a new response.
     private var isFirstAudioChunk = true
+    /// Whether a response is currently being generated — block new commits while true.
+    private var isResponseInProgress = false
 
     init(configuration: OpenRockyRealtimeProviderConfiguration, soulInstructions: String, realtimeTools: [OpenAIRealtimeSessionConfiguration.RealtimeTool] = []) {
         self.configuration = configuration.normalized()
@@ -193,7 +195,14 @@ final class OpenRockyGLMRealtimeVoiceClient: OpenRockyRealtimeVoiceClient {
                     // Speech ended — commit and request response
                     isSpeaking = false
                     silenceChunkCount = 0
+
+                    guard !isResponseInProgress else {
+                        rlog.info("GLM: skipping commit, response already in progress", category: "Voice")
+                        return
+                    }
+
                     rlog.info("GLM: client VAD detected speech end, committing (rms=\(rms))", category: "Voice")
+                    isResponseInProgress = true
                     emit(.status("Processing..."))
 
                     let commitMsg: [String: Any] = ["type": "input_audio_buffer.commit"]
@@ -487,6 +496,7 @@ Voice-specific rules:
             emit(.toolCallRequested(name: name, arguments: arguments, callID: callID))
 
         case "response.done":
+            isResponseInProgress = false
             // Emit final transcript AFTER all audio has been delivered
             if let transcript = pendingTranscript {
                 emit(.assistantTranscriptFinal(transcript))
