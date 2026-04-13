@@ -10,6 +10,10 @@
 import SwiftUI
 
 struct OpenRockyAboutView: View {
+    @ObservedObject var providerStore: OpenRockyProviderStore
+    @ObservedObject var realtimeProviderStore: OpenRockyRealtimeProviderStore
+    @State private var showsOnboarding = false
+
     var body: some View {
         List {
             // App intro
@@ -48,6 +52,31 @@ struct OpenRockyAboutView: View {
             // Feedback
             Section("Feedback") {
                 linkRow(icon: "exclamationmark.bubble.fill", tint: .red, title: "Feedback", subtitle: "Report issues or suggestions", url: "https://github.com/openrocky/openrocky/issues/new")
+
+                Button {
+                    showsOnboarding = true
+                } label: {
+                    HStack(spacing: 12) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                .fill(Color.purple.opacity(0.14))
+                                .frame(width: 32, height: 32)
+                            Image(systemName: "wand.and.stars")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundStyle(.purple)
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Setup Wizard")
+                                .font(.system(size: 15, weight: .medium, design: .rounded))
+                                .foregroundStyle(.primary)
+                            Text("Configure unified chat + voice provider")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                    }
+                    .padding(.vertical, 2)
+                }
             }
 
             // Open source libraries
@@ -61,6 +90,12 @@ libraryRow(name: "SwiftOpenAI", author: "jamesrochabrun", url: "https://github.c
         }
         .navigationTitle("About")
         .navigationBarTitleDisplayMode(.inline)
+        .fullScreenCover(isPresented: $showsOnboarding) {
+            OpenRockyOnboardingView(
+                providerStore: providerStore,
+                realtimeProviderStore: realtimeProviderStore
+            )
+        }
     }
 
     private func linkRow(icon: String, tint: Color = .cyan, title: String, subtitle: String? = nil, url: String) -> some View {
