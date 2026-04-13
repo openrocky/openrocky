@@ -454,7 +454,13 @@ Voice-specific rules:
 
         case "response.audio.delta":
             if let audioData = json["delta"] as? String, !audioData.isEmpty {
-                rlog.debug("GLM: audio.delta \(audioData.count) chars", category: "Voice")
+                // Log first chunk details to diagnose audio format
+                if let rawData = Data(base64Encoded: audioData) {
+                    let firstBytes = rawData.prefix(16).map { String(format: "%02X", $0) }.joined(separator: " ")
+                    let header = rawData.prefix(4).map { Character(UnicodeScalar($0)) }
+                    let isWAV = String(header).hasPrefix("RIFF")
+                    rlog.info("GLM: audio.delta \(rawData.count)bytes first16=[\(firstBytes)] isWAV=\(isWAV)", category: "Voice")
+                }
                 emit(.assistantAudioChunk(audioData))
             }
 
