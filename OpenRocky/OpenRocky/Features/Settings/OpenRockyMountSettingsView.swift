@@ -8,10 +8,14 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct OpenRockyMountSettingsView: View {
     private var mountStore = OpenRockyMountStore.shared
-    @State private var showAddSheet = false
+    @State private var showFolderPicker = false
+    @State private var pendingName = ""
+    @State private var showNamePrompt = false
+    @State private var pickedURL: URL?
 
     var body: some View {
         List {
@@ -23,7 +27,7 @@ struct OpenRockyMountSettingsView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Mount External Folders")
                             .font(.system(size: 15, weight: .semibold, design: .rounded))
-                        Text("Mount iCloud Drive folders so the AI can read and write files. Supports Obsidian vaults and other iCloud apps.")
+                        Text("Select folders from iCloud Drive (e.g. Obsidian vault) so the AI can read and write files.")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundStyle(.secondary)
                     }
@@ -37,11 +41,7 @@ struct OpenRockyMountSettingsView: View {
                         .foregroundStyle(.secondary)
                 } else {
                     ForEach(mountStore.mounts) { mount in
-                        NavigationLink {
-                            OpenRockyMountEditorView(editingMount: mount)
-                        } label: {
-                            mountRow(mount)
-                        }
+                        mountRow(mount)
                     }
                     .onDelete { indices in
                         for index in indices {
@@ -58,17 +58,42 @@ struct OpenRockyMountSettingsView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    showAddSheet = true
+                    showFolderPicker = true
                 } label: {
                     Image(systemName: "plus")
                 }
                 .disabled(mountStore.mounts.count >= OpenRockyMountStore.maxMounts)
             }
         }
-        .sheet(isPresented: $showAddSheet) {
-            NavigationStack {
-                OpenRockyMountEditorView(editingMount: nil)
+        .sheet(isPresented: $showFolderPicker) {
+            FolderPickerView { url in
+                pickedURL = url
+                // Derive a default name from the folder name
+                pendingName = url.lastPathComponent.lowercased()
+                showNamePrompt = true
             }
+        }
+        .alert("Mount Name", isPresented: $showNamePrompt) {
+            TextField("e.g. obsidian", text: $pendingName)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+            Button("Mount") {
+                if let url = pickedURL {
+                    let name = pendingName.trimmingCharacters(in: .whitespaces)
+                    guard !name.isEmpty else { return }
+                    if let mount = OpenRockyMountStore.createMount(name: name, url: url, readWrite: true) {
+                        mountStore.add(mount)
+                    }
+                }
+                pickedURL = nil
+                pendingName = ""
+            }
+            Button("Cancel", role: .cancel) {
+                pickedURL = nil
+                pendingName = ""
+            }
+        } message: {
+            Text("Enter a short name the AI will use to reference this folder.")
         }
     }
 
@@ -93,171 +118,45 @@ struct OpenRockyMountSettingsView: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
             }
+            Spacer()
+            // Status indicator
+            if mount.resolvedURL() != nil {
+                Circle().fill(.green).frame(width: 8, height: 8)
+            } else {
+                Circle().fill(.red).frame(width: 8, height: 8)
+            }
         }
         .padding(.vertical, 2)
     }
 }
 
-struct OpenRockyMountEditorView: View {
-    let editingMount: OpenRockyMount?
+// MARK: - Folder Picker (UIDocumentPicker wrapper)
 
-    init(editingMount: OpenRockyMount?) {
-        self.editingMount = editingMount
+private struct FolderPickerView: UIViewControllerRepresentable {
+    let onPick: (URL) -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onPick: onPick)
     }
 
-    @Environment(\.dismiss) private var dismiss
-
-    private var mountStore = OpenRockyMountStore.shared
-    @State private var name: String = ""
-    @State private var containerIdentifier: String = ""
-    @State private var subpath: String = ""
-    @State private var readWrite: Bool = true
-
-    private var isNew: Bool { editingMount == nil }
-
-    private let presets: [(String, String)] = [
-        ("Obsidian", "iCloud~md~obsidian"),
-        ("iA Writer", "iCloud~com~iawriter~iAWriter"),
-        ("Textastic", "iCloud~com~textasticapp~textastic"),
-        ("Working Copy", "iCloud~com~workingcopyapp~workingcopy"),
-    ]
-
-    var body: some View {
-        List {
-            Section {
-                TextField("Mount name (e.g. obsidian)", text: $name)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-            } header: {
-                Text("Name")
-            } footer: {
-                Text("A short name the AI will use to reference this folder.")
-            }
-
-            Section {
-                TextField("iCloud~md~obsidian", text: $containerIdentifier)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .font(.system(size: 14, design: .monospaced))
-
-                ForEach(presets, id: \.0) { preset in
-                    Button {
-                        containerIdentifier = preset.1
-                        if name.isEmpty { name = preset.0.lowercased() }
-                    } label: {
-                        HStack {
-                            Text(preset.0)
-                                .foregroundStyle(.primary)
-                            Spacer()
-                            if containerIdentifier == preset.1 {
-                                Image(systemName: "checkmark")
-                                    .foregroundStyle(.blue)
-                            }
-                        }
-                    }
-                }
-            } header: {
-                Text("iCloud Container")
-            } footer: {
-                Text("The iCloud container identifier. Pick a preset or enter a custom one.")
-            }
-
-            Section {
-                TextField("/ (root)", text: $subpath)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .font(.system(size: 14, design: .monospaced))
-            } header: {
-                Text("Subpath (Optional)")
-            } footer: {
-                Text("Subfolder within the container's Documents directory. Leave empty for root.")
-            }
-
-            Section {
-                Toggle("Read & Write", isOn: $readWrite)
-            } header: {
-                Text("Permissions")
-            }
-
-            if let mount = editingMount {
-                Section {
-                    let url = mount.resolvedURL
-                    HStack {
-                        Text("Status")
-                        Spacer()
-                        if url != nil {
-                            HStack(spacing: 4) {
-                                Circle().fill(.green).frame(width: 8, height: 8)
-                                Text("Available")
-                            }
-                            .foregroundStyle(.green)
-                        } else {
-                            HStack(spacing: 4) {
-                                Circle().fill(.red).frame(width: 8, height: 8)
-                                Text("Not Found")
-                            }
-                            .foregroundStyle(.red)
-                        }
-                    }
-                    .font(.system(size: 14, weight: .medium))
-                }
-            }
-        }
-        .navigationTitle(isNew ? "Add Mount" : "Edit Mount")
-        .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            if let mount = editingMount {
-                name = mount.name
-                containerIdentifier = mount.containerIdentifier
-                subpath = mount.subpath
-                readWrite = mount.readWrite
-            }
-        }
-        .toolbar {
-            if isNew {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Cancel") { dismiss() }
-                }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Save") {
-                    saveMount()
-                    dismiss()
-                }
-                .fontWeight(.bold)
-                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty || containerIdentifier.trimmingCharacters(in: .whitespaces).isEmpty || !hasValidSubpath)
-            }
-        }
+    func makeUIViewController(context: Context) -> UIDocumentPickerViewController {
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.folder])
+        picker.delegate = context.coordinator
+        picker.allowsMultipleSelection = false
+        return picker
     }
 
-    private var hasValidSubpath: Bool {
-        let trimmed = subpath.trimmingCharacters(in: .whitespaces)
-        if trimmed.isEmpty || trimmed == "/" { return true }
-        return !trimmed.contains("..") && !trimmed.contains("//")
-    }
+    func updateUIViewController(_ uiViewController: UIDocumentPickerViewController, context: Context) {}
 
-    private func saveMount() {
-        let trimmedName = name.trimmingCharacters(in: .whitespaces)
-        let trimmedContainer = containerIdentifier.trimmingCharacters(in: .whitespaces)
-        let trimmedSubpath = subpath.trimmingCharacters(in: .whitespaces)
-            .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+    class Coordinator: NSObject, UIDocumentPickerDelegate {
+        let onPick: (URL) -> Void
+        init(onPick: @escaping (URL) -> Void) { self.onPick = onPick }
 
-        if let existing = editingMount {
-            var updated = existing
-            updated.name = trimmedName
-            updated.containerIdentifier = trimmedContainer
-            updated.subpath = trimmedSubpath
-            updated.readWrite = readWrite
-            mountStore.update(updated)
-        } else {
-            let mount = OpenRockyMount(
-                id: UUID().uuidString,
-                name: trimmedName,
-                containerIdentifier: trimmedContainer,
-                subpath: trimmedSubpath,
-                readWrite: readWrite
-            )
-            mountStore.add(mount)
+        func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+            guard let url = urls.first else { return }
+            onPick(url)
         }
+
+        func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {}
     }
 }

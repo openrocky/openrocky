@@ -13,51 +13,33 @@ import Observation
 struct OpenRockyMount: Codable, Identifiable, Equatable {
     let id: String
     var name: String
-    var containerIdentifier: String
-    var subpath: String
+    /// Security-scoped bookmark data for the directory.
+    var bookmarkData: Data
     var readWrite: Bool
+    /// Cached display path (set at creation time for UI display).
+    var displayPath: String
 
-    var resolvedURL: URL? {
-        let fm = FileManager.default
-        let home = fm.urls(for: .documentDirectory, in: .userDomainMask).first!
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-        let mobileDocs = home.appendingPathComponent("Library/Mobile Documents")
+    /// Resolve the bookmark to a URL. Returns nil if the bookmark is stale.
+    func resolvedURL() -> (url: URL, stale: Bool)? {
+        var isStale = false
+        guard let url = try? URL(
+            resolvingBookmarkData: bookmarkData,
+            options: [],
+            relativeTo: nil,
+            bookmarkDataIsStale: &isStale
+        ) else { return nil }
+        return (url, isStale)
+    }
 
-        // Resolve container identifier
-        let containerName: String
-        switch containerIdentifier.lowercased() {
-        case "obsidian", "md.obsidian", "icloud~md~obsidian":
-            containerName = "iCloud~md~obsidian"
-        default:
-            containerName = containerIdentifier.hasPrefix("iCloud~") ? containerIdentifier : "iCloud~\(containerIdentifier)"
-        }
-
-        var url = mobileDocs.appendingPathComponent(containerName)
-        // Try Documents subfolder (common pattern)
-        let docsURL = url.appendingPathComponent("Documents")
-        if fm.fileExists(atPath: docsURL.path) {
-            url = docsURL
-        }
-        if !subpath.isEmpty && subpath != "/" {
-            url = url.appendingPathComponent(subpath)
-        }
-        guard fm.fileExists(atPath: url.path) else { return nil }
+    /// Access the directory with security scope. Call stopAccessing when done.
+    func startAccessing() -> URL? {
+        guard let (url, _) = resolvedURL() else { return nil }
+        guard url.startAccessingSecurityScopedResource() else { return nil }
         return url
     }
 
-    var displayPath: String {
-        let containerName: String
-        switch containerIdentifier.lowercased() {
-        case "obsidian", "md.obsidian", "icloud~md~obsidian":
-            containerName = "iCloud~md~obsidian"
-        default:
-            containerName = containerIdentifier.hasPrefix("iCloud~") ? containerIdentifier : "iCloud~\(containerIdentifier)"
-        }
-        if subpath.isEmpty || subpath == "/" {
-            return "/Library/Mobile Documents/\(containerName)/Documents"
-        }
-        return "/Library/Mobile Documents/\(containerName)/Documents/\(subpath)"
+    static func stopAccessing(_ url: URL) {
+        url.stopAccessingSecurityScopedResource()
     }
 }
 
@@ -101,6 +83,26 @@ final class OpenRockyMountStore {
 
     func mount(named name: String) -> OpenRockyMount? {
         mounts.first { $0.name.lowercased() == name.lowercased() }
+    }
+
+    /// Create a mount from a user-selected directory URL (security-scoped).
+    static func createMount(name: String, url: URL, readWrite: Bool) -> OpenRockyMount? {
+        guard url.startAccessingSecurityScopedResource() else { return nil }
+        defer { url.stopAccessingSecurityScopedResource() }
+
+        guard let bookmarkData = try? url.bookmarkData(
+            options: [],
+            includingResourceValuesForKeys: nil,
+            relativeTo: nil
+        ) else { return nil }
+
+        return OpenRockyMount(
+            id: UUID().uuidString,
+            name: name,
+            bookmarkData: bookmarkData,
+            readWrite: readWrite,
+            displayPath: url.path
+        )
     }
 
     private func save() {

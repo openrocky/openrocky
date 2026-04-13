@@ -1531,34 +1531,11 @@ final class OpenRockyToolbox {
 
     // MARK: - iCloud Drive
 
-    private static func resolveICloudContainerURL(container: String) -> URL? {
-        // First check mount store for named mounts
-        if let mount = OpenRockyMountStore.shared.mount(named: container) {
-            return mount.resolvedURL
-        }
-
-        let fm = FileManager.default
-        let containerName: String
-        switch container.lowercased() {
-        case "obsidian", "md.obsidian", "icloud~md~obsidian":
-            containerName = "iCloud~md~obsidian"
-        default:
-            containerName = container.hasPrefix("iCloud~") ? container : "iCloud~\(container)"
-        }
-
-        let home = fm.urls(for: .documentDirectory, in: .userDomainMask).first!
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-        let mobileDocs = home.appendingPathComponent("Library/Mobile Documents")
-        let containerURL = mobileDocs.appendingPathComponent(containerName)
-        if fm.fileExists(atPath: containerURL.path) {
-            let documentsURL = containerURL.appendingPathComponent("Documents")
-            if fm.fileExists(atPath: documentsURL.path) {
-                return documentsURL
-            }
-            return containerURL
-        }
-        return nil
+    /// Resolve a mount name to a security-scoped directory URL via bookmark.
+    private func startAccessingMount(named container: String) -> (url: URL, mount: OpenRockyMount)? {
+        guard let mount = OpenRockyMountStore.shared.mount(named: container) else { return nil }
+        guard let url = mount.startAccessing() else { return nil }
+        return (url, mount)
     }
 
     /// Validate path doesn't contain traversal sequences.
@@ -1571,15 +1548,15 @@ final class OpenRockyToolbox {
         guard Self.isPathSafe(request.path) else {
             return try encode(["error": "Invalid path: must be relative and cannot contain '..'"])
         }
-        guard let containerURL = Self.resolveICloudContainerURL(container: request.container) else {
-            return try encode(["error": "iCloud container '\(request.container)' not found. Add it in Settings → External Folders, or make sure the app is installed and synced."])
+        guard let (containerURL, _) = startAccessingMount(named: request.container) else {
+            return try encode(["error": "Mount '\(request.container)' not found. Add it in Settings → External Folders by selecting the folder from iCloud Drive."])
         }
+        defer { OpenRockyMount.stopAccessing(containerURL) }
+
         let fileURL = containerURL.appendingPathComponent(request.path)
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
             return try encode(["error": "File not found: \(request.path) in \(request.container)"])
         }
-        let accessing = fileURL.startAccessingSecurityScopedResource()
-        defer { if accessing { fileURL.stopAccessingSecurityScopedResource() } }
 
         let content = try String(contentsOf: fileURL, encoding: .utf8)
         return try encode(["container": request.container, "path": request.path, "content": String(content.prefix(16000))])
@@ -1592,18 +1569,17 @@ final class OpenRockyToolbox {
                 return try encode(["error": "Invalid path: must be relative and cannot contain '..'"])
             }
         }
-        guard let containerURL = Self.resolveICloudContainerURL(container: request.container) else {
-            return try encode(["error": "iCloud container '\(request.container)' not found. Add it in Settings → External Folders, or make sure the app is installed and synced."])
+        guard let (containerURL, _) = startAccessingMount(named: request.container) else {
+            return try encode(["error": "Mount '\(request.container)' not found. Add it in Settings → External Folders by selecting the folder from iCloud Drive."])
         }
+        defer { OpenRockyMount.stopAccessing(containerURL) }
+
         let targetURL: URL
         if let path = request.path, !path.isEmpty, path != "/" {
             targetURL = containerURL.appendingPathComponent(path)
         } else {
             targetURL = containerURL
         }
-
-        let accessing = targetURL.startAccessingSecurityScopedResource()
-        defer { if accessing { targetURL.stopAccessingSecurityScopedResource() } }
 
         guard FileManager.default.fileExists(atPath: targetURL.path) else {
             return try encode(["error": "Path not found: \(request.path ?? "/") in \(request.container)"])
@@ -1633,21 +1609,16 @@ final class OpenRockyToolbox {
         guard Self.isPathSafe(request.path) else {
             return try encode(["error": "Invalid path: must be relative and cannot contain '..'"])
         }
+        guard let (containerURL, mount) = startAccessingMount(named: request.container) else {
+            return try encode(["error": "Mount '\(request.container)' not found. Add it in Settings → External Folders."])
+        }
+        defer { OpenRockyMount.stopAccessing(containerURL) }
 
-        // Check mount permissions
-        if let mount = OpenRockyMountStore.shared.mount(named: request.container) {
-            guard mount.readWrite else {
-                return try encode(["error": "Mount '\(request.container)' is read-only. Enable read/write in Settings → External Folders."])
-            }
+        guard mount.readWrite else {
+            return try encode(["error": "Mount '\(request.container)' is read-only. Enable read/write in Settings → External Folders."])
         }
 
-        guard let containerURL = Self.resolveICloudContainerURL(container: request.container) else {
-            return try encode(["error": "iCloud container '\(request.container)' not found. Add it in Settings → External Folders."])
-        }
         let fileURL = containerURL.appendingPathComponent(request.path)
-
-        let accessing = fileURL.startAccessingSecurityScopedResource()
-        defer { if accessing { fileURL.stopAccessingSecurityScopedResource() } }
 
         // Create intermediate directories if needed
         let dir = fileURL.deletingLastPathComponent()
