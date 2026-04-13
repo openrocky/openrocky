@@ -129,7 +129,9 @@ final class AudioPCMPlayer {
           }
         }
       }
-      playerNode.play()
+      if !playerNode.isPlaying {
+        playerNode.play()
+      }
     }
   }
 
