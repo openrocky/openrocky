@@ -24,7 +24,7 @@
 - **Voice-first** — voice is the primary interface, not a chat list
 - **30+ native iOS tools** — contacts, calendar, health, weather, location, reminders, camera, photos, browser, crypto, and more
 - **Multi-provider AI** — OpenAI, Anthropic, Gemini, Azure, Groq, xAI, OpenRouter, DeepSeek, Doubao, aiProxy
-- **Realtime voice** — live voice sessions via OpenAI, Gemini, and Doubao realtime APIs
+- **Realtime voice** — live voice sessions via OpenAI and GLM realtime APIs
 - **Custom skills** — built-in skills plus user-importable custom skills
 - **Local execution** — controlled shell and Python runtime on-device via `ios_system`
 - **Characters & Souls** — configurable AI personality and voice
@@ -42,7 +42,7 @@ User Voice → Voice Engine → AI Provider → ROS Runtime → Execution Layer 
 | **Sessions** | Conversation and task contexts with state machine management |
 | **Tools** | 30+ iOS native bridge services registered in `OpenRockyToolbox` |
 | **Skills** | Built-in and custom importable skills via `OpenRockySkillStore` |
-| **Voice** | Realtime voice bridges for OpenAI, Gemini, and Doubao |
+| **Voice** | Realtime voice bridges for OpenAI and GLM |
 | **Characters & Souls** | Personality and voice configuration |
 | **Memory** | Persistent context across sessions |
 

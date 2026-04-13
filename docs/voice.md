@@ -32,18 +32,11 @@ Microphone → Audio I/O → Realtime Voice Client → AI Provider → Tool Exec
 - **Features:** Full tool support, text + audio input, streaming responses
 - **Note:** Requires microphone suspension during TTS playback to avoid feedback
 
-### Gemini Live
+### GLM (Zhipu AI)
 
-- **Model:** `gemini-2.5-flash-native-audio-latest`
-- **Protocol:** Google Multimodal Live API
-- **Features:** Cost-effective, multimodal, tool support
-- **Note:** No mic suspension needed
-
-### Doubao (Volcengine)
-
-- **Model:** `doubao-e2e-voice`
-- **Protocol:** Volcengine realtime API
-- **Features:** Natural speech emotion, VAD-based turn detection
+- **Model:** GLM realtime voice models
+- **Protocol:** GLM realtime API
+- **Features:** Tool support (via category tools), client VAD, 16kHz WAV audio input
 - **Note:** Optimized for Chinese language interactions
 
 ## Voice + Character Integration
@@ -53,7 +46,6 @@ The active character's personality and voice preferences are propagated to all v
 - **System prompt** — character personality injected (shortened for realtime brevity)
 - **Voice selection** — each character maps to specific voices per provider:
   - OpenAI voices: `alloy`, `sage`, `ash`, `echo`, `shimmer`
-  - Doubao speakers: `zh_female_vv_jupiter`, `zh_female_xiaohe`, etc.
 
 ## Text Fallback
 

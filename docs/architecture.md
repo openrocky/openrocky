@@ -46,7 +46,7 @@ See [Skills](skills.md) for details.
 
 ### Voice
 
-Realtime voice bridges connect audio I/O to AI providers for live voice conversations. Three providers are supported: OpenAI, Gemini, and Doubao.
+Realtime voice bridges connect audio I/O to AI providers for live voice conversations. Two providers are supported: OpenAI and GLM.
 
 See [Voice](voice.md) for details.
 
@@ -100,9 +100,9 @@ Provider → Account → Model
 
 OpenAI, Azure OpenAI, Anthropic, Gemini, Groq, xAI, OpenRouter, DeepSeek, Volcengine (Doubao), AIProxy.
 
-### Realtime Voice Providers (3 backends)
+### Realtime Voice Providers (2 backends)
 
-OpenAI, Gemini, Doubao — each implementing the `OpenRockyRealtimeVoiceClient` protocol.
+OpenAI, GLM — each implementing the `OpenRockyRealtimeVoiceClient` protocol.
 
 Credentials are stored in the OS Keychain, never persisted to disk files.
 

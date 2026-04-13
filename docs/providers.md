@@ -45,7 +45,7 @@ All API keys and secrets are stored in the iOS Keychain via `OpenRockyKeychain`.
 
 ## Realtime Voice Providers
 
-Three realtime voice providers enable live voice conversations:
+Two realtime voice providers enable live voice conversations:
 
 ### OpenAI Realtime
 
@@ -53,30 +53,24 @@ Three realtime voice providers enable live voice conversations:
 - Full feature support: text input, streaming, tool calls, audio output
 - Requires microphone suspension during TTS playback
 
-### Gemini Live
+### GLM (Zhipu AI)
 
-- Model: `gemini-2.5-flash-native-audio-latest`
-- Multimodal live capability
-- Cost-effective option
-
-### Doubao (Volcengine)
-
-- Model: `doubao-e2e-voice`
-- Natural speech emotion
-- VAD-based turn detection
+- GLM realtime voice models
+- Tool support via consolidated category tools (max 10 tools)
+- Client VAD, 16kHz WAV audio input
 - Optimized for Chinese language
 
 ### Voice Feature Flags
 
 Each realtime provider declares its capabilities:
 
-| Feature | OpenAI | Gemini | Doubao |
-|---------|--------|--------|--------|
-| Text input | Yes | Yes | Yes |
-| Assistant streaming | Yes | Yes | Yes |
-| Tool calls | Yes | Yes | Yes |
-| Audio output | Yes | Yes | Yes |
-| Needs mic suspension | Yes | No | No |
+| Feature | OpenAI | GLM |
+|---------|--------|-----|
+| Text input | Yes | Yes |
+| Assistant streaming | Yes | Yes |
+| Tool calls | Yes | Yes |
+| Audio output | Yes | Yes |
+| Needs mic suspension | Yes | No |
 
 ## Provider Stores
 

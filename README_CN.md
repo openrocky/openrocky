@@ -24,7 +24,7 @@
 - **语音优先** — 语音是主要交互方式，而非聊天列表
 - **30+ 原生 iOS 工具** — 通讯录、日历、健康、天气、定位、提醒事项、相机、相册、浏览器、加密等
 - **多 AI 服务商** — OpenAI、Anthropic、Gemini、Azure、Groq、xAI、OpenRouter、DeepSeek、豆包、aiProxy
-- **实时语音** — 通过 OpenAI、Gemini、豆包的实时 API 进行语音对话
+- **实时语音** — 通过 OpenAI、GLM 的实时 API 进行语音对话
 - **自定义技能** — 内置技能 + 用户可导入的自定义技能
 - **本地执行** — 通过 `ios_system` 在设备上运行受控的 Shell 和 Python
 - **角色与灵魂** — 可配置的 AI 人格和声音
@@ -42,7 +42,7 @@
 | **会话 (Sessions)** | 对话和任务上下文，带状态机管理 |
 | **工具 (Tools)** | 30+ iOS 原生桥接服务，注册在 `OpenRockyToolbox` 中 |
 | **技能 (Skills)** | 内置技能和可导入的自定义技能，通过 `OpenRockySkillStore` 管理 |
-| **语音 (Voice)** | OpenAI、Gemini、豆包的实时语音桥接 |
+| **语音 (Voice)** | OpenAI、GLM 的实时语音桥接 |
 | **角色与灵魂 (Characters & Souls)** | 人格和声音配置 |
 | **记忆 (Memory)** | 跨会话的持久化上下文 |
 

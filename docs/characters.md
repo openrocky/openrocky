@@ -13,7 +13,6 @@ Characters define the AI personality, speaking style, and voice configuration fo
 | `greeting` | Initial greeting message |
 | `speakingStyle` | Description of how the character communicates |
 | `openaiVoice` | Voice ID for OpenAI realtime (e.g., `alloy`, `sage`) |
-| `doubaoSpeaker` | Speaker ID for Doubao realtime |
 | `isBuiltIn` | Whether the character ships with the app |
 
 ## Built-in Characters
@@ -24,35 +23,30 @@ Rocky ships with five built-in characters:
 
 - **Personality:** Friendly, efficient assistant
 - **OpenAI Voice:** `alloy`
-- **Doubao Speaker:** `zh_female_vv_jupiter`
 - The default character for general-purpose use
 
 ### English Teacher
 
 - **Personality:** Patient language tutor
 - **OpenAI Voice:** `sage`
-- **Doubao Speaker:** `zh_female_xiaohe`
 - Focused on language learning and practice
 
 ### Software Dev Expert
 
 - **Personality:** Technical, precise coder
 - **OpenAI Voice:** `ash`
-- **Doubao Speaker:** `zh_male_yunzhou`
 - Specialized in programming and technical topics
 
 ### Storm Chaser
 
 - **Personality:** Enthusiastic, adventurous
 - **OpenAI Voice:** `echo`
-- **Doubao Speaker:** `zh_male_xiaotian`
 - Energetic persona for exploration and discovery
 
 ### Mindful Guide
 
 - **Personality:** Calm, wellbeing-focused
 - **OpenAI Voice:** `shimmer`
-- **Doubao Speaker:** `zh_female_vv`
 - Gentle persona for wellness and mindfulness
 
 ## Custom Characters

@@ -36,7 +36,7 @@ The central execution core at `OpenRocky/OpenRocky/Runtime/`. Organizes:
 - **Sessions** (`OpenRockySessionRuntime.swift`) — conversation and task contexts
 - **Tools** (`Runtime/Tools/`) — 31+ iOS native bridge tools (contacts, calendar, health, weather, location, reminders, notifications, etc.) registered in `OpenRockyToolbox.swift`
 - **Skills** (`Runtime/Skills/`) — built-in and custom importable skills via `OpenRockySkillStore`
-- **Voice** (`Runtime/Voice/`) — realtime voice bridges for OpenAI, Gemini, Doubao
+- **Voice** (`Runtime/Voice/`) — realtime voice bridges for OpenAI and GLM
 - **Characters/Souls** — personality and voice configuration
 
 ### Data Flow
@@ -53,7 +53,7 @@ User Voice → Voice Engine → AI Provider → ROS Runtime → Execution Layer 
 
 ### Provider Architecture
 
-Three-layer abstraction: Provider → Account → Model. Configured in `OpenRocky/OpenRocky/Providers/`. Supports 10+ backends: OpenAI, Azure, Anthropic, Gemini, Groq, xAI, OpenRouter, DeepSeek, Doubao, aiProxy. Realtime voice providers: OpenAI, Doubao.
+Three-layer abstraction: Provider → Account → Model. Configured in `OpenRocky/OpenRocky/Providers/`. Supports 10+ backends: OpenAI, Azure, Anthropic, Gemini, Groq, xAI, OpenRouter, DeepSeek, Doubao, aiProxy. Realtime voice providers: OpenAI, GLM.
 
 ### Local Packages (`Packages/`)
 
