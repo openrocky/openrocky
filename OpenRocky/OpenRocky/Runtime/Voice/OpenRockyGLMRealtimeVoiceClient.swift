@@ -353,7 +353,11 @@ Voice-specific rules:
             "beta_fields": [
                 "chat_mode": "audio",
                 "tts_source": "e2e",
-                "auto_search": false
+                "auto_search": false,
+                "greeting_config": [
+                    "enable": true,
+                    "content": configuration.characterGreeting ?? "你好，有什么可以帮你的吗？"
+                ] as [String: Any]
             ] as [String: Any]
         ]
 
