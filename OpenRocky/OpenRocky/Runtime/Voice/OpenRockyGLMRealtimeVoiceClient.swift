@@ -460,8 +460,8 @@ Voice-specific rules:
                 if isFirstAudioChunk, let rawData = Data(base64Encoded: audioData) {
                     isFirstAudioChunk = false
                     // GLM prepends a fixed audio preamble tone to every response.
-                    // Skip the first 19200 bytes (9600 samples = 400ms at 24kHz) to remove it.
-                    let skipBytes = min(19200, rawData.count / 4) // Don't skip more than 25% of chunk
+                    // Skip the first 28800 bytes (14400 samples = 600ms at 24kHz) to remove it.
+                    let skipBytes = min(28800, rawData.count / 4) // Don't skip more than 25% of chunk
                     let trimmed = rawData.dropFirst(skipBytes)
                     rlog.info("GLM: audio.delta first chunk \(rawData.count)bytes, trimmed \(skipBytes)bytes", category: "Voice")
                     if trimmed.count > 0 {
