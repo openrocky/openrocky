@@ -29,8 +29,6 @@ struct OpenRockyMount: Codable, Identifiable, Equatable {
         switch containerIdentifier.lowercased() {
         case "obsidian", "md.obsidian", "icloud~md~obsidian":
             containerName = "iCloud~md~obsidian"
-        case "nssurge", "com.nssurge.surge-ios", "icloud~com~nssurge~surge-ios":
-            containerName = "iCloud~com~nssurge~surge-ios"
         default:
             containerName = containerIdentifier.hasPrefix("iCloud~") ? containerIdentifier : "iCloud~\(containerIdentifier)"
         }
@@ -53,8 +51,6 @@ struct OpenRockyMount: Codable, Identifiable, Equatable {
         switch containerIdentifier.lowercased() {
         case "obsidian", "md.obsidian", "icloud~md~obsidian":
             containerName = "iCloud~md~obsidian"
-        case "nssurge", "com.nssurge.surge-ios", "icloud~com~nssurge~surge-ios":
-            containerName = "iCloud~com~nssurge~surge-ios"
         default:
             containerName = containerIdentifier.hasPrefix("iCloud~") ? containerIdentifier : "iCloud~\(containerIdentifier)"
         }
