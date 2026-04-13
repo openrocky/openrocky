@@ -155,29 +155,15 @@ struct OpenRockyProviderSettingsView: View {
                         )
                     }
 
-                    Link(destination: URL(string: "https://github.com/openrocky/openrocky/issues/new")!) {
-                        HStack(spacing: 12) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .fill(Color.red.opacity(0.14))
-                                    .frame(width: 40, height: 40)
-                                Image(systemName: "exclamationmark.bubble.fill")
-                                    .font(.system(size: 16, weight: .bold))
-                                    .foregroundStyle(.red)
-                            }
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Feedback")
-                                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                                Text("Report issues or suggestions")
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            Image(systemName: "arrow.up.right")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundStyle(.tertiary)
-                        }
-                        .padding(.vertical, 4)
+                    NavigationLink {
+                        OpenRockyFeedbackView()
+                    } label: {
+                        settingsRow(
+                            icon: "exclamationmark.bubble.fill",
+                            tint: .red,
+                            title: "Feedback",
+                            subtitle: "Report issues or suggestions"
+                        )
                     }
 
                     NavigationLink {
