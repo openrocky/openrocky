@@ -61,10 +61,10 @@ struct OpenRockyOnboardingView: View {
             }
         }
 
-        var badge: String {
+        var badge: String? {
             switch self {
             case .openAI: "Recommended"
-            case .glm: "China"
+            case .glm: nil
             }
         }
 
@@ -344,7 +344,7 @@ struct OpenRockyOnboardingView: View {
         icon: String,
         title: String,
         subtitle: String,
-        badge: String,
+        badge: String?,
         badgeColor: Color
     ) -> some View {
         let isSelected = selectedProvider == provider
@@ -368,14 +368,16 @@ struct OpenRockyOnboardingView: View {
                         Text(title)
                             .font(.system(size: 16, weight: .bold, design: .rounded))
                             .foregroundStyle(OpenRockyPalette.text)
-                        Text(badge)
-                            .font(.system(size: 10, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(
-                                Capsule().fill(badgeColor)
-                            )
+                        if let badge {
+                            Text(badge)
+                                .font(.system(size: 10, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(
+                                    Capsule().fill(badgeColor)
+                                )
+                        }
                     }
                     Text(subtitle)
                         .font(.system(size: 13, weight: .medium, design: .rounded))
