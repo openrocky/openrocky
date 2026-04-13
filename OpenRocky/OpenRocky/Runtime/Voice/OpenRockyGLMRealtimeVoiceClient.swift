@@ -532,17 +532,21 @@ Voice-specific rules:
             switch tool {
             case .function(let fn):
                 let converted = convertJSONValueDict(fn.parameters)
-                let properties: [String: Any]
-                if let p = converted["properties"] as? [String: Any] {
+                var properties: [String: Any]
+                if let p = converted["properties"] as? [String: Any], !p.isEmpty {
                     properties = p
                 } else {
-                    properties = [String: Any]()
+                    // GLM server converts empty {} to null internally.
+                    // Add a dummy property so properties is never empty.
+                    properties = ["_placeholder": ["type": "string", "description": "unused"] as [String: Any]]
                 }
                 let required: [Any]
-                if let r = converted["required"] as? [Any] {
+                if let r = converted["required"] as? [Any], !r.isEmpty {
                     required = r
                 } else {
-                    required = [String]()
+                    // GLM server converts empty [] to null internally.
+                    // Use a non-empty placeholder.
+                    required = ["_placeholder"]
                 }
 
                 tools.append([
