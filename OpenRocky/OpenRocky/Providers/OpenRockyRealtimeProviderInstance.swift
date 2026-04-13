@@ -14,12 +14,7 @@ struct OpenRockyRealtimeProviderInstance: Codable, Identifiable, Equatable {
     var name: String
     var kind: OpenRockyRealtimeProviderKind
     var modelID: String
-    var doubaoResourceID: String?
-    var doubaoAppId: String?
-    var doubaoAppKey: String?
-    var doubaoSpeaker: String?
     var openaiVoice: String?
-    var geminiVoice: String?
     var glmVoice: String?
     var customHost: String?
     var isBuiltIn: Bool
@@ -33,12 +28,7 @@ struct OpenRockyRealtimeProviderInstance: Codable, Identifiable, Equatable {
             provider: kind,
             modelID: kind.defaultModel,
             credential: credential,
-            doubaoResourceID: doubaoResourceID,
-            doubaoAppId: doubaoAppId,
-            doubaoAppKey: doubaoAppKey,
-            doubaoSpeaker: doubaoSpeaker,
             openaiVoice: openaiVoice,
-            geminiVoice: geminiVoice,
             glmVoice: glmVoice,
             customHost: customHost
         )

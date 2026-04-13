@@ -92,9 +92,6 @@ final class OpenRockySessionRuntime: ObservableObject {
         if config.openaiVoice == nil, let voice = character.openaiVoice {
             config.openaiVoice = voice
         }
-        if config.doubaoSpeaker == nil, let speaker = character.doubaoSpeaker {
-            config.doubaoSpeaker = speaker
-        }
 
         syncProviders(chatConfiguration: chatConfiguration, voiceConfiguration: config)
         // Clear all previous voice state for a fresh session
@@ -424,7 +421,7 @@ final class OpenRockySessionRuntime: ObservableObject {
     }
 
     private var isDoubaoVoiceMode: Bool {
-        voiceConfiguration.provider == .doubao && isMicrophoneActive
+        false
     }
 
     private func applyChatChunk(_ chunk: ChatResponseChunk) {

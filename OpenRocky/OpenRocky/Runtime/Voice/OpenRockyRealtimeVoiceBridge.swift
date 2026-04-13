@@ -215,10 +215,6 @@ final class OpenRockyRealtimeVoiceBridge {
                 throw OpenRockyRealtimeVoiceBridgeError.unsupportedProvider
             }
             return OpenRockyOpenAIRealtimeVoiceClient(configuration: chatConfiguration, realtimeConfiguration: configuration, soulInstructions: soulInstructions, realtimeTools: realtimeTools)
-        case .doubao:
-            return OpenRockyDoubaoRealtimeVoiceClient(configuration: configuration, soulInstructions: soulInstructions, realtimeTools: realtimeTools)
-        case .gemini:
-            return OpenRockyGeminiRealtimeVoiceClient(configuration: configuration, soulInstructions: soulInstructions, realtimeTools: realtimeTools)
         case .glm:
             return OpenRockyGLMRealtimeVoiceClient(configuration: configuration, soulInstructions: soulInstructions, realtimeTools: realtimeTools)
         }

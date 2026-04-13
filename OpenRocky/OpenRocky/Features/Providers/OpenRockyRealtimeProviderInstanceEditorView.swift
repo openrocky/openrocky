@@ -18,22 +18,13 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
     @State private var name: String = ""
     @State private var selectedProvider: OpenRockyRealtimeProviderKind = .openAI
     @State private var credential: String = ""
-    @State private var doubaoResourceID: String = ""
-    @State private var doubaoAppId: String = ""
-    @State private var doubaoAppKey: String = ""
-    @State private var doubaoSpeaker: String = OpenRockyDoubaoSpeaker.vivi.rawValue
-
     @State private var openaiVoice: String = OpenRockyOpenAIVoice.alloy.rawValue
-    @State private var geminiModel: String = OpenRockyRealtimeProviderKind.gemini.defaultModel
-    @State private var geminiVoice: String = OpenRockyGeminiVoice.puck.rawValue
     @State private var glmVoice: String = OpenRockyGLMVoice.tongtong.rawValue
     @State private var customHost: String = ""
     @State private var previousProvider: OpenRockyRealtimeProviderKind = .openAI
     @State private var testState: VoiceTestConnectionState = .idle
     @State private var nameManuallyEdited: Bool = false
-    @StateObject private var voicePreview = OpenRockyDoubaoVoicePreview()
     @StateObject private var openaiVoicePreview = OpenRockyOpenAIVoicePreview()
-    @StateObject private var geminiVoicePreview = OpenRockyGeminiVoicePreview()
     @StateObject private var glmVoicePreview = OpenRockyGLMVoicePreview()
 
     private var isNew: Bool { editingInstanceID == nil }
@@ -66,81 +57,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 Text("Voice Provider")
             }
 
-            if selectedProvider == .gemini {
-                Section {
-                    SecureField(
-                        "API Key",
-                        text: $credential,
-                        prompt: Text("AIza...")
-                    )
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .textContentType(.init(rawValue: ""))
-
-                    Link(destination: URL(string: "https://aistudio.google.com/apikey")!) {
-                        HStack {
-                            Image(systemName: "arrow.up.forward.square")
-                            Text("Get Gemini API Key")
-                        }
-                        .font(.subheadline)
-                    }
-                } header: {
-                    Text("Google AI Studio")
-                }
-
-                Section {
-                    ForEach(OpenRockyGeminiVoice.allCases) { voice in
-                        Button {
-                            geminiVoice = voice.rawValue
-                        } label: {
-                            HStack(spacing: 12) {
-                                Image(systemName: geminiVoice == voice.rawValue ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(geminiVoice == voice.rawValue ? Color.accentColor : .secondary)
-                                    .font(.system(size: 20))
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(voice.displayName)
-                                        .foregroundStyle(.primary)
-                                        .font(.subheadline.weight(.medium))
-                                    Text(voice.subtitle)
-                                        .foregroundStyle(.secondary)
-                                        .font(.caption2)
-                                        .lineLimit(2)
-                                }
-                                Spacer()
-                                Button {
-                                    if geminiVoicePreview.playingVoice == voice.rawValue {
-                                        geminiVoicePreview.stop()
-                                    } else {
-                                        geminiVoicePreview.play(
-                                            voice: voice.rawValue,
-                                            credential: credential,
-                                            customHost: customHost.isEmpty ? nil : customHost
-                                        )
-                                    }
-                                } label: {
-                                    if geminiVoicePreview.playingVoice == voice.rawValue && geminiVoicePreview.isLoading {
-                                        ProgressView()
-                                            .controlSize(.small)
-                                    } else {
-                                        Image(systemName: geminiVoicePreview.playingVoice == voice.rawValue ? "stop.circle.fill" : "play.circle.fill")
-                                            .font(.system(size: 26))
-                                            .foregroundStyle(geminiVoicePreview.playingVoice == voice.rawValue ? .orange : .accentColor)
-                                    }
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    if let err = geminiVoicePreview.error {
-                        Text(err)
-                            .font(.caption)
-                            .foregroundStyle(.red)
-                    }
-                } header: {
-                    Text("Voice")
-                }
-            } else if selectedProvider == .glm {
+            if selectedProvider == .glm {
                 Section {
                     SecureField(
                         "API Key",
@@ -214,83 +131,6 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 } header: {
                     Text("Voice")
                 }
-            } else if selectedProvider == .doubao {
-                Section {
-                    TextField("APP ID", text: $doubaoAppId)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .keyboardType(.numberPad)
-                    SecureField(
-                        "Access Token",
-                        text: $credential,
-                        prompt: Text("Access Token from console")
-                    )
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-                    .textContentType(.init(rawValue: ""))
-
-                    Link(destination: URL(string: "https://console.volcengine.com/speech/service/10017")!) {
-                        HStack {
-                            Image(systemName: "arrow.up.forward.square")
-                            Text("Get Real-Time API Access Token")
-                        }
-                        .font(.subheadline)
-                    }
-                } header: {
-                    Text("Doubao Speech")
-                } footer: {
-                    Text("APP ID and Access Token are found in the Volcengine speech console.")
-                }
-
-                Section {
-                    ForEach(OpenRockyDoubaoSpeaker.allCases) { speaker in
-                        Button {
-                            doubaoSpeaker = speaker.rawValue
-                        } label: {
-                            HStack(spacing: 12) {
-                                Image(systemName: doubaoSpeaker == speaker.rawValue ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(doubaoSpeaker == speaker.rawValue ? Color.accentColor : .secondary)
-                                    .font(.system(size: 20))
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(speaker.displayName)
-                                        .foregroundStyle(.primary)
-                                        .font(.subheadline.weight(.medium))
-                                    Text(speaker.subtitle)
-                                        .foregroundStyle(.secondary)
-                                        .font(.caption2)
-                                        .lineLimit(2)
-                                }
-                                Spacer()
-                                Button {
-                                    if voicePreview.playingSpeaker == speaker.rawValue {
-                                        voicePreview.stop()
-                                    } else {
-                                        voicePreview.play(speaker: speaker.rawValue, appId: doubaoAppId, credential: credential)
-                                    }
-                                } label: {
-                                    if voicePreview.playingSpeaker == speaker.rawValue && voicePreview.isLoading {
-                                        ProgressView()
-                                            .controlSize(.small)
-                                    } else {
-                                        Image(systemName: voicePreview.playingSpeaker == speaker.rawValue ? "stop.circle.fill" : "play.circle.fill")
-                                            .font(.system(size: 26))
-                                            .foregroundStyle(voicePreview.playingSpeaker == speaker.rawValue ? .orange : .accentColor)
-                                    }
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    if let err = voicePreview.error {
-                        Text(err)
-                            .font(.caption)
-                            .foregroundStyle(.red)
-                    }
-                } header: {
-                    Text("Voice")
-                }
-
             } else {
                 Section {
                     SecureField(
@@ -473,17 +313,8 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
         nameManuallyEdited = true
         selectedProvider = instance.kind
         credential = realtimeProviderStore.credential(for: instance) ?? ""
-        doubaoResourceID = instance.doubaoResourceID ?? ""
-        doubaoAppId = instance.doubaoAppId ?? ""
-        doubaoAppKey = instance.doubaoAppKey ?? ""
-        doubaoSpeaker = instance.doubaoSpeaker ?? OpenRockyDoubaoSpeaker.vivi.rawValue
-
         openaiVoice = instance.openaiVoice ?? OpenRockyOpenAIVoice.alloy.rawValue
         customHost = instance.customHost ?? ""
-        if instance.kind == .gemini {
-            geminiModel = instance.modelID
-            geminiVoice = instance.geminiVoice ?? OpenRockyGeminiVoice.puck.rawValue
-        }
         if instance.kind == .glm {
             glmVoice = instance.glmVoice ?? OpenRockyGLMVoice.tongtong.rawValue
         }
@@ -491,11 +322,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
     }
 
     private var draftModelID: String {
-        switch selectedProvider {
-        case .gemini: geminiModel
-        case .glm: selectedProvider.defaultModel
-        default: selectedProvider.defaultModel
-        }
+        selectedProvider.defaultModel
     }
 
     private var draftIsConfigured: Bool {
@@ -503,10 +330,6 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
             provider: selectedProvider,
             modelID: draftModelID,
             credential: credential,
-            doubaoResourceID: doubaoResourceID,
-            doubaoAppId: doubaoAppId,
-            doubaoAppKey: doubaoAppKey,
-            doubaoSpeaker: doubaoSpeaker,
             customHost: customHost
         ).normalized()
         return config.isConfigured
@@ -518,10 +341,6 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
             provider: selectedProvider,
             modelID: draftModelID,
             credential: credential,
-            doubaoResourceID: doubaoResourceID,
-            doubaoAppId: doubaoAppId,
-            doubaoAppKey: doubaoAppKey,
-            doubaoSpeaker: doubaoSpeaker,
             customHost: customHost
         ).normalized()
 
@@ -534,14 +353,6 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                     testModelID = "gpt-realtime-mini"
                     let openAIHost = config.customHost ?? "wss://api.openai.com"
                     url = URL(string: "\(openAIHost)/v1/realtime?model=\(testModelID)")!
-                case .doubao:
-                    testModelID = "doubao-e2e-voice"
-                    let doubaoHost = config.customHost ?? "wss://openspeech.bytedance.com"
-                    url = URL(string: "\(doubaoHost)/api/v3/realtime/dialogue")!
-                case .gemini:
-                    testModelID = "gemini-2.5-flash-native-audio-latest"
-                    let geminiHost = config.customHost ?? "wss://generativelanguage.googleapis.com"
-                    url = URL(string: "\(geminiHost)/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=\(config.credential ?? "")")!
                 case .glm:
                     testModelID = "glm-realtime"
                     let glmHost = config.customHost ?? "wss://open.bigmodel.cn"
@@ -549,40 +360,15 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 }
 
                 var request = URLRequest(url: url)
-                if config.provider == .gemini {
-                    // Gemini uses API key in URL, no additional auth headers needed
-                } else if config.provider == .glm {
+                if config.provider == .glm {
                     request.setValue("Bearer \(config.credential ?? "")", forHTTPHeaderField: "Authorization")
                 } else if config.provider == .openAI {
                     request.setValue("Bearer \(config.credential ?? "")", forHTTPHeaderField: "Authorization")
                     request.setValue("realtime=v1", forHTTPHeaderField: "openai-beta")
-                } else {
-                    request.setValue(config.doubaoAppId ?? "", forHTTPHeaderField: "X-Api-App-ID")
-                    request.setValue(config.credential ?? "", forHTTPHeaderField: "X-Api-Access-Key")
-                    request.setValue("volc.speech.dialog", forHTTPHeaderField: "X-Api-Resource-Id")
-                    let appKey = config.doubaoAppKey?.isEmpty == false ? config.doubaoAppKey! : "PlgvMymc7f3tQnJ6"
-                    request.setValue(appKey, forHTTPHeaderField: "X-Api-App-Key")
-                    request.setValue(UUID().uuidString, forHTTPHeaderField: "X-Api-Connect-Id")
                 }
 
                 let socket = URLSession.shared.webSocketTask(with: request)
                 socket.resume()
-
-                // For Gemini: send setup message (server waits for this before responding)
-                if config.provider == .gemini {
-                    let setup: [String: Any] = [
-                        "setup": [
-                            "model": "models/\(testModelID)",
-                            "generationConfig": [
-                                "responseModalities": ["AUDIO"]
-                            ]
-                        ]
-                    ]
-                    let setupData = try JSONSerialization.data(withJSONObject: setup)
-                    if let setupText = String(data: setupData, encoding: .utf8) {
-                        try await socket.send(.string(setupText))
-                    }
-                }
 
                 // For GLM: send session.update
                 if config.provider == .glm {
@@ -599,20 +385,6 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                     if let setupText = String(data: setupData, encoding: .utf8) {
                         try await socket.send(.string(setupText))
                     }
-                }
-
-                // For Doubao: send StartConnection using binary protocol
-                if config.provider == .doubao {
-                    // Binary header: version=1, headerSize=1, CLIENT_FULL_REQUEST(1), MSG_WITH_EVENT(4), JSON(1), NO_COMPRESSION(0)
-                    var msg = Data([0x11, 0x14, 0x10, 0x00])
-                    // Event=1 (StartConnection)
-                    msg.append(contentsOf: [0x00, 0x00, 0x00, 0x01])
-                    // Payload: raw "{}" (no compression)
-                    let payload = "{}".data(using: .utf8)!
-                    let payloadLen = UInt32(payload.count).bigEndian
-                    msg.append(contentsOf: withUnsafeBytes(of: payloadLen) { Array($0) })
-                    msg.append(payload)
-                    try await socket.send(.data(msg))
                 }
 
                 // Wait for first response with timeout
@@ -684,15 +456,9 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 testState = .failure(message: "Connection timed out")
             } catch {
                 rlog.error("Realtime test error: \(error.localizedDescription)", category: "Test")
-                switch config.provider {
-                case .doubao:
-                    let nsError = error as NSError
-                    testState = .failure(message: "WebSocket handshake failed (\(nsError.code)). Check APP ID and Access Token.")
-                case .openAI, .gemini, .glm:
-                    let probeMsg = await probeEndpointError(config: config)
-                    rlog.debug("Realtime test probe: \(probeMsg)", category: "Test")
-                    testState = .failure(message: probeMsg)
-                }
+                let probeMsg = await probeEndpointError(config: config)
+                rlog.debug("Realtime test probe: \(probeMsg)", category: "Test")
+                testState = .failure(message: probeMsg)
             }
         }
     }
@@ -704,12 +470,6 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
         case .openAI:
             let host = config.customHost?.replacingOccurrences(of: "wss://", with: "https://") ?? "https://api.openai.com"
             httpURL = URL(string: "\(host)/v1/realtime?model=gpt-realtime-mini")!
-        case .doubao:
-            let host = config.customHost?.replacingOccurrences(of: "wss://", with: "https://") ?? "https://openspeech.bytedance.com"
-            httpURL = URL(string: "\(host)/api/v3/realtime/dialogue")!
-        case .gemini:
-            let host = config.customHost?.replacingOccurrences(of: "wss://", with: "https://") ?? "https://generativelanguage.googleapis.com"
-            httpURL = URL(string: "\(host)/v1beta/models/gemini-2.5-flash-native-audio-latest?key=\(config.credential ?? "")")!
         case .glm:
             let host = config.customHost?.replacingOccurrences(of: "wss://", with: "https://") ?? "https://open.bigmodel.cn"
             httpURL = URL(string: "\(host)/api/paas/v4/models")!
@@ -717,20 +477,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
 
         var request = URLRequest(url: httpURL)
         request.httpMethod = "GET"
-        if config.provider == .doubao {
-            request.setValue(config.doubaoAppId ?? "", forHTTPHeaderField: "X-Api-App-ID")
-            request.setValue(config.credential ?? "", forHTTPHeaderField: "X-Api-Access-Key")
-            request.setValue("volc.speech.dialog", forHTTPHeaderField: "X-Api-Resource-Id")
-            if let appKey = config.doubaoAppKey, !appKey.isEmpty {
-                request.setValue(appKey, forHTTPHeaderField: "X-Api-App-Key")
-            }
-        } else if config.provider == .gemini {
-            // Gemini uses API key in the URL query parameter, no auth header needed
-        } else if config.provider == .glm {
-            request.setValue("Bearer \(config.credential ?? "")", forHTTPHeaderField: "Authorization")
-        } else {
-            request.setValue("Bearer \(config.credential ?? "")", forHTTPHeaderField: "Authorization")
-        }
+        request.setValue("Bearer \(config.credential ?? "")", forHTTPHeaderField: "Authorization")
 
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
@@ -765,13 +512,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
             instance.name = trimmedName
             instance.kind = selectedProvider
             instance.modelID = resolvedModelID
-            instance.doubaoResourceID = doubaoResourceID.isEmpty ? nil : doubaoResourceID
-            instance.doubaoAppId = doubaoAppId.isEmpty ? nil : doubaoAppId
-            instance.doubaoAppKey = doubaoAppKey.isEmpty ? nil : doubaoAppKey
-            instance.doubaoSpeaker = doubaoSpeaker
-
             instance.openaiVoice = openaiVoice
-            instance.geminiVoice = geminiVoice
             instance.glmVoice = glmVoice
             instance.customHost = customHost.isEmpty ? nil : customHost
             realtimeProviderStore.update(instance, credential: cred.isEmpty ? nil : cred)
@@ -781,13 +522,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
                 name: trimmedName,
                 kind: selectedProvider,
                 modelID: resolvedModelID,
-                doubaoResourceID: doubaoResourceID.isEmpty ? nil : doubaoResourceID,
-                doubaoAppId: doubaoAppId.isEmpty ? nil : doubaoAppId,
-                doubaoAppKey: doubaoAppKey.isEmpty ? nil : doubaoAppKey,
-                doubaoSpeaker: doubaoSpeaker,
-
                 openaiVoice: openaiVoice,
-                geminiVoice: geminiVoice,
                 glmVoice: glmVoice,
                 customHost: customHost.isEmpty ? nil : customHost,
                 isBuiltIn: false

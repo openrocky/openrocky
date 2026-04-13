@@ -110,7 +110,6 @@ final class OpenRockyRealtimeProviderStore: ObservableObject {
             var updated = instance
             updated.kind = configuration.provider
             updated.modelID = configuration.modelID
-            updated.doubaoResourceID = configuration.doubaoResourceID
             update(updated, credential: configuration.credential)
         } else {
             let instance = OpenRockyRealtimeProviderInstance(
@@ -118,7 +117,6 @@ final class OpenRockyRealtimeProviderStore: ObservableObject {
                 name: configuration.provider.displayName,
                 kind: configuration.provider,
                 modelID: configuration.modelID,
-                doubaoResourceID: configuration.doubaoResourceID,
                 isBuiltIn: false
             )
             add(instance, credential: configuration.credential)
@@ -221,7 +219,6 @@ final class OpenRockyRealtimeProviderStore: ObservableObject {
                 name: provider.displayName,
                 kind: provider,
                 modelID: modelID,
-                doubaoResourceID: defaults.string(forKey: "rocky.realtime-provider.doubao.resource-id"),
                 isBuiltIn: false
             )
             saveInstance(instance)

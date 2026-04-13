@@ -21,7 +21,6 @@ struct OpenRockyCharacterEditorView: View {
     @State private var greeting: String = ""
     @State private var speakingStyle: String = ""
     @State private var openaiVoice: String = OpenRockyOpenAIVoice.alloy.rawValue
-    @State private var doubaoSpeaker: String = OpenRockyDoubaoSpeaker.vivi.rawValue
 
     private var isNew: Bool { editingCharacterID == nil }
     private var isBuiltIn: Bool {
@@ -69,20 +68,6 @@ struct OpenRockyCharacterEditorView: View {
             }
 
             Section {
-                Picker("Doubao Speaker", selection: $doubaoSpeaker) {
-                    ForEach(OpenRockyDoubaoSpeaker.allCases) { speaker in
-                        Text("\(speaker.displayName) — \(speaker.subtitle)")
-                            .tag(speaker.rawValue)
-                    }
-                }
-                .pickerStyle(.inline)
-            } header: {
-                Text("Doubao Speaker")
-            } footer: {
-                Text("Preferred speaker when using Doubao realtime.")
-            }
-
-            Section {
                 TextEditor(text: $personality)
                     .font(.system(size: 13, design: .monospaced))
                     .frame(minHeight: 300)
@@ -103,7 +88,6 @@ struct OpenRockyCharacterEditorView: View {
                             greeting = builtIn.greeting
                             speakingStyle = builtIn.speakingStyle
                             openaiVoice = builtIn.openaiVoice ?? OpenRockyOpenAIVoice.alloy.rawValue
-                            doubaoSpeaker = builtIn.doubaoSpeaker ?? OpenRockyDoubaoSpeaker.vivi.rawValue
                         }
                     }
                     .foregroundStyle(.red)
@@ -121,7 +105,6 @@ struct OpenRockyCharacterEditorView: View {
                 greeting = character.greeting
                 speakingStyle = character.speakingStyle
                 openaiVoice = character.openaiVoice ?? OpenRockyOpenAIVoice.alloy.rawValue
-                doubaoSpeaker = character.doubaoSpeaker ?? OpenRockyDoubaoSpeaker.vivi.rawValue
             }
         }
         .toolbar {
@@ -145,7 +128,6 @@ struct OpenRockyCharacterEditorView: View {
             character.greeting = greeting
             character.speakingStyle = speakingStyle
             character.openaiVoice = openaiVoice
-            character.doubaoSpeaker = doubaoSpeaker
             characterStore.update(character)
         } else {
             let character = OpenRockyCharacterDefinition(
@@ -156,7 +138,6 @@ struct OpenRockyCharacterEditorView: View {
                 greeting: greeting,
                 speakingStyle: speakingStyle,
                 openaiVoice: openaiVoice,
-                doubaoSpeaker: doubaoSpeaker,
                 isBuiltIn: false
             )
             characterStore.add(character)

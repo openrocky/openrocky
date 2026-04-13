@@ -433,7 +433,6 @@ struct OpenRockyVoiceProviderSettingsView: View {
     @State private var selectedProvider: OpenRockyRealtimeProviderKind
     @State private var modelID: String
     @State private var credential: String
-    @State private var doubaoResourceID: String
     @State private var previousProvider: OpenRockyRealtimeProviderKind
 
     init(realtimeProviderStore: OpenRockyRealtimeProviderStore) {
@@ -442,7 +441,6 @@ struct OpenRockyVoiceProviderSettingsView: View {
         _selectedProvider = State(initialValue: config.provider)
         _modelID = State(initialValue: config.modelID)
         _credential = State(initialValue: config.credential ?? "")
-        _doubaoResourceID = State(initialValue: config.doubaoResourceID ?? "")
         _previousProvider = State(initialValue: config.provider)
     }
 
@@ -486,18 +484,6 @@ struct OpenRockyVoiceProviderSettingsView: View {
                 Text(selectedProvider.credentialTitle)
             }
 
-            if selectedProvider == .doubao {
-                Section {
-                    TextField("Optional resource ID", text: $doubaoResourceID)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                } header: {
-                    Text("Doubao")
-                } footer: {
-                    Text("Set the Volcengine resource ID if your gateway requires it.")
-                }
-            }
-
             Section {
                 TextField("Model ID", text: $modelID)
                     .textInputAutocapitalization(.never)
@@ -522,7 +508,7 @@ struct OpenRockyVoiceProviderSettingsView: View {
             } header: {
                 Text("Voice Model")
             } footer: {
-                Text("OpenAI uses realtime models. Doubao expects the transcription model ID.")
+                Text("OpenAI uses realtime models. GLM uses glm-realtime.")
             }
         }
         .navigationTitle("Voice Provider")
@@ -548,8 +534,7 @@ struct OpenRockyVoiceProviderSettingsView: View {
         OpenRockyRealtimeProviderConfiguration(
             provider: selectedProvider,
             modelID: modelID,
-            credential: credential,
-            doubaoResourceID: doubaoResourceID
+            credential: credential
         )
     }
 

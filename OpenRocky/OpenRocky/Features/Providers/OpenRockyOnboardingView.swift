@@ -25,7 +25,6 @@ struct OpenRockyOnboardingView: View {
     @State private var buttonVisible = false
     @State private var apiKey = ""
     @State private var customHost = ""
-    @State private var doubaoAppId = ""
     @State private var isSubmitting = false
 
     @State private var floatingOffset: CGFloat = 0
@@ -39,111 +38,87 @@ struct OpenRockyOnboardingView: View {
 
     private enum OnboardingProvider: CaseIterable {
         case openAI
-        case gemini
         case glm
-        case doubao
 
         var displayName: String {
             switch self {
             case .openAI: "OpenAI"
-            case .gemini: "Google Gemini"
             case .glm: "GLM (Zhipu AI)"
-            case .doubao: "Doubao"
             }
         }
 
         var icon: String {
             switch self {
             case .openAI: "globe"
-            case .gemini: "sparkle"
             case .glm: "brain.fill"
-            case .doubao: "waveform.path"
             }
         }
 
         var subtitle: String {
             switch self {
             case .openAI: "Recommended. One API key powers chat + voice."
-            case .gemini: "Google AI. One API key powers chat + voice."
-            case .glm: "Zhipu AI. One API key powers chat + voice. Optimized for Chinese."
-            case .doubao: "ByteDance. One API key powers chat + voice. Optimized for Chinese."
+            case .glm: "Zhipu AI. One API key powers chat + voice. Optimized for Chinese. No VPN needed."
             }
         }
 
         var badge: String {
             switch self {
             case .openAI: "Recommended"
-            case .gemini: "Beta"
-            case .glm: "Beta"
-            case .doubao: "Beta"
+            case .glm: "China"
             }
         }
 
         var badgeColor: Color {
             switch self {
             case .openAI: OpenRockyPalette.accent
-            case .gemini: .blue
             case .glm: .purple
-            case .doubao: .orange
             }
         }
 
         var apiKeyPlaceholder: String {
             switch self {
             case .openAI: "sk-..."
-            case .gemini: "AIza..."
             case .glm: "your-api-key..."
-            case .doubao: "Access Token"
             }
         }
 
         var apiKeyTitle: String {
             switch self {
             case .openAI: "Enter OpenAI API Key"
-            case .gemini: "Enter Gemini API Key"
             case .glm: "Enter Zhipu AI API Key"
-            case .doubao: "Enter Doubao Access Token"
             }
         }
 
         var apiKeySubtitle: String {
             switch self {
             case .openAI: "One key powers both chat and voice."
-            case .gemini: "One key powers both chat and voice."
             case .glm: "One key powers both chat and voice."
-            case .doubao: "Access Token for voice. You also need APP ID."
             }
         }
 
         var apiKeyGuideURL: String {
             switch self {
             case .openAI: "https://platform.openai.com/api-keys"
-            case .gemini: "https://aistudio.google.com/apikey"
             case .glm: "https://open.bigmodel.cn/usercenter/apikeys"
-            case .doubao: "https://console.volcengine.com/speech/service/10017"
             }
         }
 
         var chatProviderKind: OpenRockyProviderKind {
             switch self {
             case .openAI: .openAI
-            case .gemini: .gemini
             case .glm: .zhipuAI
-            case .doubao: .volcengine
             }
         }
 
         var voiceProviderKind: OpenRockyRealtimeProviderKind {
             switch self {
             case .openAI: .openAI
-            case .gemini: .gemini
             case .glm: .glm
-            case .doubao: .doubao
             }
         }
 
         var requiresAppId: Bool {
-            self == .doubao
+            false
         }
     }
 
@@ -323,7 +298,6 @@ struct OpenRockyOnboardingView: View {
                 Button {
                     apiKey = ""
                     customHost = ""
-                    doubaoAppId = ""
                     withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
                         step = .apiKey
                     }
@@ -485,23 +459,6 @@ struct OpenRockyOnboardingView: View {
 
             // API key input
             VStack(spacing: 12) {
-                // Doubao needs APP ID first
-                if selectedProvider.requiresAppId {
-                    TextField("APP ID", text: $doubaoAppId)
-                        .font(.system(size: 16, design: .monospaced))
-                        .padding(14)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .fill(OpenRockyPalette.card)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .stroke(doubaoAppId.isEmpty ? OpenRockyPalette.stroke : OpenRockyPalette.accent.opacity(0.5), lineWidth: 1)
-                                )
-                        )
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .keyboardType(.numberPad)
-                }
 
                 SecureField(selectedProvider.apiKeyPlaceholder, text: $apiKey)
                     .font(.system(size: 16, design: .monospaced))
@@ -681,12 +638,6 @@ struct OpenRockyOnboardingView: View {
             credential: key
         )
         voiceConfig.customHost = voiceHost
-
-        // Doubao needs extra fields
-        if selectedProvider == .doubao {
-            let appId = doubaoAppId.trimmingCharacters(in: .whitespacesAndNewlines)
-            voiceConfig.doubaoAppId = appId.isEmpty ? nil : appId
-        }
 
         realtimeProviderStore.update(configuration: voiceConfig)
 
