@@ -710,7 +710,7 @@ Voice-specific rules:
         [
             "type": "function",
             "name": "files_memory",
-            "description": "File operations, iCloud, memory and todo. Actions: read_file (needs: path), write_file (needs: path, content), icloud_read (needs: container e.g. 'obsidian', path), icloud_list (needs: container; optional: path), icloud_write (needs: container, path, content; mount must have read/write permission), memory_get (needs: key), memory_write (needs: key, value), todo (needs: action: list/add/complete/delete; optional: title, id)",
+            "description": "File operations, iCloud mounts, memory and todo. Actions: read_file (needs: path), write_file (needs: path, content), icloud_read (needs: container mount name e.g. 'obsidian', path), icloud_list (needs: container; optional: path), icloud_write (needs: container, path, content; mount must be read/write enabled), memory_get (needs: key), memory_write (needs: key, value), todo (needs: action: list/add/complete/delete; optional: title, id). iCloud uses mount names from Settings → External Folders.",
             "parameters": [
                 "type": "object",
                 "properties": [

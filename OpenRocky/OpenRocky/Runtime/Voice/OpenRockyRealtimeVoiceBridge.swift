@@ -7,6 +7,7 @@
 // Copyright (c) 2026 everettjf. All rights reserved.
 //
 
+import AVFoundation
 import Foundation
 @preconcurrency import SwiftOpenAI
 
@@ -142,16 +143,12 @@ final class OpenRockyRealtimeVoiceBridge {
                         // Check if user wants voice interruption enabled (from Preferences)
                         let interruptionEnabled = UserDefaults.standard.object(forKey: "rocky.pref.voiceInterruptionEnabled") as? Bool ?? false
                         if interruptionEnabled {
-                            // Check if the user is speaking loudly enough to interrupt
-                            // Use a high threshold (3500) to avoid false triggers from ambient noise
-                            if let base64 = AudioUtils.base64EncodeAudioPCMBuffer(from: buffer),
-                               let pcmData = Data(base64Encoded: base64) {
-                                let rms = AudioUtils.computeRMS(pcmData)
-                                if rms > 3500 {
-                                    rlog.info("Mic interrupt detected during suspension (rms=\(rms))", category: "Audio")
-                                    interruptPlayback()
-                                    emit(.inputSpeechStarted)
-                                }
+                            // Read PCM data directly from buffer — no base64 round-trip
+                            let rms = Self.computeRMSFromBuffer(buffer)
+                            if rms > 3500 {
+                                rlog.info("Mic interrupt detected during suspension (rms=\(rms))", category: "Audio")
+                                interruptPlayback()
+                                emit(.inputSpeechStarted)
                             }
                         }
                         if skippedCount % 50 == 1 {
@@ -213,6 +210,15 @@ final class OpenRockyRealtimeVoiceBridge {
             pendingMicResume = false
             isMicSuspended = false
         }
+    }
+
+    /// Compute RMS energy directly from an AVAudioPCMBuffer without base64 round-trip.
+    private static func computeRMSFromBuffer(_ buffer: AVAudioPCMBuffer) -> Double {
+        guard buffer.format.channelCount == 1,
+              let ptr = buffer.audioBufferList.pointee.mBuffers.mData else { return 0 }
+        let byteCount = Int(buffer.audioBufferList.pointee.mBuffers.mDataByteSize)
+        let data = Data(bytes: ptr, count: byteCount)
+        return AudioUtils.computeRMS(data)
     }
 
     private func emit(_ event: OpenRockyRealtimeEvent) {

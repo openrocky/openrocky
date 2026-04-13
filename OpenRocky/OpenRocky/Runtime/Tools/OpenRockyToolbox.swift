@@ -1561,16 +1561,23 @@ final class OpenRockyToolbox {
         return nil
     }
 
+    /// Validate path doesn't contain traversal sequences.
+    private static func isPathSafe(_ path: String) -> Bool {
+        !path.contains("..") && !path.hasPrefix("/")
+    }
+
     private func executeICloudRead(arguments: String) throws -> String {
         let request = try decode(ICloudReadRequest.self, from: arguments)
+        guard Self.isPathSafe(request.path) else {
+            return try encode(["error": "Invalid path: must be relative and cannot contain '..'"])
+        }
         guard let containerURL = Self.resolveICloudContainerURL(container: request.container) else {
-            return try encode(["error": "iCloud container '\(request.container)' not found. Make sure the app is installed and synced to iCloud."])
+            return try encode(["error": "iCloud container '\(request.container)' not found. Add it in Settings → External Folders, or make sure the app is installed and synced."])
         }
         let fileURL = containerURL.appendingPathComponent(request.path)
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
             return try encode(["error": "File not found: \(request.path) in \(request.container)"])
         }
-        // Start accessing security-scoped resource
         let accessing = fileURL.startAccessingSecurityScopedResource()
         defer { if accessing { fileURL.stopAccessingSecurityScopedResource() } }
 
@@ -1580,8 +1587,13 @@ final class OpenRockyToolbox {
 
     private func executeICloudList(arguments: String) throws -> String {
         let request = try decode(ICloudListRequest.self, from: arguments)
+        if let path = request.path, !path.isEmpty, path != "/" {
+            guard Self.isPathSafe(path) else {
+                return try encode(["error": "Invalid path: must be relative and cannot contain '..'"])
+            }
+        }
         guard let containerURL = Self.resolveICloudContainerURL(container: request.container) else {
-            return try encode(["error": "iCloud container '\(request.container)' not found. Make sure the app is installed and synced to iCloud."])
+            return try encode(["error": "iCloud container '\(request.container)' not found. Add it in Settings → External Folders, or make sure the app is installed and synced."])
         }
         let targetURL: URL
         if let path = request.path, !path.isEmpty, path != "/" {
@@ -1618,6 +1630,9 @@ final class OpenRockyToolbox {
 
     private func executeICloudWrite(arguments: String) throws -> String {
         let request = try decode(ICloudWriteRequest.self, from: arguments)
+        guard Self.isPathSafe(request.path) else {
+            return try encode(["error": "Invalid path: must be relative and cannot contain '..'"])
+        }
 
         // Check mount permissions
         if let mount = OpenRockyMountStore.shared.mount(named: request.container) {

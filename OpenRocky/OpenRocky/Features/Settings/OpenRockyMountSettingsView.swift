@@ -225,15 +225,22 @@ struct OpenRockyMountEditorView: View {
                     dismiss()
                 }
                 .fontWeight(.bold)
-                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty || containerIdentifier.trimmingCharacters(in: .whitespaces).isEmpty)
+                .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty || containerIdentifier.trimmingCharacters(in: .whitespaces).isEmpty || !hasValidSubpath)
             }
         }
+    }
+
+    private var hasValidSubpath: Bool {
+        let trimmed = subpath.trimmingCharacters(in: .whitespaces)
+        if trimmed.isEmpty || trimmed == "/" { return true }
+        return !trimmed.contains("..") && !trimmed.contains("//")
     }
 
     private func saveMount() {
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
         let trimmedContainer = containerIdentifier.trimmingCharacters(in: .whitespaces)
         let trimmedSubpath = subpath.trimmingCharacters(in: .whitespaces)
+            .trimmingCharacters(in: CharacterSet(charactersIn: "/"))
 
         if let existing = editingMount {
             var updated = existing
