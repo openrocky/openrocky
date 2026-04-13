@@ -523,8 +523,8 @@ Voice-specific rules:
 
     // MARK: - Tool Conversion
 
-    /// Convert OpenAI realtime tool definitions to GLM format.
-    /// GLM strictly requires every tool to have parameters.properties (dict) and parameters.required (list).
+    /// Convert OpenAI realtime tool definitions to GLM flat format.
+    /// GLM docs show flat format: {type, name, description, parameters} without function wrapper.
     private func buildGLMTools() -> [[String: Any]] {
         var tools: [[String: Any]] = []
 
@@ -532,7 +532,6 @@ Voice-specific rules:
             switch tool {
             case .function(let fn):
                 let converted = convertJSONValueDict(fn.parameters)
-                // Extract properties and required, ensuring they are never null/missing
                 let properties: [String: Any]
                 if let p = converted["properties"] as? [String: Any] {
                     properties = p
@@ -546,17 +545,14 @@ Voice-specific rules:
                     required = [String]()
                 }
 
-                let params: [String: Any] = [
-                    "type": "object",
-                    "properties": properties,
-                    "required": required
-                ]
                 tools.append([
                     "type": "function",
-                    "function": [
-                        "name": fn.name,
-                        "description": fn.description,
-                        "parameters": params
+                    "name": fn.name,
+                    "description": fn.description,
+                    "parameters": [
+                        "type": "object",
+                        "properties": properties,
+                        "required": required
                     ] as [String: Any]
                 ])
             case .mcp:
