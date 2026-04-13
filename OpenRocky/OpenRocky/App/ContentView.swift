@@ -8,6 +8,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct ContentView: View {
     @StateObject private var chatProviderStore = OpenRockyProviderStore()
@@ -63,14 +64,12 @@ struct ContentView: View {
                 }
             }
         }
-        .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .background {
-                // Stop voice session when app goes to background
-                if showsVoiceOverlay {
-                    endVoiceSession()
-                }
-                return
+        .onReceive(NotificationCenter.default.publisher(for: OpenRockyAppLifecycleService.willExitNotification)) { _ in
+            if showsVoiceOverlay {
+                endVoiceSession()
             }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
             guard newPhase == .active else { return }
             // Check if Siri set the voice-start flag while the app was in the background
             if UserDefaults.standard.bool(forKey: "rocky.launch.startVoice") {

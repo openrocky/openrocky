@@ -586,7 +586,8 @@ Voice-specific rules:
         "contacts_communication": [
             "search_contacts": "apple-contacts-search",
             "send_notification": "notification-schedule",
-            "open_url": "open-url"
+            "open_url": "open-url",
+            "exit_app": "app-exit"
         ],
         "health": [
             "summary": "apple-health-summary",
@@ -602,6 +603,7 @@ Voice-specific rules:
             "write_file": "file-write",
             "icloud_read": "icloud-read",
             "icloud_list": "icloud-list",
+            "icloud_write": "icloud-write",
             "memory_get": "memory_get",
             "memory_write": "memory_write",
             "todo": "todo"
@@ -662,16 +664,17 @@ Voice-specific rules:
         [
             "type": "function",
             "name": "contacts_communication",
-            "description": "Contacts, notifications and URLs. Actions: search_contacts (needs: query), send_notification (needs: title; optional: body, delay_seconds), open_url (needs: url)",
+            "description": "Contacts, notifications, URLs and app control. Actions: search_contacts (needs: query), send_notification (needs: title; optional: body, delay_seconds), open_url (needs: url), exit_app (quit the app, only when user explicitly asks; optional: farewell_message)",
             "parameters": [
                 "type": "object",
                 "properties": [
-                    "action": ["type": "string", "description": "One of: search_contacts, send_notification, open_url"] as [String: Any],
+                    "action": ["type": "string", "description": "One of: search_contacts, send_notification, open_url, exit_app"] as [String: Any],
                     "query": ["type": "string", "description": "Contact search query"] as [String: Any],
                     "title": ["type": "string", "description": "Notification title"] as [String: Any],
                     "body": ["type": "string", "description": "Notification body"] as [String: Any],
                     "delay_seconds": ["type": "integer", "description": "Notification delay in seconds"] as [String: Any],
-                    "url": ["type": "string", "description": "URL to open"] as [String: Any]
+                    "url": ["type": "string", "description": "URL to open"] as [String: Any],
+                    "farewell_message": ["type": "string", "description": "For exit_app: a brief farewell message before exiting"] as [String: Any]
                 ] as [String: Any],
                 "required": ["action"]
             ] as [String: Any]
@@ -707,11 +710,11 @@ Voice-specific rules:
         [
             "type": "function",
             "name": "files_memory",
-            "description": "File operations, iCloud, memory and todo. Actions: read_file (needs: path), write_file (needs: path, content), icloud_read (needs: container e.g. 'Obsidian', path), icloud_list (needs: container; optional: path), memory_get (needs: key), memory_write (needs: key, value), todo (needs: action: list/add/complete/delete; optional: title, id)",
+            "description": "File operations, iCloud, memory and todo. Actions: read_file (needs: path), write_file (needs: path, content), icloud_read (needs: container e.g. 'obsidian', path), icloud_list (needs: container; optional: path), icloud_write (needs: container, path, content; mount must have read/write permission), memory_get (needs: key), memory_write (needs: key, value), todo (needs: action: list/add/complete/delete; optional: title, id)",
             "parameters": [
                 "type": "object",
                 "properties": [
-                    "action": ["type": "string", "description": "One of: read_file, write_file, icloud_read, icloud_list, memory_get, memory_write, todo"] as [String: Any],
+                    "action": ["type": "string", "description": "One of: read_file, write_file, icloud_read, icloud_list, icloud_write, memory_get, memory_write, todo"] as [String: Any],
                     "path": ["type": "string", "description": "File path"] as [String: Any],
                     "content": ["type": "string", "description": "File content to write"] as [String: Any],
                     "container": ["type": "string", "description": "iCloud container name, e.g. 'Obsidian'"] as [String: Any],

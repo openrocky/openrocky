@@ -614,6 +614,22 @@ final class OpenRockyToolbox {
                         "required": ["task"]
                     ]
                 )
+            ),
+            .function(
+                .init(
+                    name: "app-exit",
+                    description: "Exit/quit the OpenRocky app. Only call this when the user EXPLICITLY asks to quit, exit, or close the app. Before calling, always say a brief farewell.",
+                    parameters: [
+                        "type": "object",
+                        "properties": [
+                            "farewell_message": [
+                                "type": "string",
+                                "description": "A brief farewell message to display before exiting."
+                            ]
+                        ],
+                        "required": ["farewell_message"]
+                    ]
+                )
             )
         ]
     }
@@ -1160,6 +1176,8 @@ final class OpenRockyToolbox {
             return try executeICloudRead(arguments: arguments)
         case "icloud-list":
             return try executeICloudList(arguments: arguments)
+        case "icloud-write":
+            return try executeICloudWrite(arguments: arguments)
         default:
             // Check if it's a custom skill tool (skill-*)
             if let skill = OpenRockyCustomSkillStore.shared.skill(forToolName: name) {
@@ -1514,45 +1532,31 @@ final class OpenRockyToolbox {
     // MARK: - iCloud Drive
 
     private static func resolveICloudContainerURL(container: String) -> URL? {
+        // First check mount store for named mounts
+        if let mount = OpenRockyMountStore.shared.mount(named: container) {
+            return mount.resolvedURL
+        }
+
         let fm = FileManager.default
-        // Try well-known container identifiers
         let containerName: String
         switch container.lowercased() {
         case "obsidian", "md.obsidian", "icloud~md~obsidian":
             containerName = "iCloud~md~obsidian"
         default:
-            // Try as-is, or with iCloud~ prefix
             containerName = container.hasPrefix("iCloud~") ? container : "iCloud~\(container)"
         }
 
-        // iCloud Drive app containers are at ~/Library/Mobile Documents/{containerName}/
-        guard let mobileDocsURL = fm.url(forUbiquityContainerIdentifier: nil) else {
-            // Fallback: try the Mobile Documents path directly
-            let home = fm.urls(for: .documentDirectory, in: .userDomainMask).first!
-                .deletingLastPathComponent()
-                .deletingLastPathComponent()
-            let mobileDocs = home.appendingPathComponent("Library/Mobile Documents")
-            let containerURL = mobileDocs.appendingPathComponent(containerName)
-            if fm.fileExists(atPath: containerURL.path) {
-                return containerURL
-            }
-            // Also try "Documents" subfolder pattern
+        let home = fm.urls(for: .documentDirectory, in: .userDomainMask).first!
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let mobileDocs = home.appendingPathComponent("Library/Mobile Documents")
+        let containerURL = mobileDocs.appendingPathComponent(containerName)
+        if fm.fileExists(atPath: containerURL.path) {
             let documentsURL = containerURL.appendingPathComponent("Documents")
             if fm.fileExists(atPath: documentsURL.path) {
                 return documentsURL
             }
-            return nil
-        }
-
-        // ubiquity container root — navigate to specific app folder
-        let baseURL = mobileDocsURL.deletingLastPathComponent()
-        let containerURL = baseURL.appendingPathComponent(containerName)
-        if fm.fileExists(atPath: containerURL.path) {
             return containerURL
-        }
-        let documentsURL = containerURL.appendingPathComponent("Documents")
-        if fm.fileExists(atPath: documentsURL.path) {
-            return documentsURL
         }
         return nil
     }
@@ -1610,6 +1614,32 @@ final class OpenRockyToolbox {
         ]
         let data = try JSONSerialization.data(withJSONObject: result, options: [.sortedKeys])
         return String(data: data, encoding: .utf8) ?? "{}"
+    }
+
+    private func executeICloudWrite(arguments: String) throws -> String {
+        let request = try decode(ICloudWriteRequest.self, from: arguments)
+
+        // Check mount permissions
+        if let mount = OpenRockyMountStore.shared.mount(named: request.container) {
+            guard mount.readWrite else {
+                return try encode(["error": "Mount '\(request.container)' is read-only. Enable read/write in Settings → External Folders."])
+            }
+        }
+
+        guard let containerURL = Self.resolveICloudContainerURL(container: request.container) else {
+            return try encode(["error": "iCloud container '\(request.container)' not found. Add it in Settings → External Folders."])
+        }
+        let fileURL = containerURL.appendingPathComponent(request.path)
+
+        let accessing = fileURL.startAccessingSecurityScopedResource()
+        defer { if accessing { fileURL.stopAccessingSecurityScopedResource() } }
+
+        // Create intermediate directories if needed
+        let dir = fileURL.deletingLastPathComponent()
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+
+        try request.content.write(to: fileURL, atomically: true, encoding: .utf8)
+        return try encode(["container": request.container, "path": request.path, "written": true, "bytes": request.content.utf8.count])
     }
 
     // MARK: - Web Search
@@ -2141,6 +2171,12 @@ private struct ICloudReadRequest: Decodable {
 private struct ICloudListRequest: Decodable {
     let container: String
     let path: String?
+}
+
+private struct ICloudWriteRequest: Decodable {
+    let container: String
+    let path: String
+    let content: String
 }
 
 private struct WebSearchRequest: Decodable {

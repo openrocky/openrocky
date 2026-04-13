@@ -64,7 +64,7 @@ struct OpenRockyAboutView: View {
                                 .foregroundStyle(.purple)
                         }
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Setup Wizard")
+                            Text("Onboarding Page")
                                 .font(.system(size: 15, weight: .medium, design: .rounded))
                                 .foregroundStyle(.primary)
                             Text("Configure unified chat + voice provider")

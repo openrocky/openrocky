@@ -139,14 +139,19 @@ final class OpenRockyRealtimeVoiceBridge {
                     // to allow interrupting assistant playback
                     if isMicSuspended {
                         skippedCount += 1
-                        // Check if the user is speaking loudly enough to interrupt
-                        if let base64 = AudioUtils.base64EncodeAudioPCMBuffer(from: buffer),
-                           let pcmData = Data(base64Encoded: base64) {
-                            let rms = AudioUtils.computeRMS(pcmData)
-                            if rms > 2000 { // User is speaking — interrupt playback
-                                rlog.info("Mic interrupt detected during suspension (rms=\(rms))", category: "Audio")
-                                interruptPlayback()
-                                emit(.inputSpeechStarted)
+                        // Check if user wants voice interruption enabled (from Preferences)
+                        let interruptionEnabled = UserDefaults.standard.object(forKey: "rocky.pref.voiceInterruptionEnabled") as? Bool ?? false
+                        if interruptionEnabled {
+                            // Check if the user is speaking loudly enough to interrupt
+                            // Use a high threshold (3500) to avoid false triggers from ambient noise
+                            if let base64 = AudioUtils.base64EncodeAudioPCMBuffer(from: buffer),
+                               let pcmData = Data(base64Encoded: base64) {
+                                let rms = AudioUtils.computeRMS(pcmData)
+                                if rms > 3500 {
+                                    rlog.info("Mic interrupt detected during suspension (rms=\(rms))", category: "Audio")
+                                    interruptPlayback()
+                                    emit(.inputSpeechStarted)
+                                }
                             }
                         }
                         if skippedCount % 50 == 1 {

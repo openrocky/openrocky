@@ -130,9 +130,31 @@ struct OpenRockyProviderSettingsView: View {
                             subtitle: "Files created by the assistant"
                         )
                     }
+
+                    NavigationLink {
+                        OpenRockyMountSettingsView()
+                    } label: {
+                        settingsRow(
+                            icon: "externaldrive.fill.badge.icloud",
+                            tint: .blue,
+                            title: "External Folders",
+                            subtitle: mountsSummary
+                        )
+                    }
                 }
 
                 Section {
+                    NavigationLink {
+                        OpenRockyPreferencesView()
+                    } label: {
+                        settingsRow(
+                            icon: "slider.horizontal.3",
+                            tint: .indigo,
+                            title: "Preferences",
+                            subtitle: "Voice, chat & general settings"
+                        )
+                    }
+
                     Link(destination: URL(string: "https://github.com/openrocky/openrocky/issues/new")!) {
                         HStack(spacing: 12) {
                             ZStack {
@@ -232,6 +254,12 @@ struct OpenRockyProviderSettingsView: View {
         if count >= 1_000_000 { return String(format: "%.1fM", Double(count) / 1_000_000) }
         if count >= 1_000 { return String(format: "%.1fK", Double(count) / 1_000) }
         return "\(count)"
+    }
+
+    private var mountsSummary: String {
+        let count = OpenRockyMountStore.shared.mounts.count
+        if count == 0 { return "Mount iCloud folders for AI access" }
+        return "\(count) folder(s) mounted"
     }
 
     private var customSkillsSummary: String {
