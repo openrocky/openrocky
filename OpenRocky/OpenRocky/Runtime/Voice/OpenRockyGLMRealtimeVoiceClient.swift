@@ -370,12 +370,9 @@ Voice-specific rules:
             ] as [String: Any]
         ]
 
-        // GLM realtime has issues with many tools (responses hang or 422).
-        // Limit to a small subset of essential tools.
-        let maxTools = 10
         if !tools.isEmpty {
-            sessionConfig["tools"] = Array(tools.prefix(maxTools))
-            rlog.info("GLM: sending \(min(tools.count, maxTools))/\(tools.count) tools", category: "Voice")
+            sessionConfig["tools"] = tools
+            rlog.info("GLM: sending \(tools.count) consolidated tools", category: "Voice")
         }
 
         let message: [String: Any] = [
@@ -481,11 +478,13 @@ Voice-specific rules:
             break
 
         case "response.function_call_arguments.done":
-            let name = json["name"] as? String ?? ""
+            let rawName = json["name"] as? String ?? ""
             let callID = json["call_id"] as? String ?? UUID().uuidString
-            let arguments = json["arguments"] as? String ?? "{}"
-            rlog.info("GLM tool call: \(name) callID=\(callID)", category: "Voice")
-            emit(.toolCallRequested(name: name, arguments: arguments, callID: callID))
+            let rawArguments = json["arguments"] as? String ?? "{}"
+            // Resolve consolidated tool call to original tool name
+            let (resolvedName, resolvedArgs) = Self.resolveConsolidatedToolCall(name: rawName, arguments: rawArguments)
+            rlog.info("GLM tool call: \(rawName) → \(resolvedName) callID=\(callID)", category: "Voice")
+            emit(.toolCallRequested(name: resolvedName, arguments: resolvedArgs, callID: callID))
 
         case "response.done":
             isResponseInProgress = false
@@ -523,71 +522,235 @@ Voice-specific rules:
         }
     }
 
-    // MARK: - Tool Conversion
+    // MARK: - Consolidated Tool Definitions for GLM
 
-    /// Convert OpenAI realtime tool definitions to GLM flat format.
-    /// GLM docs show flat format: {type, name, description, parameters} without function wrapper.
+    /// GLM can only handle ~10 tools. Consolidate 31+ tools into category-based tools.
+    /// Each category tool has an `action` parameter that maps to individual tool names.
     private func buildGLMTools() -> [[String: Any]] {
-        var tools: [[String: Any]] = []
+        Self.consolidatedTools
+    }
 
-        for tool in realtimeTools {
-            switch tool {
-            case .function(let fn):
-                let converted = convertJSONValueDict(fn.parameters)
-                var properties: [String: Any]
-                if let p = converted["properties"] as? [String: Any], !p.isEmpty {
-                    properties = p
-                } else {
-                    // GLM server converts empty {} to null internally.
-                    // Add a dummy property so properties is never empty.
-                    properties = ["_placeholder": ["type": "string", "description": "unused"] as [String: Any]]
-                }
-                let required: [Any]
-                if let r = converted["required"] as? [Any], !r.isEmpty {
-                    required = r
-                } else {
-                    // GLM server converts empty [] to null internally.
-                    // Use a non-empty placeholder.
-                    required = ["_placeholder"]
-                }
+    /// Map a consolidated GLM tool call back to the original tool name + arguments.
+    /// Returns (originalToolName, originalArguments) for the Toolbox to execute.
+    static func resolveConsolidatedToolCall(name: String, arguments: String) -> (String, String) {
+        guard let data = arguments.data(using: .utf8),
+              var json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return (name, arguments)
+        }
 
-                tools.append([
-                    "type": "function",
-                    "name": fn.name,
-                    "description": fn.description,
-                    "parameters": [
-                        "type": "object",
-                        "properties": properties,
-                        "required": required
-                    ] as [String: Any]
-                ])
-            case .mcp:
-                break
+        // delegate_task is a pass-through — just rename to "delegate-task"
+        if name == "delegate_task" {
+            return ("delegate-task", arguments)
+        }
+
+        let action = json.removeValue(forKey: "action") as? String ?? ""
+        let mapping = consolidatedToolMapping[name] ?? [:]
+
+        if let originalName = mapping[action] {
+            // Re-serialize remaining args without the "action" key
+            if let newData = try? JSONSerialization.data(withJSONObject: json),
+               let newArgs = String(data: newData, encoding: .utf8) {
+                return (originalName, newArgs)
             }
+            return (originalName, arguments)
         }
 
-        return tools
+        // No mapping found — pass through as-is
+        return (name, arguments)
     }
 
-    private func convertJSONValueDict(_ dict: [String: OpenAIJSONValue]) -> [String: Any] {
-        var result: [String: Any] = [:]
-        for (key, value) in dict {
-            result[key] = convertJSONValue(value)
-        }
-        return result
-    }
+    // MARK: - Consolidated Tool Definitions
 
-    private func convertJSONValue(_ value: OpenAIJSONValue) -> Any {
-        switch value {
-        case .null: return NSNull()
-        case .bool(let b): return b
-        case .int(let i): return i
-        case .double(let d): return d
-        case .string(let s): return s
-        case .array(let arr): return arr.map { convertJSONValue($0) }
-        case .object(let obj): return convertJSONValueDict(obj)
-        }
-    }
+    private static let consolidatedToolMapping: [String: [String: String]] = [
+        "location_weather": [
+            "get_location": "apple-location",
+            "geocode": "apple-geocode",
+            "weather": "weather",
+            "nearby": "nearby-search"
+        ],
+        "calendar_reminders": [
+            "list_events": "apple-calendar-list",
+            "create_event": "apple-calendar-create",
+            "list_reminders": "apple-reminder-list",
+            "create_reminder": "apple-reminder-create",
+            "set_alarm": "apple-alarm"
+        ],
+        "contacts_communication": [
+            "search_contacts": "apple-contacts-search",
+            "send_notification": "notification-schedule",
+            "open_url": "open-url"
+        ],
+        "health": [
+            "summary": "apple-health-summary",
+            "metric": "apple-health-metric"
+        ],
+        "web_search": [
+            "search": "web-search",
+            "read_page": "browser-read",
+            "open_browser": "browser-open"
+        ],
+        "files_memory": [
+            "read_file": "file-read",
+            "write_file": "file-write",
+            "memory_get": "memory_get",
+            "memory_write": "memory_write",
+            "todo": "todo"
+        ],
+        "code_execute": [
+            "shell": "shell-execute",
+            "python": "python-execute",
+            "ffmpeg": "ffmpeg-execute"
+        ],
+        "media_capture": [
+            "camera": "camera-capture",
+            "photo_pick": "photo-pick",
+            "file_pick": "file-pick"
+        ],
+        "delegate_task": ["delegate": "delegate-task"]
+    ]
+
+    private static let consolidatedTools: [[String: Any]] = [
+        [
+            "type": "function",
+            "name": "location_weather",
+            "description": "Location and weather tools. Actions: get_location (get device GPS), geocode (address to coordinates, needs: address), weather (get weather, optional: latitude, longitude, label), nearby (search nearby places, needs: query)",
+            "parameters": [
+                "type": "object",
+                "properties": [
+                    "action": ["type": "string", "description": "One of: get_location, geocode, weather, nearby"] as [String: Any],
+                    "address": ["type": "string", "description": "For geocode: place name or address"] as [String: Any],
+                    "latitude": ["type": "number", "description": "For weather: latitude"] as [String: Any],
+                    "longitude": ["type": "number", "description": "For weather: longitude"] as [String: Any],
+                    "label": ["type": "string", "description": "For weather: location label"] as [String: Any],
+                    "query": ["type": "string", "description": "For nearby: search query"] as [String: Any]
+                ] as [String: Any],
+                "required": ["action"]
+            ] as [String: Any]
+        ] as [String: Any],
+        [
+            "type": "function",
+            "name": "calendar_reminders",
+            "description": "Calendar, reminders and alarms. Actions: list_events (needs: start_date, end_date), create_event (needs: title, start_date; optional: end_date, location, notes, all_day), list_reminders (optional: include_completed), create_reminder (needs: title; optional: due_date, notes, priority), set_alarm (needs: time in ISO-8601; optional: title)",
+            "parameters": [
+                "type": "object",
+                "properties": [
+                    "action": ["type": "string", "description": "One of: list_events, create_event, list_reminders, create_reminder, set_alarm"] as [String: Any],
+                    "title": ["type": "string", "description": "Event/reminder/alarm title"] as [String: Any],
+                    "start_date": ["type": "string", "description": "Start date ISO-8601 with timezone e.g. 2026-04-12T09:00:00+08:00"] as [String: Any],
+                    "end_date": ["type": "string", "description": "End date ISO-8601"] as [String: Any],
+                    "location": ["type": "string", "description": "Event location"] as [String: Any],
+                    "notes": ["type": "string", "description": "Notes"] as [String: Any],
+                    "all_day": ["type": "boolean", "description": "All-day event flag"] as [String: Any],
+                    "due_date": ["type": "string", "description": "Reminder due date ISO-8601"] as [String: Any],
+                    "priority": ["type": "integer", "description": "Reminder priority 1-9"] as [String: Any],
+                    "time": ["type": "string", "description": "Alarm time ISO-8601"] as [String: Any],
+                    "include_completed": ["type": "boolean", "description": "Include completed reminders"] as [String: Any]
+                ] as [String: Any],
+                "required": ["action"]
+            ] as [String: Any]
+        ] as [String: Any],
+        [
+            "type": "function",
+            "name": "contacts_communication",
+            "description": "Contacts, notifications and URLs. Actions: search_contacts (needs: query), send_notification (needs: title; optional: body, delay_seconds), open_url (needs: url)",
+            "parameters": [
+                "type": "object",
+                "properties": [
+                    "action": ["type": "string", "description": "One of: search_contacts, send_notification, open_url"] as [String: Any],
+                    "query": ["type": "string", "description": "Contact search query"] as [String: Any],
+                    "title": ["type": "string", "description": "Notification title"] as [String: Any],
+                    "body": ["type": "string", "description": "Notification body"] as [String: Any],
+                    "delay_seconds": ["type": "integer", "description": "Notification delay in seconds"] as [String: Any],
+                    "url": ["type": "string", "description": "URL to open"] as [String: Any]
+                ] as [String: Any],
+                "required": ["action"]
+            ] as [String: Any]
+        ] as [String: Any],
+        [
+            "type": "function",
+            "name": "health",
+            "description": "Apple Health data. Actions: summary (get health overview), metric (get specific metric, needs: metric_name e.g. steps/heartRate/sleepAnalysis; optional: days)",
+            "parameters": [
+                "type": "object",
+                "properties": [
+                    "action": ["type": "string", "description": "One of: summary, metric"] as [String: Any],
+                    "metric_name": ["type": "string", "description": "Health metric: steps, heartRate, sleepAnalysis, activeEnergyBurned, etc."] as [String: Any],
+                    "days": ["type": "integer", "description": "Number of days to look back"] as [String: Any]
+                ] as [String: Any],
+                "required": ["action"]
+            ] as [String: Any]
+        ] as [String: Any],
+        [
+            "type": "function",
+            "name": "web_search",
+            "description": "Web search and browsing. Actions: search (needs: query), read_page (needs: url), open_browser (needs: url)",
+            "parameters": [
+                "type": "object",
+                "properties": [
+                    "action": ["type": "string", "description": "One of: search, read_page, open_browser"] as [String: Any],
+                    "query": ["type": "string", "description": "Search query"] as [String: Any],
+                    "url": ["type": "string", "description": "URL to read or open"] as [String: Any]
+                ] as [String: Any],
+                "required": ["action"]
+            ] as [String: Any]
+        ] as [String: Any],
+        [
+            "type": "function",
+            "name": "files_memory",
+            "description": "File operations, memory and todo. Actions: read_file (needs: path), write_file (needs: path, content), memory_get (needs: key), memory_write (needs: key, value), todo (needs: action: list/add/complete/delete; optional: title, id)",
+            "parameters": [
+                "type": "object",
+                "properties": [
+                    "action": ["type": "string", "description": "One of: read_file, write_file, memory_get, memory_write, todo"] as [String: Any],
+                    "path": ["type": "string", "description": "File path"] as [String: Any],
+                    "content": ["type": "string", "description": "File content to write"] as [String: Any],
+                    "key": ["type": "string", "description": "Memory key"] as [String: Any],
+                    "value": ["type": "string", "description": "Memory value"] as [String: Any],
+                    "title": ["type": "string", "description": "Todo title"] as [String: Any],
+                    "id": ["type": "string", "description": "Todo ID"] as [String: Any]
+                ] as [String: Any],
+                "required": ["action"]
+            ] as [String: Any]
+        ] as [String: Any],
+        [
+            "type": "function",
+            "name": "code_execute",
+            "description": "Execute code on device. Actions: shell (needs: command), python (needs: code), ffmpeg (needs: command)",
+            "parameters": [
+                "type": "object",
+                "properties": [
+                    "action": ["type": "string", "description": "One of: shell, python, ffmpeg"] as [String: Any],
+                    "command": ["type": "string", "description": "Shell or ffmpeg command"] as [String: Any],
+                    "code": ["type": "string", "description": "Python code to execute"] as [String: Any]
+                ] as [String: Any],
+                "required": ["action"]
+            ] as [String: Any]
+        ] as [String: Any],
+        [
+            "type": "function",
+            "name": "media_capture",
+            "description": "Camera and photo. Actions: camera (take photo), photo_pick (pick from library), file_pick (pick any file)",
+            "parameters": [
+                "type": "object",
+                "properties": [
+                    "action": ["type": "string", "description": "One of: camera, photo_pick, file_pick"] as [String: Any]
+                ] as [String: Any],
+                "required": ["action"]
+            ] as [String: Any]
+        ] as [String: Any],
+        [
+            "type": "function",
+            "name": "delegate_task",
+            "description": "Delegate a complex multi-step task to a background agent that can use ALL tools. Use when the task requires multiple steps, combining info from different sources, or deep analysis.",
+            "parameters": [
+                "type": "object",
+                "properties": [
+                    "task": ["type": "string", "description": "Detailed task description for the agent"] as [String: Any]
+                ] as [String: Any],
+                "required": ["task"]
+            ] as [String: Any]
+        ] as [String: Any]
+    ]
 
     // MARK: - Helpers
 
