@@ -710,14 +710,14 @@ Voice-specific rules:
         [
             "type": "function",
             "name": "files_memory",
-            "description": "File operations, iCloud mounts, memory and todo. Actions: read_file (needs: path), write_file (needs: path, content), icloud_read (needs: container mount name e.g. 'obsidian', path), icloud_list (needs: container; optional: path), icloud_write (needs: container, path, content; mount must be read/write enabled), memory_get (needs: key), memory_write (needs: key, value), todo (needs: action: list/add/complete/delete; optional: title, id). iCloud uses mount names from Settings → External Folders.",
+            "description": "File operations, external folder mounts, memory and todo. Actions: read_file (needs: path), write_file (needs: path, content), icloud_read (needs: container mount name, path), icloud_list (needs: container; optional: path), icloud_write (needs: container, path, content; mount must be read/write), memory_get (needs: key), memory_write (needs: key, value), todo (needs: action: list/add/complete/delete; optional: title, id). Mount names are configured by the user in Settings.",
             "parameters": [
                 "type": "object",
                 "properties": [
                     "action": ["type": "string", "description": "One of: read_file, write_file, icloud_read, icloud_list, icloud_write, memory_get, memory_write, todo"] as [String: Any],
                     "path": ["type": "string", "description": "File path"] as [String: Any],
                     "content": ["type": "string", "description": "File content to write"] as [String: Any],
-                    "container": ["type": "string", "description": "iCloud container name, e.g. 'Obsidian'"] as [String: Any],
+                    "container": ["type": "string", "description": "Mount name configured by the user"] as [String: Any],
                     "key": ["type": "string", "description": "Memory key"] as [String: Any],
                     "value": ["type": "string", "description": "Memory value"] as [String: Any],
                     "title": ["type": "string", "description": "Todo title"] as [String: Any],

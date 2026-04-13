@@ -223,27 +223,27 @@ final class OpenRockyToolProvider: ToolProvider, @unchecked Sendable {
         .function(name: "camera-capture", description: "Take a photo using the device camera and save it to the workspace.", parameters: ["type": "object", "properties": [:] as AnyCodingValue], strict: nil),
         .function(name: "photo-pick", description: "Pick a photo from the device photo library and save it to the workspace.", parameters: ["type": "object", "properties": [:] as AnyCodingValue], strict: nil),
         .function(name: "file-pick", description: "Pick a file from the device and save it to the workspace.", parameters: ["type": "object", "properties": [:] as AnyCodingValue], strict: nil),
-        .function(name: "icloud-read", description: "Read a file from a mounted iCloud Drive folder. Use mount name (configured in Settings → External Folders) or container ID.", parameters: [
+        .function(name: "icloud-read", description: "Read a file from a mounted external folder. Mount name is configured by the user in Settings → External Folders.", parameters: [
             "type": "object",
             "properties": [
-                "container": ["type": "string", "description": "Mount name (e.g. 'obsidian') or iCloud container ID (e.g. 'iCloud~md~obsidian')."],
-                "path": ["type": "string", "description": "Relative file path within the container, e.g. 'MyVault/note.md'."]
+                "container": ["type": "string", "description": "Mount name configured by the user (e.g. 'obsidian', 'notes')."],
+                "path": ["type": "string", "description": "Relative file path within the mounted folder."]
             ],
             "required": ["container", "path"]
         ], strict: nil),
-        .function(name: "icloud-list", description: "List files and folders in a mounted iCloud Drive folder. Use mount name or container ID.", parameters: [
+        .function(name: "icloud-list", description: "List files and folders in a mounted external folder.", parameters: [
             "type": "object",
             "properties": [
-                "container": ["type": "string", "description": "Mount name (e.g. 'obsidian') or iCloud container ID."],
-                "path": ["type": "string", "description": "Relative folder path within the container. Use '' or '/' for root."]
+                "container": ["type": "string", "description": "Mount name configured by the user."],
+                "path": ["type": "string", "description": "Relative folder path. Use '' or '/' for root."]
             ],
             "required": ["container"]
         ], strict: nil),
-        .function(name: "icloud-write", description: "Write content to a file in an iCloud Drive mount. The mount must have read/write permission.", parameters: [
+        .function(name: "icloud-write", description: "Write content to a file in a mounted external folder. The mount must have read/write permission.", parameters: [
             "type": "object",
             "properties": [
-                "container": ["type": "string", "description": "Mount name, e.g. 'obsidian'."],
-                "path": ["type": "string", "description": "Relative file path, e.g. 'MyVault/note.md'."],
+                "container": ["type": "string", "description": "Mount name configured by the user."],
+                "path": ["type": "string", "description": "Relative file path."],
                 "content": ["type": "string", "description": "Text content to write."]
             ],
             "required": ["container", "path", "content"]
