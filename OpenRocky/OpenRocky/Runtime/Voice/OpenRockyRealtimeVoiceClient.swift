@@ -23,10 +23,15 @@ protocol OpenRockyRealtimeVoiceClient: AnyObject, Sendable {
     func sendToolOutput(callID: String, output: String) async throws
     /// Speak text via TTS without going through the dialog model. Default: no-op.
     func speakText(_ text: String) async throws
+    /// Cancel any in-progress response (used for interruption). Default: no-op.
+    func cancelResponse() async throws
 }
 
 extension OpenRockyRealtimeVoiceClient {
     func speakText(_ text: String) async throws {
         // Default: no-op. Overridden by providers that support external TTS injection.
+    }
+    func cancelResponse() async throws {
+        // Default: no-op.
     }
 }

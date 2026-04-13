@@ -7,6 +7,7 @@
 // Copyright (c) 2026 everettjf. All rights reserved.
 //
 
+import AVFoundation
 import Foundation
 @preconcurrency import SwiftOpenAI
 
@@ -135,9 +136,21 @@ final class OpenRockyRealtimeVoiceBridge {
                 for await buffer in micStream {
                     guard Task.isCancelled == false else { break }
                     micBufferCount += 1
-                    // Skip sending mic data while assistant is playing audio (echo suppression)
-                    guard !isMicSuspended else {
+                    // When mic is suspended (echo suppression), still check for user speech
+                    // to allow interrupting assistant playback
+                    if isMicSuspended {
                         skippedCount += 1
+                        // Check if user wants voice interruption enabled (from Preferences)
+                        let interruptionEnabled = UserDefaults.standard.object(forKey: "rocky.pref.voiceInterruptionEnabled") as? Bool ?? false
+                        if interruptionEnabled {
+                            // Read PCM data directly from buffer — no base64 round-trip
+                            let rms = Self.computeRMSFromBuffer(buffer)
+                            if rms > 3500 {
+                                rlog.info("Mic interrupt detected during suspension (rms=\(rms))", category: "Audio")
+                                interruptPlayback()
+                                emit(.inputSpeechStarted)
+                            }
+                        }
                         if skippedCount % 50 == 1 {
                             rlog.debug("Mic buffer skipped (suspended), skipped=\(skippedCount)", category: "Audio")
                         }
@@ -178,6 +191,10 @@ final class OpenRockyRealtimeVoiceBridge {
         // Resume mic immediately when playback is interrupted (user wants to speak)
         pendingMicResume = false
         isMicSuspended = false
+        // Tell the server to cancel any in-progress response
+        Task { @RealtimeActor in
+            try? await client?.cancelResponse()
+        }
     }
 
     /// Called when the assistant finishes its response (transcript final).
@@ -193,6 +210,15 @@ final class OpenRockyRealtimeVoiceBridge {
             pendingMicResume = false
             isMicSuspended = false
         }
+    }
+
+    /// Compute RMS energy directly from an AVAudioPCMBuffer without base64 round-trip.
+    private static func computeRMSFromBuffer(_ buffer: AVAudioPCMBuffer) -> Double {
+        guard buffer.format.channelCount == 1,
+              let ptr = buffer.audioBufferList.pointee.mBuffers.mData else { return 0 }
+        let byteCount = Int(buffer.audioBufferList.pointee.mBuffers.mDataByteSize)
+        let data = Data(bytes: ptr, count: byteCount)
+        return AudioUtils.computeRMS(data)
     }
 
     private func emit(_ event: OpenRockyRealtimeEvent) {

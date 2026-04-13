@@ -49,10 +49,8 @@ struct OpenRockyAboutView: View {
                 linkRow(icon: "bubble.left.and.bubble.right.fill", tint: .purple, title: "Discord", url: "https://discord.gg/SvvsaDA4nE")
             }
 
-            // Feedback
-            Section("Feedback") {
-                linkRow(icon: "exclamationmark.bubble.fill", tint: .red, title: "Feedback", subtitle: "Report issues or suggestions", url: "https://github.com/openrocky/openrocky/issues/new")
-
+            // Setup
+            Section {
                 Button {
                     showsOnboarding = true
                 } label: {
@@ -66,7 +64,7 @@ struct OpenRockyAboutView: View {
                                 .foregroundStyle(.purple)
                         }
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Setup Wizard")
+                            Text("Onboarding Page")
                                 .font(.system(size: 15, weight: .medium, design: .rounded))
                                 .foregroundStyle(.primary)
                             Text("Configure unified chat + voice provider")

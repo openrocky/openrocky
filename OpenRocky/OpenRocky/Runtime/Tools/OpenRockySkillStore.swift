@@ -128,6 +128,9 @@ final class OpenRockyBuiltInToolStore: ObservableObject {
         .init(id: "ffmpeg-execute", displayName: "FFmpeg", description: "Audio/video processing: merge, extract, transcode, trim, thumbnails.", icon: "film.fill", group: .fileShell),
         .init(id: "file-read", displayName: "File Read", description: "Read files from the workspace sandbox.", icon: "doc.text.fill", group: .fileShell),
         .init(id: "file-write", displayName: "File Write", description: "Write files to the workspace sandbox.", icon: "doc.badge.plus", group: .fileShell),
+        .init(id: "icloud-read", displayName: "iCloud Read", description: "Read files from iCloud Drive (e.g. Obsidian vaults).", icon: "icloud.fill", group: .fileShell),
+        .init(id: "icloud-list", displayName: "iCloud List", description: "List files in iCloud Drive containers.", icon: "icloud.and.arrow.down.fill", group: .fileShell),
+        .init(id: "icloud-write", displayName: "iCloud Write", description: "Write files to iCloud Drive mounts.", icon: "icloud.and.arrow.up.fill", group: .fileShell),
 
         // Media
         .init(id: "camera-capture", displayName: "Camera", description: "Take a photo with the device camera.", icon: "camera.fill", group: .media),

@@ -117,14 +117,15 @@ struct OpenRockyTests {
         #expect(OpenRockyProviderKind.allCases.contains(.openRouter))
         #expect(OpenRockyProviderKind.allCases.contains(.deepSeek))
         #expect(OpenRockyProviderKind.allCases.contains(.aiProxy))
-        #expect(OpenRockyProviderKind.openAI.defaultModel == "gpt-5.2-codex")
+        #expect(OpenRockyProviderKind.allCases.contains(.bailian))
+        #expect(OpenRockyProviderKind.openAI.defaultModel == "gpt-5")
     }
 
-    @Test func realtimeProviderInventorySupportsOpenAIAndDoubao() async throws {
+    @Test func realtimeProviderInventorySupportsOpenAIAndGLM() async throws {
         #expect(OpenRockyRealtimeProviderKind.allCases.contains(.openAI))
-        #expect(OpenRockyRealtimeProviderKind.allCases.contains(.doubao))
+        #expect(OpenRockyRealtimeProviderKind.allCases.contains(.glm))
         #expect(OpenRockyRealtimeProviderKind.openAI.defaultModel == "gpt-realtime-mini")
-        #expect(OpenRockyRealtimeProviderKind.doubao.defaultModel == "doubao-e2e-voice")
+        #expect(OpenRockyRealtimeProviderKind.glm.defaultModel == "glm-realtime")
     }
 
     @Test func providerConfigurationReflectsConnectionStateInIdentity() async throws {
@@ -171,15 +172,14 @@ struct OpenRockyTests {
 
     @Test func realtimeProviderConfigurationReflectsCredentialState() async throws {
         let disconnected = OpenRockyRealtimeProviderConfiguration(
-            provider: .doubao,
-            modelID: "doubao-e2e-voice",
+            provider: .glm,
+            modelID: "glm-realtime",
             credential: nil
         )
         let connected = OpenRockyRealtimeProviderConfiguration(
-            provider: .doubao,
-            modelID: "doubao-e2e-voice",
-            credential: "sk-doubao-test",
-            doubaoResourceID: "speech-cn"
+            provider: .glm,
+            modelID: "glm-realtime",
+            credential: "sk-glm-test"
         )
 
         #expect(disconnected.identity.contains("disconnected"))

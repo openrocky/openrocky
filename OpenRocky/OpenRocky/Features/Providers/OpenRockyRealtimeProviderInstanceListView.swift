@@ -11,6 +11,8 @@ import SwiftUI
 
 struct OpenRockyRealtimeProviderInstanceListView: View {
     @ObservedObject var realtimeProviderStore: OpenRockyRealtimeProviderStore
+    @State private var showProviderPicker = false
+    @State private var selectedNewProvider: OpenRockyRealtimeProviderKind?
 
     var body: some View {
         List {
@@ -32,11 +34,8 @@ struct OpenRockyRealtimeProviderInstanceListView: View {
             }
 
             Section {
-                NavigationLink {
-                    OpenRockyRealtimeProviderInstanceEditorView(
-                        realtimeProviderStore: realtimeProviderStore,
-                        editingInstanceID: nil
-                    )
+                Button {
+                    showProviderPicker = true
                 } label: {
                     Label("Add Voice Provider", systemImage: "plus.circle")
                 }
@@ -44,6 +43,19 @@ struct OpenRockyRealtimeProviderInstanceListView: View {
         }
         .navigationTitle("Voice Providers")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showProviderPicker) {
+            OpenRockyRealtimeProviderKindPickerView { kind in
+                selectedNewProvider = kind
+                showProviderPicker = false
+            }
+        }
+        .navigationDestination(item: $selectedNewProvider) { kind in
+            OpenRockyRealtimeProviderInstanceEditorView(
+                realtimeProviderStore: realtimeProviderStore,
+                editingInstanceID: nil,
+                initialProviderKind: kind
+            )
+        }
     }
 
     @ViewBuilder

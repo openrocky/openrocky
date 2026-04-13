@@ -109,6 +109,12 @@ enum OpenRockyOpenAIServiceFactory {
                 overrideBaseURL: host ?? "https://open.bigmodel.cn/api/paas",
                 overrideVersion: "v4"
             )
+        case .bailian:
+            return OpenAIServiceFactory.service(
+                apiKey: credential,
+                overrideBaseURL: host ?? "https://coding.dashscope.aliyuncs.com",
+                overrideVersion: "v1"
+            )
         case .aiProxy:
             guard let serviceURL = normalized.aiProxyServiceURL, serviceURL.isEmpty == false else {
                 throw OpenRockyOpenAIServiceError.missingAIProxyServiceURL

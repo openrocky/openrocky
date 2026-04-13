@@ -11,6 +11,8 @@ import SwiftUI
 
 struct OpenRockyProviderInstanceListView: View {
     @ObservedObject var providerStore: OpenRockyProviderStore
+    @State private var showProviderPicker = false
+    @State private var selectedNewProvider: OpenRockyProviderKind?
 
     var body: some View {
         List {
@@ -32,11 +34,8 @@ struct OpenRockyProviderInstanceListView: View {
             }
 
             Section {
-                NavigationLink {
-                    OpenRockyProviderInstanceEditorView(
-                        providerStore: providerStore,
-                        editingInstanceID: nil
-                    )
+                Button {
+                    showProviderPicker = true
                 } label: {
                     Label("Add Provider", systemImage: "plus.circle")
                 }
@@ -44,6 +43,19 @@ struct OpenRockyProviderInstanceListView: View {
         }
         .navigationTitle("Chat Providers")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showProviderPicker) {
+            OpenRockyProviderKindPickerView { kind in
+                selectedNewProvider = kind
+                showProviderPicker = false
+            }
+        }
+        .navigationDestination(item: $selectedNewProvider) { kind in
+            OpenRockyProviderInstanceEditorView(
+                providerStore: providerStore,
+                editingInstanceID: nil,
+                initialProviderKind: kind
+            )
+        }
     }
 
     @ViewBuilder

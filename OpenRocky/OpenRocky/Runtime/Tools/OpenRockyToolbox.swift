@@ -614,6 +614,22 @@ final class OpenRockyToolbox {
                         "required": ["task"]
                     ]
                 )
+            ),
+            .function(
+                .init(
+                    name: "app-exit",
+                    description: "Exit/quit the OpenRocky app. Only call this when the user EXPLICITLY asks to quit, exit, or close the app. Before calling, always say a brief farewell.",
+                    parameters: [
+                        "type": "object",
+                        "properties": [
+                            "farewell_message": [
+                                "type": "string",
+                                "description": "A brief farewell message to display before exiting."
+                            ]
+                        ],
+                        "required": ["farewell_message"]
+                    ]
+                )
             )
         ]
     }
@@ -1156,6 +1172,12 @@ final class OpenRockyToolbox {
             return try await executeEmailSend(arguments: arguments)
         case "delegate-task":
             return try await executeDelegateTask(arguments: arguments)
+        case "icloud-read":
+            return try executeICloudRead(arguments: arguments)
+        case "icloud-list":
+            return try executeICloudList(arguments: arguments)
+        case "icloud-write":
+            return try executeICloudWrite(arguments: arguments)
         default:
             // Check if it's a custom skill tool (skill-*)
             if let skill = OpenRockyCustomSkillStore.shared.skill(forToolName: name) {
@@ -1505,6 +1527,134 @@ final class OpenRockyToolbox {
         let encodedPath = request.path.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? request.path
         let link = "rocky://workspace/\(encodedPath)"
         return try encode(["path": request.path, "written": true, "bytes": request.content.utf8.count, "link": link, "markdown_link": "[\(request.path)](\(link))"])
+    }
+
+    // MARK: - iCloud Drive
+
+    private static func resolveICloudContainerURL(container: String) -> URL? {
+        // First check mount store for named mounts
+        if let mount = OpenRockyMountStore.shared.mount(named: container) {
+            return mount.resolvedURL
+        }
+
+        let fm = FileManager.default
+        let containerName: String
+        switch container.lowercased() {
+        case "obsidian", "md.obsidian", "icloud~md~obsidian":
+            containerName = "iCloud~md~obsidian"
+        default:
+            containerName = container.hasPrefix("iCloud~") ? container : "iCloud~\(container)"
+        }
+
+        let home = fm.urls(for: .documentDirectory, in: .userDomainMask).first!
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+        let mobileDocs = home.appendingPathComponent("Library/Mobile Documents")
+        let containerURL = mobileDocs.appendingPathComponent(containerName)
+        if fm.fileExists(atPath: containerURL.path) {
+            let documentsURL = containerURL.appendingPathComponent("Documents")
+            if fm.fileExists(atPath: documentsURL.path) {
+                return documentsURL
+            }
+            return containerURL
+        }
+        return nil
+    }
+
+    /// Validate path doesn't contain traversal sequences.
+    private static func isPathSafe(_ path: String) -> Bool {
+        !path.contains("..") && !path.hasPrefix("/")
+    }
+
+    private func executeICloudRead(arguments: String) throws -> String {
+        let request = try decode(ICloudReadRequest.self, from: arguments)
+        guard Self.isPathSafe(request.path) else {
+            return try encode(["error": "Invalid path: must be relative and cannot contain '..'"])
+        }
+        guard let containerURL = Self.resolveICloudContainerURL(container: request.container) else {
+            return try encode(["error": "iCloud container '\(request.container)' not found. Add it in Settings → External Folders, or make sure the app is installed and synced."])
+        }
+        let fileURL = containerURL.appendingPathComponent(request.path)
+        guard FileManager.default.fileExists(atPath: fileURL.path) else {
+            return try encode(["error": "File not found: \(request.path) in \(request.container)"])
+        }
+        let accessing = fileURL.startAccessingSecurityScopedResource()
+        defer { if accessing { fileURL.stopAccessingSecurityScopedResource() } }
+
+        let content = try String(contentsOf: fileURL, encoding: .utf8)
+        return try encode(["container": request.container, "path": request.path, "content": String(content.prefix(16000))])
+    }
+
+    private func executeICloudList(arguments: String) throws -> String {
+        let request = try decode(ICloudListRequest.self, from: arguments)
+        if let path = request.path, !path.isEmpty, path != "/" {
+            guard Self.isPathSafe(path) else {
+                return try encode(["error": "Invalid path: must be relative and cannot contain '..'"])
+            }
+        }
+        guard let containerURL = Self.resolveICloudContainerURL(container: request.container) else {
+            return try encode(["error": "iCloud container '\(request.container)' not found. Add it in Settings → External Folders, or make sure the app is installed and synced."])
+        }
+        let targetURL: URL
+        if let path = request.path, !path.isEmpty, path != "/" {
+            targetURL = containerURL.appendingPathComponent(path)
+        } else {
+            targetURL = containerURL
+        }
+
+        let accessing = targetURL.startAccessingSecurityScopedResource()
+        defer { if accessing { targetURL.stopAccessingSecurityScopedResource() } }
+
+        guard FileManager.default.fileExists(atPath: targetURL.path) else {
+            return try encode(["error": "Path not found: \(request.path ?? "/") in \(request.container)"])
+        }
+        let items = try FileManager.default.contentsOfDirectory(at: targetURL, includingPropertiesForKeys: [.isDirectoryKey, .fileSizeKey])
+        let entries: [[String: Any]] = items.prefix(200).compactMap { url in
+            let isDir = (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
+            let size = (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+            return [
+                "name": url.lastPathComponent,
+                "type": isDir ? "directory" : "file",
+                "size": size
+            ] as [String: Any]
+        }
+        let result: [String: Any] = [
+            "container": request.container,
+            "path": request.path ?? "/",
+            "count": entries.count,
+            "items": entries
+        ]
+        let data = try JSONSerialization.data(withJSONObject: result, options: [.sortedKeys])
+        return String(data: data, encoding: .utf8) ?? "{}"
+    }
+
+    private func executeICloudWrite(arguments: String) throws -> String {
+        let request = try decode(ICloudWriteRequest.self, from: arguments)
+        guard Self.isPathSafe(request.path) else {
+            return try encode(["error": "Invalid path: must be relative and cannot contain '..'"])
+        }
+
+        // Check mount permissions
+        if let mount = OpenRockyMountStore.shared.mount(named: request.container) {
+            guard mount.readWrite else {
+                return try encode(["error": "Mount '\(request.container)' is read-only. Enable read/write in Settings → External Folders."])
+            }
+        }
+
+        guard let containerURL = Self.resolveICloudContainerURL(container: request.container) else {
+            return try encode(["error": "iCloud container '\(request.container)' not found. Add it in Settings → External Folders."])
+        }
+        let fileURL = containerURL.appendingPathComponent(request.path)
+
+        let accessing = fileURL.startAccessingSecurityScopedResource()
+        defer { if accessing { fileURL.stopAccessingSecurityScopedResource() } }
+
+        // Create intermediate directories if needed
+        let dir = fileURL.deletingLastPathComponent()
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+
+        try request.content.write(to: fileURL, atomically: true, encoding: .utf8)
+        return try encode(["container": request.container, "path": request.path, "written": true, "bytes": request.content.utf8.count])
     }
 
     // MARK: - Web Search
@@ -2024,6 +2174,22 @@ private struct FileReadRequest: Decodable {
 }
 
 private struct FileWriteRequest: Decodable {
+    let path: String
+    let content: String
+}
+
+private struct ICloudReadRequest: Decodable {
+    let container: String
+    let path: String
+}
+
+private struct ICloudListRequest: Decodable {
+    let container: String
+    let path: String?
+}
+
+private struct ICloudWriteRequest: Decodable {
+    let container: String
     let path: String
     let content: String
 }

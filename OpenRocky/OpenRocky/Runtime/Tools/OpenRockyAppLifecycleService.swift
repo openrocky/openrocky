@@ -13,7 +13,10 @@ import UIKit
 final class OpenRockyAppLifecycleService {
     static let shared = OpenRockyAppLifecycleService()
 
+    static let willExitNotification = Notification.Name("OpenRockyWillExit")
+
     func exitApp(afterDelay delay: TimeInterval = 1.0) {
+        NotificationCenter.default.post(name: Self.willExitNotification, object: nil)
         Task { @MainActor in
             try? await Task.sleep(for: .seconds(delay))
             exit(0)

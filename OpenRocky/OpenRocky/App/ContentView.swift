@@ -8,6 +8,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct ContentView: View {
     @StateObject private var chatProviderStore = OpenRockyProviderStore()
@@ -61,6 +62,11 @@ struct ContentView: View {
                 if !showsVoiceOverlay {
                     toggleVoiceSession()
                 }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: OpenRockyAppLifecycleService.willExitNotification)) { _ in
+            if showsVoiceOverlay {
+                endVoiceSession()
             }
         }
         .onChange(of: scenePhase) { _, newPhase in

@@ -14,6 +14,7 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
     @Environment(\.dismiss) private var dismiss
 
     let editingInstanceID: String?
+    var initialProviderKind: OpenRockyRealtimeProviderKind? = nil
 
     @State private var name: String = ""
     @State private var selectedProvider: OpenRockyRealtimeProviderKind = .openAI
@@ -44,9 +45,18 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
             }
 
             Section {
-                Picker("Provider", selection: $selectedProvider) {
-                    ForEach(OpenRockyRealtimeProviderKind.allCases) { provider in
-                        Text(provider.displayName).tag(provider)
+                if isNew && initialProviderKind != nil {
+                    HStack {
+                        Text("Provider")
+                        Spacer()
+                        Text(selectedProvider.displayName)
+                            .foregroundStyle(.secondary)
+                    }
+                } else {
+                    Picker("Provider", selection: $selectedProvider) {
+                        ForEach(OpenRockyRealtimeProviderKind.allCases) { provider in
+                            Text(provider.displayName).tag(provider)
+                        }
                     }
                 }
 
@@ -305,6 +315,10 @@ struct OpenRockyRealtimeProviderInstanceEditorView: View {
     private func loadExisting() {
         guard let id = editingInstanceID,
               let instance = realtimeProviderStore.instances.first(where: { $0.id == id }) else {
+            if let initial = initialProviderKind {
+                selectedProvider = initial
+                previousProvider = initial
+            }
             name = selectedProvider.displayName
             nameManuallyEdited = false
             return

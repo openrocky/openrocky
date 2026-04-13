@@ -130,9 +130,56 @@ struct OpenRockyProviderSettingsView: View {
                             subtitle: "Files created by the assistant"
                         )
                     }
+
+                    NavigationLink {
+                        OpenRockyMountSettingsView()
+                    } label: {
+                        settingsRow(
+                            icon: "externaldrive.fill.badge.icloud",
+                            tint: .blue,
+                            title: "External Folders",
+                            subtitle: mountsSummary
+                        )
+                    }
                 }
 
-                Section("About") {
+                Section {
+                    NavigationLink {
+                        OpenRockyPreferencesView()
+                    } label: {
+                        settingsRow(
+                            icon: "slider.horizontal.3",
+                            tint: .indigo,
+                            title: "Preferences",
+                            subtitle: "Voice, chat & general settings"
+                        )
+                    }
+
+                    Link(destination: URL(string: "https://github.com/openrocky/openrocky/issues/new")!) {
+                        HStack(spacing: 12) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(Color.red.opacity(0.14))
+                                    .frame(width: 40, height: 40)
+                                Image(systemName: "exclamationmark.bubble.fill")
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundStyle(.red)
+                            }
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Feedback")
+                                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                                Text("Report issues or suggestions")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(.tertiary)
+                        }
+                        .padding(.vertical, 4)
+                    }
+
                     NavigationLink {
                         OpenRockyAboutView(
                             providerStore: providerStore,
@@ -207,6 +254,12 @@ struct OpenRockyProviderSettingsView: View {
         if count >= 1_000_000 { return String(format: "%.1fM", Double(count) / 1_000_000) }
         if count >= 1_000 { return String(format: "%.1fK", Double(count) / 1_000) }
         return "\(count)"
+    }
+
+    private var mountsSummary: String {
+        let count = OpenRockyMountStore.shared.mounts.count
+        if count == 0 { return "Mount iCloud folders for AI access" }
+        return "\(count) folder(s) mounted"
     }
 
     private var customSkillsSummary: String {

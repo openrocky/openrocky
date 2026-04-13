@@ -16,6 +16,7 @@ struct OpenRockyProviderInstanceEditorView: View {
     @Environment(\.dismiss) private var dismiss
 
     let editingInstanceID: String?
+    var initialProviderKind: OpenRockyProviderKind? = nil
 
     @State private var name: String = ""
     @State private var selectedProvider: OpenRockyProviderKind = .openAI
@@ -50,12 +51,21 @@ struct OpenRockyProviderInstanceEditorView: View {
             }
 
             Section {
-                Picker("Provider", selection: $selectedProvider) {
-                    ForEach(OpenRockyProviderKind.allCases) { provider in
-                        Text(provider.displayName).tag(provider)
+                if isNew && initialProviderKind != nil {
+                    HStack {
+                        Text("Provider")
+                        Spacer()
+                        Text(selectedProvider.displayName)
+                            .foregroundStyle(.secondary)
                     }
+                } else {
+                    Picker("Provider", selection: $selectedProvider) {
+                        ForEach(OpenRockyProviderKind.allCases) { provider in
+                            Text(provider.displayName).tag(provider)
+                        }
+                    }
+                    .pickerStyle(.menu)
                 }
-                .pickerStyle(.menu)
 
                 Text(selectedProvider.summary)
                     .font(.footnote)
@@ -387,6 +397,10 @@ struct OpenRockyProviderInstanceEditorView: View {
         guard let id = editingInstanceID,
               let instance = providerStore.instances.first(where: { $0.id == id }) else {
             // New instance defaults
+            if let initial = initialProviderKind {
+                selectedProvider = initial
+                previousProvider = initial
+            }
             name = selectedProvider.displayName
             modelID = selectedProvider.defaultModel
             credential = ""
