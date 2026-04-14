@@ -74,6 +74,19 @@ struct OpenRockyPreferencesView: View {
             }
 
             Section {
+                Stepper(
+                    "Context Messages: \(preferences.voiceContextMessageCount)",
+                    value: $preferences.voiceContextMessageCount,
+                    in: 2...50,
+                    step: 2
+                )
+            } header: {
+                Text("Voice Context")
+            } footer: {
+                Text("Number of recent messages included as context for voice mode. More context = better memory but higher latency and cost.")
+            }
+
+            Section {
                 Toggle("Auto-save Conversations", isOn: $preferences.chatAutoSaveConversation)
             } header: {
                 Text("Chat")

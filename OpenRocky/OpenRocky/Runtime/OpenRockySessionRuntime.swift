@@ -82,6 +82,16 @@ final class OpenRockySessionRuntime: ObservableObject {
         }
         toolbox.subagentStatusHandler = statusHandler
         chatRuntime.toolbox.subagentStatusHandler = statusHandler
+
+        // Wire up tool result status from chatRuntime → timeline
+        chatRuntime.onToolStatus = { [weak self] status in
+            guard let self else { return }
+            let icon = status.succeeded ? "done" : "failed"
+            self.appendTimeline(kind: .tool, text: "Tool `\(status.name)` \(icon): \(status.resultSummary)")
+            self.statusText = status.succeeded
+                ? "Tool \(status.name) completed."
+                : "Tool \(status.name) failed."
+        }
     }
 
     func syncProviders(
@@ -99,11 +109,22 @@ final class OpenRockySessionRuntime: ObservableObject {
         toolbox.subagentChatConfiguration = normalizedChat
         chatRuntime.toolbox.subagentChatConfiguration = normalizedChat
 
-        // Determine voice mode: use traditional if STT+TTS are configured, otherwise realtime
+        // Determine voice mode based on user preference and provider availability
         let sttReady = self.sttConfiguration.isConfigured
         let ttsReady = self.ttsConfiguration.isConfigured
+        let realtimeReady = voiceConfiguration.isConfigured
         let preferTraditional = UserDefaults.standard.string(forKey: "rocky.pref.voiceMode") == OpenRockyVoiceMode.traditional.rawValue
-        activeVoiceMode = (preferTraditional && sttReady && ttsReady) ? .traditional : .realtime
+        let traditionalReady = sttReady && ttsReady && chatConfiguration.isConfigured
+
+        if preferTraditional && traditionalReady {
+            // User explicitly prefers traditional and it's ready
+            activeVoiceMode = .traditional
+        } else if !realtimeReady && traditionalReady {
+            // No realtime provider configured but traditional is ready — auto-switch
+            activeVoiceMode = .traditional
+        } else {
+            activeVoiceMode = .realtime
+        }
 
         let providerName = activeVoiceMode == .realtime
             ? voiceConfiguration.provider.displayName
@@ -467,10 +488,10 @@ final class OpenRockySessionRuntime: ObservableObject {
         chatRuntime.resetConversation()
 
         // Reload recent messages so the chat model has conversation context
-        // Limit to last 10 messages to keep inference fast for voice mode
+        let contextCount = OpenRockyPreferences.shared.voiceContextMessageCount
         if !conversationID.isEmpty {
             let allHistory = storage.messages(in: conversationID)
-            let recentHistory = Array(allHistory.suffix(10))
+            let recentHistory = Array(allHistory.suffix(contextCount))
             chatRuntime.loadHistory(from: recentHistory)
         }
 
@@ -516,7 +537,11 @@ final class OpenRockySessionRuntime: ObservableObject {
             statusText = "OpenRocky is responding..."
             refreshPlan(connect: .done, capture: .done, tool: .queued, answer: .active)
         case .tool(let request):
-            appendTimeline(kind: .tool, text: "Chat provider requested tool `\(request.name)` but typed fallback tool execution is not wired yet.")
+            lastToolName = request.name
+            session.mode = .executing
+            statusText = "Running \(request.name)..."
+            refreshPlan(connect: .done, capture: .done, tool: .active, answer: .queued, toolDetail: "Executing \(request.name) via chat inference.")
+            appendTimeline(kind: .tool, text: "Chat tool call: `\(request.name)`")
         case .image, .thinkingBlock, .redactedThinking:
             break
         }

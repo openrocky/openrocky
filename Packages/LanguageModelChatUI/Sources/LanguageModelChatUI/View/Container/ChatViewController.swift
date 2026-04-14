@@ -76,6 +76,10 @@ open class ChatViewController: UIViewController {
     public var onDictationRequested: (() -> Void)?
     /// Called when the user cancels an in-progress dictation.
     public var onDictationCancelled: (() -> Void)?
+    /// Called when the user long-presses the mic button (push-to-talk start).
+    public var onPushToTalkBegan: (() -> Void)?
+    /// Called when the user releases the mic button (push-to-talk end).
+    public var onPushToTalkEnded: (() -> Void)?
 
     public weak var menuDelegate: ChatViewControllerMenuDelegate? {
         didSet {
@@ -589,6 +593,14 @@ extension ChatViewController: ChatInputDelegate {
 
     public func chatInputDidCancelDictation(_: ChatInputView) {
         onDictationCancelled?()
+    }
+
+    public func chatInputDidBeginPushToTalk(_: ChatInputView) {
+        onPushToTalkBegan?()
+    }
+
+    public func chatInputDidEndPushToTalk(_: ChatInputView) {
+        onPushToTalkEnded?()
     }
 
     /// Programmatically set text in the input and submit it.

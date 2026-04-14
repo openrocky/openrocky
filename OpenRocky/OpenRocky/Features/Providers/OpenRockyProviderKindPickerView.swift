@@ -98,6 +98,12 @@ struct OpenRockySTTProviderKindPickerView: View {
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(.secondary)
                                 .lineLimit(2)
+                            HStack(spacing: 12) {
+                                Label(kind.estimatedLatency, systemImage: "bolt")
+                                Label(kind.priceRange, systemImage: "dollarsign.circle")
+                            }
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                            .foregroundStyle(.tertiary)
                         }
                         .padding(.vertical, 4)
                     }
@@ -133,6 +139,12 @@ struct OpenRockyTTSProviderKindPickerView: View {
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(.secondary)
                                 .lineLimit(2)
+                            HStack(spacing: 12) {
+                                Label(kind.estimatedLatency, systemImage: "bolt")
+                                Label(kind.priceRange, systemImage: "dollarsign.circle")
+                            }
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                            .foregroundStyle(.tertiary)
                         }
                         .padding(.vertical, 4)
                     }

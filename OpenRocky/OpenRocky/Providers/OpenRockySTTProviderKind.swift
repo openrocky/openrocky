@@ -121,6 +121,30 @@ enum OpenRockySTTProviderKind: String, Codable, CaseIterable, Identifiable {
         }
     }
 
+    /// Estimated transcription latency for typical short audio clips.
+    nonisolated var estimatedLatency: String {
+        switch self {
+        case .openAI: "~1-2s"
+        case .groq: "~0.3-0.5s"
+        case .deepgram: "~0.3s"
+        case .azureSpeech: "~0.5-1s"
+        case .googleCloud: "~0.5-1s"
+        case .aliCloud: "~0.5-1s"
+        }
+    }
+
+    /// Estimated price range per minute of audio.
+    nonisolated var priceRange: String {
+        switch self {
+        case .openAI: "$0.006/min"
+        case .groq: "Free tier"
+        case .deepgram: "$0.0043/min"
+        case .azureSpeech: "$0.016/hr"
+        case .googleCloud: "$0.006/min"
+        case .aliCloud: "~$0.002/min"
+        }
+    }
+
     /// Whether this provider uses the OpenAI-compatible /v1/audio/transcriptions endpoint.
     nonisolated var isOpenAICompatible: Bool {
         switch self {

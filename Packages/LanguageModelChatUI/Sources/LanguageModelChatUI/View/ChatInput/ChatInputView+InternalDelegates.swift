@@ -82,6 +82,14 @@ extension ChatInputView: InputEditor.Delegate {
     func onInputEditorDictationCancelled() {
         delegate?.chatInputDidCancelDictation(self)
     }
+
+    func onInputEditorPushToTalkBegan() {
+        delegate?.chatInputDidBeginPushToTalk(self)
+    }
+
+    func onInputEditorPushToTalkEnded() {
+        delegate?.chatInputDidEndPushToTalk(self)
+    }
 }
 
 // MARK: - AttachmentsBar.Delegate

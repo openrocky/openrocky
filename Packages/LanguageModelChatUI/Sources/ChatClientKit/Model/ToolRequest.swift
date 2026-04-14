@@ -13,7 +13,7 @@ public struct ToolRequest: Codable, Equatable, Hashable, Sendable {
     public let name: String
     public let arguments: String
 
-    init(id: String? = nil, name: String, arguments: String) {
+    public init(id: String? = nil, name: String, arguments: String) {
         var identifier = id?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if identifier.isEmpty { identifier = UUID().uuidString }
         self.id = identifier

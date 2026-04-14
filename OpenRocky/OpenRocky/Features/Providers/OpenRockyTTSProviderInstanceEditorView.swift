@@ -15,6 +15,9 @@ struct OpenRockyTTSProviderInstanceEditorView: View {
 
     let editingInstanceID: String?
     var initialProviderKind: OpenRockyTTSProviderKind? = nil
+    var chatProviderStore: OpenRockyProviderStore? = nil
+    var realtimeProviderStore: OpenRockyRealtimeProviderStore? = nil
+    var sttProviderStore: OpenRockySTTProviderStore? = nil
 
     @State private var name: String = ""
     @State private var selectedProvider: OpenRockyTTSProviderKind = .openAI
@@ -24,6 +27,7 @@ struct OpenRockyTTSProviderInstanceEditorView: View {
     @State private var customHost: String = ""
     @State private var nameManuallyEdited: Bool = false
     @StateObject private var ttsPreview = OpenRockyTTSPreview()
+    @State private var reusableCredentials: [OpenRockyCredentialReuse.ReusableCredential] = []
 
     private var isNew: Bool { editingInstanceID == nil }
 
@@ -73,6 +77,29 @@ struct OpenRockyTTSProviderInstanceEditorView: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .textContentType(.init(rawValue: ""))
+
+                if credential.isEmpty, !reusableCredentials.isEmpty {
+                    ForEach(Array(reusableCredentials.enumerated()), id: \.offset) { _, reusable in
+                        Button {
+                            credential = reusable.credential
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "key.fill")
+                                    .foregroundStyle(Color.accentColor)
+                                    .font(.system(size: 14))
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Use key from \(reusable.sourceName)")
+                                        .font(.subheadline.weight(.medium))
+                                        .foregroundStyle(.primary)
+                                    Text(reusable.maskedCredential)
+                                        .font(.caption.monospaced())
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                            }
+                        }
+                    }
+                }
 
                 if let guideURL = selectedProvider.apiKeyGuideURL, let url = URL(string: guideURL) {
                     Link(destination: url) {
@@ -183,7 +210,10 @@ struct OpenRockyTTSProviderInstanceEditorView: View {
         }
         .navigationTitle(isNew ? "Add TTS Provider" : "Edit TTS Provider")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { loadExisting() }
+        .onAppear {
+            loadExisting()
+            refreshReusableCredentials()
+        }
         .onDisappear { ttsPreview.stop() }
         .onChange(of: selectedProvider) { _, newValue in
             ttsPreview.stop()
@@ -194,6 +224,7 @@ struct OpenRockyTTSProviderInstanceEditorView: View {
                 modelID = newValue.defaultModel
             }
             selectedVoice = newValue.defaultVoice
+            refreshReusableCredentials()
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -227,6 +258,21 @@ struct OpenRockyTTSProviderInstanceEditorView: View {
         modelID = instance.modelID
         selectedVoice = instance.voice ?? selectedProvider.defaultVoice
         customHost = instance.customHost ?? ""
+    }
+
+    private func refreshReusableCredentials() {
+        guard let chatStore = chatProviderStore,
+              let realtimeStore = realtimeProviderStore,
+              let sttStore = sttProviderStore else {
+            reusableCredentials = []
+            return
+        }
+        reusableCredentials = OpenRockyCredentialReuse.findCredentials(
+            forTTSProvider: selectedProvider,
+            chatStore: chatStore,
+            realtimeStore: realtimeStore,
+            sttStore: sttStore
+        )
     }
 
     private func saveInstance() {

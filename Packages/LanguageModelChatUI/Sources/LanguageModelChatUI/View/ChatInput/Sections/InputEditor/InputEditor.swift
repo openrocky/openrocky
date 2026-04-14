@@ -80,13 +80,24 @@ class InputEditor: EditorSectionView {
                     voiceButton.change(icon: "mic.fill")
                     voiceButton.tintColor = .systemRed
                     placeholderLabel.text = String.localized("Listening...")
+                    dictationWaveformView.isHidden = false
                 } else {
                     voiceButton.change(icon: "mic")
                     voiceButton.tintColor = .label
                     placeholderLabel.text = String.localized("Type something...")
+                    dictationWaveformView.isHidden = true
+                    dictationWaveformView.audioLevel = 0
                 }
             }
         }
+    }
+
+    /// Audio level waveform view shown during dictation.
+    let dictationWaveformView = DictationWaveformView()
+
+    /// Update the audio level for waveform animation (0.0–1.0).
+    func updateDictationAudioLevel(_ level: Float) {
+        dictationWaveformView.audioLevel = level
     }
 
     weak var delegate: Delegate?
@@ -140,13 +151,22 @@ class InputEditor: EditorSectionView {
         elementClipper.addSubview(placeholderLabel)
         voiceButton.tapAction = { [weak self] in
             guard let self else { return }
+            // Skip tap if long press was active (push-to-talk mode)
+            guard !longPressActive else { return }
             if isDictating {
                 delegate?.onInputEditorDictationCancelled()
             } else {
                 delegate?.onInputEditorDictationRequested()
             }
         }
+        // Long-press for push-to-talk
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleVoiceLongPress(_:)))
+        longPress.minimumPressDuration = 0.4
+        voiceButton.addGestureRecognizer(longPress)
         elementClipper.addSubview(voiceButton)
+        // Waveform view for dictation audio levels
+        dictationWaveformView.isHidden = true
+        elementClipper.addSubview(dictationWaveformView)
         moreButton.tapAction = { [weak self] in
             self?.isControlPanelOpened.toggle()
             self?.setNeedsLayout()
@@ -221,6 +241,18 @@ class InputEditor: EditorSectionView {
         }
 
         updatePlaceholderAlpha()
+
+        // Position waveform view next to voice button when dictating
+        if isDictating {
+            let waveformHeight: CGFloat = 20
+            let waveformWidth: CGFloat = voiceButton.frame.minX - inset.left - iconSpacing
+            dictationWaveformView.frame = CGRect(
+                x: inset.left,
+                y: (bounds.height - waveformHeight) / 2,
+                width: max(0, waveformWidth),
+                height: waveformHeight
+            )
+        }
     }
 
     func set(text: String) {
@@ -240,6 +272,27 @@ class InputEditor: EditorSectionView {
 
     @objc private func voiceKeyboardTapped() {
         delegate?.onInputEditorVoiceSessionToggle()
+    }
+
+    private var longPressActive = false
+
+    @objc private func handleVoiceLongPress(_ gesture: UILongPressGestureRecognizer) {
+        switch gesture.state {
+        case .began:
+            longPressActive = true
+            // Haptic feedback on push-to-talk start
+            let impact = UIImpactFeedbackGenerator(style: .medium)
+            impact.impactOccurred()
+            delegate?.onInputEditorPushToTalkBegan()
+        case .ended, .cancelled:
+            longPressActive = false
+            // Haptic feedback on push-to-talk end
+            let impact = UIImpactFeedbackGenerator(style: .light)
+            impact.impactOccurred()
+            delegate?.onInputEditorPushToTalkEnded()
+        default:
+            break
+        }
     }
 
     /// Enter or exit voice mode externally (e.g. from top-right button).

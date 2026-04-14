@@ -15,6 +15,9 @@ struct OpenRockySTTProviderInstanceEditorView: View {
 
     let editingInstanceID: String?
     var initialProviderKind: OpenRockySTTProviderKind? = nil
+    var chatProviderStore: OpenRockyProviderStore? = nil
+    var realtimeProviderStore: OpenRockyRealtimeProviderStore? = nil
+    var ttsProviderStore: OpenRockyTTSProviderStore? = nil
 
     @State private var name: String = ""
     @State private var selectedProvider: OpenRockySTTProviderKind = .openAI
@@ -24,6 +27,7 @@ struct OpenRockySTTProviderInstanceEditorView: View {
     @State private var language: String = ""
     @State private var nameManuallyEdited: Bool = false
     @StateObject private var sttTest = OpenRockySTTTest()
+    @State private var reusableCredentials: [OpenRockyCredentialReuse.ReusableCredential] = []
 
     private var isNew: Bool { editingInstanceID == nil }
 
@@ -73,6 +77,29 @@ struct OpenRockySTTProviderInstanceEditorView: View {
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .textContentType(.init(rawValue: ""))
+
+                if credential.isEmpty, !reusableCredentials.isEmpty {
+                    ForEach(Array(reusableCredentials.enumerated()), id: \.offset) { _, reusable in
+                        Button {
+                            credential = reusable.credential
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "key.fill")
+                                    .foregroundStyle(Color.accentColor)
+                                    .font(.system(size: 14))
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Use key from \(reusable.sourceName)")
+                                        .font(.subheadline.weight(.medium))
+                                        .foregroundStyle(.primary)
+                                    Text(reusable.maskedCredential)
+                                        .font(.caption.monospaced())
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                            }
+                        }
+                    }
+                }
 
                 if let guideURL = selectedProvider.apiKeyGuideURL, let url = URL(string: guideURL) {
                     Link(destination: url) {
@@ -205,7 +232,10 @@ struct OpenRockySTTProviderInstanceEditorView: View {
         }
         .navigationTitle(isNew ? "Add STT Provider" : "Edit STT Provider")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { loadExisting() }
+        .onAppear {
+            loadExisting()
+            refreshReusableCredentials()
+        }
         .onDisappear { sttTest.stop() }
         .onChange(of: selectedProvider) { _, newValue in
             sttTest.reset()
@@ -215,6 +245,7 @@ struct OpenRockySTTProviderInstanceEditorView: View {
             if modelID.isEmpty || modelID == OpenRockySTTProviderKind.openAI.defaultModel || modelID == OpenRockySTTProviderKind.aliCloud.defaultModel {
                 modelID = newValue.defaultModel
             }
+            refreshReusableCredentials()
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -247,6 +278,21 @@ struct OpenRockySTTProviderInstanceEditorView: View {
         modelID = instance.modelID
         customHost = instance.customHost ?? ""
         language = instance.language ?? ""
+    }
+
+    private func refreshReusableCredentials() {
+        guard let chatStore = chatProviderStore,
+              let realtimeStore = realtimeProviderStore,
+              let ttsStore = ttsProviderStore else {
+            reusableCredentials = []
+            return
+        }
+        reusableCredentials = OpenRockyCredentialReuse.findCredentials(
+            forSTTProvider: selectedProvider,
+            chatStore: chatStore,
+            realtimeStore: realtimeStore,
+            ttsStore: ttsStore
+        )
     }
 
     private func saveInstance() {

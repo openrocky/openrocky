@@ -288,6 +288,11 @@ open class ChatInputView: EditorSectionView {
         inputEditor.isDictating = active
     }
 
+    /// Update dictation audio level for waveform animation (0.0–1.0).
+    public func updateDictationAudioLevel(_ level: Float) {
+        inputEditor.updateDictationAudioLevel(level)
+    }
+
     /// Insert dictated text into the input field and end dictation state.
     public func insertDictatedText(_ text: String) {
         let existing = inputEditor.textView.text ?? ""

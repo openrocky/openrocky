@@ -143,6 +143,32 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
         }
     }
 
+    /// Estimated synthesis latency for typical sentences.
+    nonisolated var estimatedLatency: String {
+        switch self {
+        case .openAI: "~0.5-1s"
+        case .miniMax: "~0.5-1s"
+        case .elevenLabs: "~0.3-0.8s"
+        case .volcengine: "~0.3-0.5s"
+        case .azureSpeech: "~0.3-0.5s"
+        case .googleCloud: "~0.3-0.5s"
+        case .aliCloud: "~0.5-1s"
+        }
+    }
+
+    /// Estimated price per 1M characters of text.
+    nonisolated var priceRange: String {
+        switch self {
+        case .openAI: "$15/1M chars"
+        case .miniMax: "~$1/1M chars"
+        case .elevenLabs: "$0.30/1K chars"
+        case .volcengine: "~$0.5/1M chars"
+        case .azureSpeech: "$16/1M chars"
+        case .googleCloud: "$16/1M chars"
+        case .aliCloud: "~$1/1M chars"
+        }
+    }
+
     /// Whether this provider uses the OpenAI-compatible /v1/audio/speech endpoint.
     nonisolated var isOpenAICompatible: Bool {
         switch self {

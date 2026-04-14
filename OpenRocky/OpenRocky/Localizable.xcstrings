@@ -132,7 +132,6 @@
       }
     },
     "Access Token" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -222,6 +221,12 @@
         }
       }
     },
+    "Add STT Provider" : {
+
+    },
+    "Add TTS Provider" : {
+
+    },
     "Add Voice Provider" : {
       "localizations" : {
         "zh-Hans" : {
@@ -232,7 +237,16 @@
         }
       }
     },
+    "AI Model" : {
+
+    },
     "AIProxy" : {
+
+    },
+    "Alibaba Cloud CosyVoice" : {
+
+    },
+    "Alibaba Cloud Paraformer" : {
 
     },
     "All" : {
@@ -260,6 +274,7 @@
       }
     },
     "Analytics" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -348,6 +363,9 @@
 
     },
     "Azure OpenAI" : {
+
+    },
+    "Azure Speech" : {
 
     },
     "Back" : {
@@ -521,6 +539,12 @@
       }
     },
     "Choose Provider" : {
+
+    },
+    "Choose STT Provider" : {
+
+    },
+    "Choose TTS Provider" : {
 
     },
     "Choose Voice Provider" : {
@@ -721,6 +745,9 @@
         }
       }
     },
+    "Context Messages: %lld" : {
+
+    },
     "Continue with %@" : {
 
     },
@@ -855,6 +882,9 @@
         }
       }
     },
+    "Deepgram" : {
+
+    },
     "DeepSeek" : {
 
     },
@@ -970,6 +1000,9 @@
     "e.g. obsidian" : {
 
     },
+    "e.g. zh, en, ja (optional)" : {
+
+    },
     "Each skill should be in a subdirectory with a SKILL.md file. Already imported skills will be skipped." : {
       "localizations" : {
         "zh-Hans" : {
@@ -1020,6 +1053,12 @@
         }
       }
     },
+    "Edit STT Provider" : {
+
+    },
+    "Edit TTS Provider" : {
+
+    },
     "Edit Voice Provider" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1029,6 +1068,9 @@
           }
         }
       }
+    },
+    "ElevenLabs" : {
+
     },
     "Email" : {
       "localizations" : {
@@ -1072,6 +1114,9 @@
           }
         }
       }
+    },
+    "Enable STT + TTS with %@" : {
+
     },
     "Enabled" : {
       "localizations" : {
@@ -1175,6 +1220,9 @@
           }
         }
       }
+    },
+    "Features & Data" : {
+
     },
     "Features are optional capabilities that require extra setup before they can be used." : {
       "localizations" : {
@@ -1291,6 +1339,12 @@
         }
       }
     },
+    "Google Cloud Speech" : {
+
+    },
+    "Google Cloud TTS" : {
+
+    },
     "Greeting" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1302,6 +1356,9 @@
       }
     },
     "Groq" : {
+
+    },
+    "Groq Whisper" : {
 
     },
     "Group" : {
@@ -1426,6 +1483,12 @@
           }
         }
       }
+    },
+    "ISO-639-1 language code. Leave empty for auto-detection." : {
+
+    },
+    "Language Hint" : {
+
     },
     "Launch OpenRocky hands-free with Siri" : {
 
@@ -1582,6 +1645,9 @@
         }
       }
     },
+    "MiniMax TTS" : {
+
+    },
     "Model" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1637,7 +1703,13 @@
         }
       }
     },
+    "Name (e.g. My OpenAI TTS)" : {
+
+    },
     "Name (e.g. My OpenAI Voice)" : {
+
+    },
+    "Name (e.g. My Whisper)" : {
 
     },
     "Name (e.g. Personal OpenAI)" : {
@@ -1746,6 +1818,12 @@
         }
       }
     },
+    "No speech recognition providers configured. Add one to enable voice input with the traditional pipeline." : {
+
+    },
+    "No text-to-speech providers configured. Add one to enable voice output with the traditional pipeline." : {
+
+    },
     "No usage data for this period" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1775,6 +1853,9 @@
           }
         }
       }
+    },
+    "Number of recent messages included as context for voice mode. More context = better memory but higher latency and cost." : {
+
     },
     "OAuth" : {
 
@@ -1890,6 +1971,9 @@
         }
       }
     },
+    "OpenAI TTS" : {
+
+    },
     "OpenAI uses realtime models. GLM uses glm-realtime." : {
 
     },
@@ -1902,6 +1986,9 @@
           }
         }
       }
+    },
+    "OpenAI Whisper" : {
+
     },
     "Opening OpenRocky..." : {
 
@@ -1933,6 +2020,9 @@
       }
     },
     "Optional. If provided, this token overrides OAuth for API calls." : {
+
+    },
+    "Optional. Override the default API endpoint." : {
 
     },
     "Optional. Override the default API host for this provider." : {
@@ -2153,6 +2243,9 @@
         }
       }
     },
+    "Realtime mode uses Voice (Realtime). Traditional mode uses STT + Chat + TTS." : {
+
+    },
     "Realtime voice conversations" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2184,6 +2277,12 @@
           }
         }
       }
+    },
+    "Recording... %llds" : {
+
+    },
+    "Records 4 seconds of microphone audio and sends it for transcription. Requires microphone permission." : {
+
     },
     "Register Shortcuts with Siri" : {
       "localizations" : {
@@ -2240,7 +2339,13 @@
         }
       }
     },
+    "Requires a Realtime voice provider (OpenAI or GLM) to be configured." : {
+
+    },
     "Requires a supported iPhone with iOS 26 or later. No API key needed." : {
+
+    },
+    "Requires Speech-to-Text, Chat, and Text-to-Speech providers to be configured in Settings > Providers." : {
 
     },
     "Reset to Default" : {
@@ -2383,6 +2488,9 @@
         }
       }
     },
+    "Set Up & Continue" : {
+
+    },
     "Settings" : {
 
     },
@@ -2505,6 +2613,9 @@
     "Skills & Tools" : {
 
     },
+    "Skip" : {
+
+    },
     "Skip for now" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2582,6 +2693,12 @@
         }
       }
     },
+    "Speech-to-Text" : {
+
+    },
+    "Speech-to-Text Providers" : {
+
+    },
     "Star us on GitHub!" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2607,6 +2724,7 @@
 
     },
     "Storage" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2626,6 +2744,12 @@
         }
       }
     },
+    "STT Provider" : {
+
+    },
+    "Subscription Key" : {
+
+    },
     "Supported Phrases" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2637,7 +2761,6 @@
       }
     },
     "System" : {
-      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -2657,6 +2780,9 @@
         }
       }
     },
+    "Tap the play button to preview a voice. Requires a valid API key." : {
+
+    },
     "Tap to activate. Only one provider can be active at a time." : {
       "localizations" : {
         "zh-Hans" : {
@@ -2666,6 +2792,12 @@
           }
         }
       }
+    },
+    "Tap to activate. Only one STT provider can be active at a time." : {
+
+    },
+    "Tap to activate. Only one TTS provider can be active at a time." : {
+
     },
     "Tap to activate. Only one voice provider can be active at a time." : {
       "localizations" : {
@@ -2717,6 +2849,12 @@
         }
       }
     },
+    "Test" : {
+
+    },
+    "Test Again" : {
+
+    },
     "Test Connection" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2737,6 +2875,9 @@
         }
       }
     },
+    "Test Speech Recognition" : {
+
+    },
     "Testing..." : {
       "localizations" : {
         "zh-Hans" : {
@@ -2746,6 +2887,12 @@
           }
         }
       }
+    },
+    "Text-to-Speech" : {
+
+    },
+    "Text-to-Speech Providers" : {
+
     },
     "The instructions that will be appended to the system prompt when this skill is active." : {
       "localizations" : {
@@ -2786,6 +2933,9 @@
           }
         }
       }
+    },
+    "This will create %@ STT and TTS providers using the same API key. You can switch between Realtime and Traditional voice in Settings > Preferences." : {
+
     },
     "This will delete all log files." : {
       "localizations" : {
@@ -2869,6 +3019,15 @@
         }
       }
     },
+    "Traditional Voice Mode" : {
+
+    },
+    "Traditional voice mode requires Chat, Speech-to-Text, and Text-to-Speech providers. Please configure them in Settings." : {
+
+    },
+    "Transcribing..." : {
+
+    },
     "TRANSCRIPT" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2898,6 +3057,12 @@
           }
         }
       }
+    },
+    "Try Again" : {
+
+    },
+    "TTS Provider" : {
+
     },
     "Type a request..." : {
       "localizations" : {
@@ -2987,6 +3152,9 @@
     "Use an API key, or sign in with your ChatGPT account for Codex-style OAuth." : {
 
     },
+    "Use key from %@" : {
+
+    },
     "Use QQ Mail authorization code (not your QQ password). Get it from QQ Mail Settings → Account → POP3/SMTP." : {
       "localizations" : {
         "zh-Hans" : {
@@ -2997,7 +3165,13 @@
         }
       }
     },
+    "Use separate STT + Chat + TTS providers.\nWorks with any chat model, not just realtime." : {
+
+    },
     "Use TLS" : {
+
+    },
+    "Use your %@ key for speech recognition and text-to-speech too." : {
 
     },
     "Use your Outlook/Microsoft account password or an app password if 2FA is enabled." : {
@@ -3061,6 +3235,9 @@
         }
       }
     },
+    "Voice Context" : {
+
+    },
     "VOICE FIRST" : {
 
     },
@@ -3073,6 +3250,12 @@
     "Voice Model" : {
 
     },
+    "Voice Not Configured" : {
+
+    },
+    "Voice Pipeline" : {
+
+    },
     "Voice Provider" : {
       "localizations" : {
         "zh-Hans" : {
@@ -3082,9 +3265,6 @@
           }
         }
       }
-    },
-    "Voice Provider Not Configured" : {
-
     },
     "Voice Providers" : {
       "localizations" : {
@@ -3097,6 +3277,9 @@
       }
     },
     "Voice Session" : {
+
+    },
+    "Volcengine (Doubao)" : {
 
     },
     "Want to use OpenAI OAuth instead of API key? Finish onboarding first, then go to Settings → Chat Providers → OpenAI and choose OAuth." : {

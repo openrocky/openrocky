@@ -12,6 +12,8 @@ import SwiftUI
 struct OpenRockyOnboardingView: View {
     @ObservedObject var providerStore: OpenRockyProviderStore
     @ObservedObject var realtimeProviderStore: OpenRockyRealtimeProviderStore
+    var sttProviderStore: OpenRockySTTProviderStore? = nil
+    var ttsProviderStore: OpenRockyTTSProviderStore? = nil
     @Environment(\.dismiss) private var dismiss
 
     @State private var step: OnboardingStep = .welcome
@@ -29,10 +31,13 @@ struct OpenRockyOnboardingView: View {
 
     @State private var floatingOffset: CGFloat = 0
 
+    @State private var enableTraditionalVoice = false
+
     private enum OnboardingStep: Comparable {
         case welcome
         case providerChoice
         case apiKey
+        case traditionalVoice
         case done
     }
 
@@ -120,6 +125,28 @@ struct OpenRockyOnboardingView: View {
         var requiresAppId: Bool {
             false
         }
+
+        /// Whether this provider has STT/TTS that can be set up with the same key.
+        var supportsTraditionalVoice: Bool {
+            switch self {
+            case .openAI: true
+            case .glm: false
+            }
+        }
+
+        var sttProviderKind: OpenRockySTTProviderKind? {
+            switch self {
+            case .openAI: .openAI
+            case .glm: nil
+            }
+        }
+
+        var ttsProviderKind: OpenRockyTTSProviderKind? {
+            switch self {
+            case .openAI: .openAI
+            case .glm: nil
+            }
+        }
     }
 
     var body: some View {
@@ -134,6 +161,8 @@ struct OpenRockyOnboardingView: View {
                     providerChoiceStep
                 case .apiKey:
                     apiKeyStep
+                case .traditionalVoice:
+                    traditionalVoiceStep
                 case .done:
                     doneStep
                 }
@@ -551,6 +580,179 @@ struct OpenRockyOnboardingView: View {
         .frame(maxWidth: 500)
     }
 
+    // MARK: - Traditional Voice Setup
+
+    private var traditionalVoiceStep: some View {
+        VStack(spacing: 24) {
+            Spacer()
+
+            ZStack {
+                ForEach(0..<3, id: \.self) { i in
+                    Circle()
+                        .stroke(OpenRockyPalette.accent.opacity(0.15), lineWidth: 1.5)
+                        .frame(width: CGFloat(80 + i * 40), height: CGFloat(80 + i * 40))
+                }
+
+                Image(systemName: "arrow.triangle.branch")
+                    .font(.system(size: 48))
+                    .foregroundStyle(OpenRockyPalette.accent)
+            }
+
+            VStack(spacing: 12) {
+                Text("Traditional Voice Mode")
+                    .font(.system(size: 26, weight: .black, design: .rounded))
+                    .foregroundStyle(OpenRockyPalette.text)
+
+                Text("Use separate STT + Chat + TTS providers.\nWorks with any chat model, not just realtime.")
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            VStack(spacing: 12) {
+                // Enable toggle
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        enableTraditionalVoice.toggle()
+                    }
+                } label: {
+                    HStack(spacing: 14) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                .fill(enableTraditionalVoice ? OpenRockyPalette.accent.opacity(0.14) : OpenRockyPalette.card)
+                                .frame(width: 44, height: 44)
+                            Image(systemName: "mic.and.signal.meter.fill")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundStyle(enableTraditionalVoice ? OpenRockyPalette.accent : OpenRockyPalette.muted)
+                        }
+
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Enable STT + TTS with \(selectedProvider.displayName)")
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .foregroundStyle(OpenRockyPalette.text)
+                            Text("Use your \(selectedProvider.displayName) key for speech recognition and text-to-speech too.")
+                                .font(.system(size: 13, weight: .medium, design: .rounded))
+                                .foregroundStyle(OpenRockyPalette.muted)
+                                .lineLimit(3)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+
+                        Spacer()
+
+                        Image(systemName: enableTraditionalVoice ? "checkmark.circle.fill" : "circle")
+                            .font(.system(size: 22))
+                            .foregroundStyle(enableTraditionalVoice ? OpenRockyPalette.accent : OpenRockyPalette.stroke)
+                    }
+                    .padding(14)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(OpenRockyPalette.card)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .stroke(enableTraditionalVoice ? OpenRockyPalette.accent.opacity(0.6) : OpenRockyPalette.stroke, lineWidth: enableTraditionalVoice ? 2 : 1)
+                            )
+                    )
+                }
+                .buttonStyle(.plain)
+
+                if enableTraditionalVoice {
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: "info.circle.fill")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(OpenRockyPalette.accent)
+                            .padding(.top, 1)
+                        Text("This will create \(selectedProvider.displayName) STT and TTS providers using the same API key. You can switch between Realtime and Traditional voice in Settings > Preferences.")
+                            .font(.system(size: 13, weight: .medium, design: .rounded))
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(OpenRockyPalette.card)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(OpenRockyPalette.accent.opacity(0.25), lineWidth: 1)
+                            )
+                    )
+                }
+            }
+            .padding(.horizontal, 30)
+
+            Spacer()
+
+            VStack(spacing: 12) {
+                Button {
+                    if enableTraditionalVoice {
+                        setupTraditionalVoice()
+                    }
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                        step = .done
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 14, weight: .bold))
+                        Text(enableTraditionalVoice ? "Set Up & Continue" : "Skip")
+                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                    }
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(OpenRockyPalette.accent)
+                            .shadow(color: OpenRockyPalette.accent.opacity(0.4), radius: 12, y: 6)
+                    )
+                }
+            }
+            .padding(.horizontal, 30)
+            .padding(.bottom, 40)
+        }
+        .padding(.horizontal, 32)
+        .frame(maxWidth: 500)
+    }
+
+    private func setupTraditionalVoice() {
+        let key = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !key.isEmpty else { return }
+
+        let host = customHost.trimmingCharacters(in: .whitespacesAndNewlines)
+        let customHostValue: String? = host.isEmpty ? nil : host
+
+        // Create STT provider instance
+        if let sttKind = selectedProvider.sttProviderKind, let sttStore = sttProviderStore {
+            let sttInstance = OpenRockySTTProviderInstance(
+                id: UUID().uuidString,
+                name: "\(selectedProvider.displayName) STT",
+                kind: sttKind,
+                modelID: sttKind.defaultModel,
+                customHost: customHostValue,
+                language: nil,
+                isBuiltIn: false
+            )
+            sttStore.add(sttInstance, credential: key)
+            sttStore.setActive(id: sttInstance.id)
+        }
+
+        // Create TTS provider instance
+        if let ttsKind = selectedProvider.ttsProviderKind, let ttsStore = ttsProviderStore {
+            let ttsInstance = OpenRockyTTSProviderInstance(
+                id: UUID().uuidString,
+                name: "\(selectedProvider.displayName) TTS",
+                kind: ttsKind,
+                modelID: ttsKind.defaultModel,
+                voice: ttsKind.defaultVoice,
+                customHost: customHostValue,
+                isBuiltIn: false
+            )
+            ttsStore.add(ttsInstance, credential: key)
+            ttsStore.setActive(id: ttsInstance.id)
+        }
+    }
+
     // MARK: - Done
 
     private var doneStep: some View {
@@ -607,7 +809,10 @@ struct OpenRockyOnboardingView: View {
     }
 
     private var doneSubtitle: String {
-        "\(selectedProvider.displayName) chat and voice are ready.\nExplore more providers and settings anytime."
+        if enableTraditionalVoice {
+            return "\(selectedProvider.displayName) chat, voice, STT, and TTS are ready.\nSwitch voice modes in Settings > Preferences."
+        }
+        return "\(selectedProvider.displayName) chat and voice are ready.\nExplore more providers and settings anytime."
     }
 
     // MARK: - Submit
@@ -649,8 +854,16 @@ struct OpenRockyOnboardingView: View {
         realtimeProviderStore.setActive(id: voiceInstance.id)
 
         isSubmitting = false
-        withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
-            step = .done
+
+        // If the provider supports STT/TTS (OpenAI), offer traditional voice setup
+        if selectedProvider.supportsTraditionalVoice, sttProviderStore != nil, ttsProviderStore != nil {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                step = .traditionalVoice
+            }
+        } else {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                step = .done
+            }
         }
     }
 

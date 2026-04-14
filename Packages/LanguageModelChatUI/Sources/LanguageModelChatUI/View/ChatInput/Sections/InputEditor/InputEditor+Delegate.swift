@@ -24,5 +24,7 @@ extension InputEditor {
         func onInputEditorVoiceSessionStop()
         func onInputEditorDictationRequested()
         func onInputEditorDictationCancelled()
+        func onInputEditorPushToTalkBegan()
+        func onInputEditorPushToTalkEnded()
     }
 }

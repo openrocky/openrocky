@@ -193,6 +193,7 @@ final class OpenRockyTraditionalVoiceBridge {
     // MARK: - TTS Playback
 
     /// Synthesize text via TTS and play it, emitting audio events.
+    /// Uses a pipeline approach: synthesize the next sentence while playing the current one.
     func synthesizeAndPlay(text: String) async {
         guard let ttsClient else {
             emit(.error("TTS provider not configured"))
@@ -207,16 +208,49 @@ final class OpenRockyTraditionalVoiceBridge {
         }
 
         let sentences = Self.splitIntoSentences(cleanText)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
 
-        for sentence in sentences {
-            let trimmed = sentence.trimmingCharacters(in: .whitespacesAndNewlines)
-            guard !trimmed.isEmpty else { continue }
+        guard !sentences.isEmpty else {
+            resumeListening()
+            return
+        }
 
+        // Pipeline: pre-synthesize the next sentence while playing the current one
+        var nextSynthesisTask: Task<Data?, Never>?
+
+        // Kick off synthesis for the first sentence
+        nextSynthesisTask = Task {
             do {
-                let audioData = try await ttsClient.synthesize(text: trimmed)
-                await playAudio(data: audioData)
+                return try await ttsClient.synthesize(text: sentences[0])
             } catch {
-                rlog.error("TTS synthesis failed for sentence: \(error.localizedDescription)", category: "TTS")
+                rlog.error("TTS synthesis failed: \(error.localizedDescription)", category: "TTS")
+                return nil
+            }
+        }
+
+        for i in 0..<sentences.count {
+            // Wait for the current sentence's audio
+            let audioData = await nextSynthesisTask?.value
+
+            // Start synthesizing the NEXT sentence in parallel with playback
+            if i + 1 < sentences.count {
+                let nextText = sentences[i + 1]
+                nextSynthesisTask = Task {
+                    do {
+                        return try await ttsClient.synthesize(text: nextText)
+                    } catch {
+                        rlog.error("TTS synthesis failed: \(error.localizedDescription)", category: "TTS")
+                        return nil
+                    }
+                }
+            } else {
+                nextSynthesisTask = nil
+            }
+
+            // Play current sentence audio
+            if let audioData {
+                await playAudio(data: audioData)
             }
         }
 

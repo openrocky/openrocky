@@ -28,6 +28,16 @@ final class OpenRockyChatInferenceRuntime {
     }
     private(set) var completedToolCalls: [CompletedToolCall] = []
 
+    /// Tool execution status reported during chat inference.
+    struct ToolStatus {
+        let name: String
+        let succeeded: Bool
+        let resultSummary: String
+    }
+
+    /// Callback for tool execution status updates (name, success, result summary).
+    var onToolStatus: (@MainActor (ToolStatus) -> Void)?
+
     func run(
         prompt: String,
         configuration: OpenRockyProviderConfiguration,
@@ -128,6 +138,7 @@ final class OpenRockyChatInferenceRuntime {
 
                 for tc in toolCalls where !tc.name.isEmpty {
                     rlog.info("Chat tool call: \(tc.name) args=\(tc.arguments.prefix(200))", category: "Chat")
+                    onChunk(.tool(ToolRequest(name: tc.name, arguments: tc.arguments)))
                     let result: String
                     var succeeded = true
                     do {
@@ -143,6 +154,9 @@ final class OpenRockyChatInferenceRuntime {
                         id: tc.id, name: tc.name, arguments: tc.arguments,
                         result: result, succeeded: succeeded
                     ))
+                    // Report tool result summary to UI
+                    let summary = Self.summarizeToolResult(result, maxLength: 120)
+                    onToolStatus?(ToolStatus(name: tc.name, succeeded: succeeded, resultSummary: summary))
                     onChunk(.text("\n"))
 
                     conversationHistory.append(.init(role: .tool, content: .text(result), toolCallID: tc.id))
@@ -213,6 +227,30 @@ final class OpenRockyChatInferenceRuntime {
                 return [.init(role: .user, content: .text(text))]
             }
         }
+    }
+
+    /// Produce a short human-readable summary from a tool result JSON string.
+    private static func summarizeToolResult(_ result: String, maxLength: Int) -> String {
+        let trimmed = result.trimmingCharacters(in: .whitespacesAndNewlines)
+        // Try to extract a meaningful snippet from JSON
+        if trimmed.hasPrefix("{"), let data = trimmed.data(using: .utf8),
+           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            // Look for common result keys
+            for key in ["result", "text", "content", "message", "summary", "answer", "output", "data"] {
+                if let value = json[key] {
+                    let str = String(describing: value)
+                    if str.count <= maxLength { return str }
+                    return String(str.prefix(maxLength - 3)) + "..."
+                }
+            }
+            // If error key
+            if let error = json["error"] as? String {
+                return "Error: \(error.prefix(maxLength - 7))"
+            }
+        }
+        // Fallback: truncate raw result
+        if trimmed.count <= maxLength { return trimmed }
+        return String(trimmed.prefix(maxLength - 3)) + "..."
     }
 
     func resetConversation() {

@@ -17,6 +17,7 @@ struct OpenRockyProviderSettingsView: View {
     @ObservedObject var skillStore: OpenRockyBuiltInToolStore
     @ObservedObject var characterStore: OpenRockyCharacterStore
     @StateObject private var customSkillStore = OpenRockyCustomSkillStore.shared
+    @ObservedObject private var healthService = OpenRockyProviderHealthService.shared
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -45,7 +46,8 @@ struct OpenRockyProviderSettingsView: View {
                             icon: "bubble.left.and.text.bubble.right.fill",
                             tint: OpenRockyPalette.accent,
                             title: "Chat",
-                            subtitle: chatStatusSummary
+                            subtitle: chatStatusSummary,
+                            healthStatus: providerStore.activeInstance.map { healthService.status(for: $0.id) }
                         )
                     }
                 }
@@ -64,24 +66,36 @@ struct OpenRockyProviderSettingsView: View {
                     }
 
                     NavigationLink {
-                        OpenRockySTTProviderInstanceListView(sttProviderStore: sttProviderStore)
+                        OpenRockySTTProviderInstanceListView(
+                            sttProviderStore: sttProviderStore,
+                            chatProviderStore: providerStore,
+                            realtimeProviderStore: realtimeProviderStore,
+                            ttsProviderStore: ttsProviderStore
+                        )
                     } label: {
                         settingsRow(
                             icon: "mic.badge.waveform",
                             tint: .teal,
                             title: "Speech-to-Text",
-                            subtitle: sttStatusSummary
+                            subtitle: sttStatusSummary,
+                            healthStatus: sttProviderStore.activeInstance.map { healthService.status(for: $0.id) }
                         )
                     }
 
                     NavigationLink {
-                        OpenRockyTTSProviderInstanceListView(ttsProviderStore: ttsProviderStore)
+                        OpenRockyTTSProviderInstanceListView(
+                            ttsProviderStore: ttsProviderStore,
+                            chatProviderStore: providerStore,
+                            realtimeProviderStore: realtimeProviderStore,
+                            sttProviderStore: sttProviderStore
+                        )
                     } label: {
                         settingsRow(
                             icon: "speaker.wave.2.fill",
                             tint: .mint,
                             title: "Text-to-Speech",
-                            subtitle: ttsStatusSummary
+                            subtitle: ttsStatusSummary,
+                            healthStatus: ttsProviderStore.activeInstance.map { healthService.status(for: $0.id) }
                         )
                     }
                 } header: {
@@ -228,6 +242,14 @@ struct OpenRockyProviderSettingsView: View {
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                healthService.checkAll(
+                    chatStore: providerStore,
+                    realtimeStore: realtimeProviderStore,
+                    sttStore: sttProviderStore,
+                    ttsStore: ttsProviderStore
+                )
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Done") { dismiss() }
@@ -310,7 +332,7 @@ struct OpenRockyProviderSettingsView: View {
         return "\(enabled) of \(count) enabled"
     }
 
-    private func settingsRow(icon: String, tint: Color, title: String, subtitle: String) -> some View {
+    private func settingsRow(icon: String, tint: Color, title: String, subtitle: String, healthStatus: OpenRockyProviderHealthService.HealthStatus? = nil) -> some View {
         HStack(spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -327,8 +349,31 @@ struct OpenRockyProviderSettingsView: View {
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.secondary)
             }
+            Spacer()
+            if let status = healthStatus {
+                healthDot(status)
+            }
         }
         .padding(.vertical, 4)
+    }
+
+    @ViewBuilder
+    private func healthDot(_ status: OpenRockyProviderHealthService.HealthStatus) -> some View {
+        switch status {
+        case .unknown:
+            EmptyView()
+        case .checking:
+            ProgressView()
+                .controlSize(.mini)
+        case .healthy:
+            Circle()
+                .fill(.green)
+                .frame(width: 8, height: 8)
+        case .unhealthy:
+            Circle()
+                .fill(.red)
+                .frame(width: 8, height: 8)
+        }
     }
 }
 

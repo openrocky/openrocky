@@ -11,6 +11,9 @@ import SwiftUI
 
 struct OpenRockySTTProviderInstanceListView: View {
     @ObservedObject var sttProviderStore: OpenRockySTTProviderStore
+    var chatProviderStore: OpenRockyProviderStore? = nil
+    var realtimeProviderStore: OpenRockyRealtimeProviderStore? = nil
+    var ttsProviderStore: OpenRockyTTSProviderStore? = nil
     @State private var showProviderPicker = false
     @State private var selectedNewProvider: OpenRockySTTProviderKind?
 
@@ -53,7 +56,10 @@ struct OpenRockySTTProviderInstanceListView: View {
             OpenRockySTTProviderInstanceEditorView(
                 sttProviderStore: sttProviderStore,
                 editingInstanceID: nil,
-                initialProviderKind: kind
+                initialProviderKind: kind,
+                chatProviderStore: chatProviderStore,
+                realtimeProviderStore: realtimeProviderStore,
+                ttsProviderStore: ttsProviderStore
             )
         }
     }
@@ -65,7 +71,10 @@ struct OpenRockySTTProviderInstanceListView: View {
         NavigationLink {
             OpenRockySTTProviderInstanceEditorView(
                 sttProviderStore: sttProviderStore,
-                editingInstanceID: instance.id
+                editingInstanceID: instance.id,
+                chatProviderStore: chatProviderStore,
+                realtimeProviderStore: realtimeProviderStore,
+                ttsProviderStore: ttsProviderStore
             )
         } label: {
             HStack {

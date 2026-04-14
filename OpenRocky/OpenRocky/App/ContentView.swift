@@ -140,7 +140,9 @@ struct ContentView: View {
         }) {
             OpenRockyOnboardingView(
                 providerStore: chatProviderStore,
-                realtimeProviderStore: voiceProviderStore
+                realtimeProviderStore: voiceProviderStore,
+                sttProviderStore: sttProviderStore,
+                ttsProviderStore: ttsProviderStore
             )
         }
         .overlay { keyboardShortcutButtons }

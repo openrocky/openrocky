@@ -153,10 +153,14 @@ private struct OpenRockyChatViewControllerRepresentable: UIViewControllerReprese
         dictationService.onRecordingStateChanged = { [weak controller] isRecording in
             controller?.chatInputView.setDictating(isRecording)
         }
+        dictationService.onAudioLevelUpdate = { [weak controller] level in
+            controller?.chatInputView.updateDictationAudioLevel(level)
+        }
+        // Short tap: auto-VAD mode (stop on silence)
         controller.onDictationRequested = { [weak controller] in
             guard let controller else { return }
             if sttConfig.isConfigured {
-                dictationService.startDictation(configuration: sttConfig)
+                dictationService.startDictation(configuration: sttConfig, mode: .autoVAD)
             } else {
                 // Fall back to Apple's built-in speech recognition
                 controller.chatInputView.presentSpeechRecognition()
@@ -164,6 +168,15 @@ private struct OpenRockyChatViewControllerRepresentable: UIViewControllerReprese
         }
         controller.onDictationCancelled = {
             dictationService.stopDictation()
+        }
+        // Long press: push-to-talk mode (hold to record, release to stop)
+        controller.onPushToTalkBegan = {
+            if sttConfig.isConfigured {
+                dictationService.startDictation(configuration: sttConfig, mode: .pushToTalk)
+            }
+        }
+        controller.onPushToTalkEnded = {
+            dictationService.requestStop()
         }
         // Keep dictation service alive
         objc_setAssociatedObject(controller, "dictationService", dictationService, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
