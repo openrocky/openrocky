@@ -129,44 +129,43 @@ final class AudioPCMPlayer {
 
   // MARK: - Private Helpers
 
-  private func convertToPCM32(audioData: Data) -> AVAudioPCMBuffer? {
-    var bufferList = AudioBufferList(
-      mNumberBuffers: 1,
-      mBuffers:
-      AudioBuffer(
-        mNumberChannels: 1,
-        mDataByteSize: UInt32(audioData.count),
-        mData: UnsafeMutableRawPointer(mutating: (audioData as NSData).bytes)))
+  /// Number of samples for fade-in/fade-out (~2ms at 24kHz).
+  /// Matches the official GLM pcm-player which uses 50-sample linear fades
+  /// to eliminate clicks/pops at buffer boundaries.
+  private let fadeSamples: Int = 50
 
-    guard
-      let inPCMBuf = AVAudioPCMBuffer(
-        pcmFormat: inputFormat,
-        bufferListNoCopy: &bufferList)
-    else {
-      logger.error("Could not create input buffer for audio playback")
-      return nil
-    }
+  private func convertToPCM32(audioData: Data) -> AVAudioPCMBuffer? {
+    let sampleCount = audioData.count / 2  // PCM16 = 2 bytes per sample
+    guard sampleCount > 0 else { return nil }
 
     guard
       let outPCMBuf = AVAudioPCMBuffer(
         pcmFormat: playableFormat,
-        frameCapacity: AVAudioFrameCount(UInt32(audioData.count) * 2))
+        frameCapacity: AVAudioFrameCount(sampleCount))
     else {
       logger.error("Could not create output buffer for audio playback")
       return nil
     }
 
-    guard let converter = AVAudioConverter(from: inputFormat, to: playableFormat) else {
-      logger.error("Could not create audio converter needed to map from pcm16int to pcm32float")
-      return nil
+    // Convert PCM16 Int to PCM32 Float directly (no AVAudioConverter needed)
+    // and apply fade-in/fade-out in the same pass.
+    guard let channelData = outPCMBuf.floatChannelData?[0] else { return nil }
+    audioData.withUnsafeBytes { rawBuffer in
+      let int16Ptr = rawBuffer.bindMemory(to: Int16.self)
+      for i in 0..<sampleCount {
+        var sample = Float(int16Ptr[i]) / 32768.0
+        // Fade-in: ramp from 0 to 1 over the first fadeSamples
+        if i < fadeSamples {
+          sample *= Float(i) / Float(fadeSamples)
+        }
+        // Fade-out: ramp from 1 to 0 over the last fadeSamples
+        if i >= sampleCount - fadeSamples {
+          sample *= Float(sampleCount - 1 - i) / Float(fadeSamples)
+        }
+        channelData[i] = sample
+      }
     }
-
-    do {
-      try converter.convert(to: outPCMBuf, from: inPCMBuf)
-    } catch {
-      logger.error("Could not map from pcm16int to pcm32float: \(error.localizedDescription)")
-      return nil
-    }
+    outPCMBuf.frameLength = AVAudioFrameCount(sampleCount)
 
     return outPCMBuf
   }
