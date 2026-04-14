@@ -23,6 +23,7 @@ struct OpenRockyTTSProviderInstanceEditorView: View {
     @State private var selectedVoice: String = ""
     @State private var customHost: String = ""
     @State private var nameManuallyEdited: Bool = false
+    @StateObject private var ttsPreview = OpenRockyTTSPreview()
 
     private var isNew: Bool { editingInstanceID == nil }
 
@@ -130,12 +131,43 @@ struct OpenRockyTTSProviderInstanceEditorView: View {
                                     .lineLimit(2)
                             }
                             Spacer()
+                            // Play/Stop preview button
+                            Button {
+                                if ttsPreview.playingVoice == voice.id {
+                                    ttsPreview.stop()
+                                } else {
+                                    ttsPreview.play(
+                                        voice: voice.id,
+                                        provider: selectedProvider,
+                                        modelID: modelID.isEmpty ? selectedProvider.defaultModel : modelID,
+                                        credential: credential,
+                                        customHost: customHost.isEmpty ? nil : customHost
+                                    )
+                                }
+                            } label: {
+                                if ttsPreview.playingVoice == voice.id && ttsPreview.isLoading {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                } else {
+                                    Image(systemName: ttsPreview.playingVoice == voice.id ? "stop.circle.fill" : "play.circle.fill")
+                                        .font(.system(size: 26))
+                                        .foregroundStyle(ttsPreview.playingVoice == voice.id ? .orange : .accentColor)
+                                }
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                     .buttonStyle(.plain)
                 }
+                if let err = ttsPreview.error {
+                    Text(err)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
             } header: {
                 Text("Voice")
+            } footer: {
+                Text("Tap the play button to preview a voice. Requires a valid API key.")
             }
 
             Section {
@@ -152,7 +184,9 @@ struct OpenRockyTTSProviderInstanceEditorView: View {
         .navigationTitle(isNew ? "Add TTS Provider" : "Edit TTS Provider")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { loadExisting() }
+        .onDisappear { ttsPreview.stop() }
         .onChange(of: selectedProvider) { _, newValue in
+            ttsPreview.stop()
             if !nameManuallyEdited {
                 name = newValue.displayName
             }
@@ -164,6 +198,7 @@ struct OpenRockyTTSProviderInstanceEditorView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Save") {
+                    ttsPreview.stop()
                     saveInstance()
                     dismiss()
                 }

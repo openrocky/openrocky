@@ -23,6 +23,7 @@ struct OpenRockySTTProviderInstanceEditorView: View {
     @State private var customHost: String = ""
     @State private var language: String = ""
     @State private var nameManuallyEdited: Bool = false
+    @StateObject private var sttTest = OpenRockySTTTest()
 
     private var isNew: Bool { editingInstanceID == nil }
 
@@ -131,11 +132,83 @@ struct OpenRockySTTProviderInstanceEditorView: View {
             } footer: {
                 Text("Optional. Override the default API endpoint.")
             }
+
+            // Test section
+            Section {
+                Button {
+                    if case .recording = sttTest.state {
+                        sttTest.stop()
+                    } else {
+                        sttTest.startTest(
+                            provider: selectedProvider,
+                            modelID: modelID.isEmpty ? selectedProvider.defaultModel : modelID,
+                            credential: credential,
+                            customHost: customHost.isEmpty ? nil : customHost,
+                            language: language.isEmpty ? nil : language
+                        )
+                    }
+                } label: {
+                    HStack(spacing: 10) {
+                        switch sttTest.state {
+                        case .idle:
+                            Image(systemName: "mic.circle.fill")
+                                .foregroundStyle(Color.accentColor)
+                            Text("Test Speech Recognition")
+                                .foregroundStyle(Color.accentColor)
+                        case .recording(let seconds):
+                            Image(systemName: "mic.fill")
+                                .foregroundStyle(.red)
+                                .symbolEffect(.pulse)
+                            Text("Recording... \(seconds)s")
+                                .foregroundStyle(.red)
+                        case .transcribing:
+                            ProgressView()
+                                .controlSize(.small)
+                            Text("Transcribing...")
+                                .foregroundStyle(.secondary)
+                        case .success(let text):
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundStyle(.green)
+                            Text(text)
+                                .foregroundStyle(.primary)
+                                .lineLimit(3)
+                        case .failure(let message):
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.red)
+                            Text(message)
+                                .foregroundStyle(.red)
+                                .lineLimit(5)
+                        }
+                        Spacer()
+                    }
+                    .font(.system(size: 14, weight: .semibold))
+                }
+                .disabled(sttTest.state == .transcribing || credential.isEmpty)
+
+                if case .success = sttTest.state {
+                    Button("Test Again") {
+                        sttTest.reset()
+                    }
+                    .font(.system(size: 14))
+                }
+                if case .failure = sttTest.state {
+                    Button("Try Again") {
+                        sttTest.reset()
+                    }
+                    .font(.system(size: 14))
+                }
+            } header: {
+                Text("Test")
+            } footer: {
+                Text("Records 4 seconds of microphone audio and sends it for transcription. Requires microphone permission.")
+            }
         }
         .navigationTitle(isNew ? "Add STT Provider" : "Edit STT Provider")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { loadExisting() }
+        .onDisappear { sttTest.stop() }
         .onChange(of: selectedProvider) { _, newValue in
+            sttTest.reset()
             if !nameManuallyEdited {
                 name = newValue.displayName
             }
@@ -146,6 +219,7 @@ struct OpenRockySTTProviderInstanceEditorView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Save") {
+                    sttTest.stop()
                     saveInstance()
                     dismiss()
                 }
