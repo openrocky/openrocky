@@ -74,18 +74,18 @@ final class AudioPCMPlayer {
   public var onPlaybackDrained: (() -> Void)?
 
   // MARK: - Initial Buffering
-  // Accumulate the first few audio chunks before starting playback to prevent
-  // buffer underruns that cause clicking/beeping artifacts. Once enough data is
-  // buffered, all accumulated chunks are scheduled at once for gapless playback.
+  // Accumulate the first few audio chunks as raw PCM16 data and merge into a
+  // single continuous AVAudioPCMBuffer before scheduling playback. This matches
+  // the approach used by official GLM SDKs (pcm-player flushTime: 500ms,
+  // realtime-front 200KB accumulation) and eliminates micro-gaps between tiny
+  // individually-scheduled buffers that cause clicking/beeping artifacts.
 
-  /// Accumulated PCM buffers waiting to be flushed.
-  private var accumulatedBuffers: [AVAudioPCMBuffer] = []
-  /// Total raw byte count of accumulated audio data.
-  private var accumulatedByteCount: Int = 0
+  /// Accumulated raw PCM16 data waiting to be flushed as a single buffer.
+  private var accumulatedPCMData = Data()
   /// Whether initial buffering has completed and playback has started.
   private var hasStartedPlayback: Bool = false
-  /// Byte threshold before flushing initial buffer (~300ms at 24kHz mono 16-bit).
-  private let initialBufferThreshold: Int = 14_400
+  /// Byte threshold before flushing initial buffer (~500ms at 24kHz mono 16-bit).
+  private let initialBufferThreshold: Int = 24_000
 
   public func playPCM16Audio(from base64String: String) {
     guard let audioData = Data(base64Encoded: base64String) else {
@@ -93,31 +93,32 @@ final class AudioPCMPlayer {
       return
     }
 
-    guard let outPCMBuf = convertToPCM32(audioData: audioData) else { return }
-
     if hasStartedPlayback {
-      scheduleBuffer(outPCMBuf)
+      // After initial buffering, schedule each chunk immediately.
+      // The player has a ~500ms head start so underruns are unlikely.
+      if let buf = convertToPCM32(audioData: audioData) {
+        scheduleBuffer(buf)
+      }
     } else {
-      accumulatedBuffers.append(outPCMBuf)
-      accumulatedByteCount += audioData.count
-      if accumulatedByteCount >= initialBufferThreshold {
-        flushAccumulatedBuffers()
+      // Accumulate raw PCM16 bytes; will be merged into one buffer on flush
+      accumulatedPCMData.append(audioData)
+      if accumulatedPCMData.count >= initialBufferThreshold {
+        flushAccumulatedData()
       }
     }
   }
 
-  /// Force-flush any accumulated audio buffers and start playback.
+  /// Force-flush any accumulated audio data and start playback.
   /// Call this when the server signals no more audio is coming (response.audio.done)
   /// to handle responses shorter than the buffer threshold.
   public func flushBufferedAudio() {
-    guard !hasStartedPlayback, !accumulatedBuffers.isEmpty else { return }
-    flushAccumulatedBuffers()
+    guard !hasStartedPlayback, !accumulatedPCMData.isEmpty else { return }
+    flushAccumulatedData()
   }
 
   public func interruptPlayback() {
-    // Clear any accumulated buffers that haven't started playing yet
-    accumulatedBuffers.removeAll()
-    accumulatedByteCount = 0
+    // Clear any accumulated data that hasn't started playing yet
+    accumulatedPCMData = Data()
     hasStartedPlayback = false
 
     guard pendingBufferCount > 0 else { return }
@@ -189,13 +190,16 @@ final class AudioPCMPlayer {
     }
   }
 
-  private func flushAccumulatedBuffers() {
-    logger.debug("Flushing \(self.accumulatedBuffers.count) buffered audio chunks (\(self.accumulatedByteCount) bytes)")
-    for buffer in accumulatedBuffers {
-      scheduleBuffer(buffer)
+  /// Merge all accumulated raw PCM16 data into a single continuous buffer
+  /// and schedule it for playback. This avoids micro-gaps between small buffers.
+  private func flushAccumulatedData() {
+    let byteCount = accumulatedPCMData.count
+    guard byteCount > 0 else { return }
+    logger.debug("Flushing \(byteCount) bytes of accumulated PCM16 as single buffer")
+    if let buf = convertToPCM32(audioData: accumulatedPCMData) {
+      scheduleBuffer(buf)
     }
-    accumulatedBuffers.removeAll()
-    accumulatedByteCount = 0
+    accumulatedPCMData = Data()
     hasStartedPlayback = true
   }
 
