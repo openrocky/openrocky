@@ -34,7 +34,7 @@ class InputEditor: EditorSectionView {
     let voiceStatusLabel = UILabel()
 
     /// When true, only the + button and text/send are shown (no camera or mic).
-    var minimalistLayout: Bool = true
+    var minimalistLayout: Bool = false
 
     let inset: UIEdgeInsets = .init(top: 10, left: 10, bottom: 10, right: 10)
     let iconSpacing: CGFloat = 10
@@ -70,6 +70,24 @@ class InputEditor: EditorSectionView {
 
     /// Configuration injected from ChatInputView.
     var configuration: ChatInputConfiguration = .default
+
+    /// Whether the input is currently in dictation mode (recording for STT).
+    var isDictating: Bool = false {
+        didSet {
+            guard oldValue != isDictating else { return }
+            doWithAnimation { [self] in
+                if isDictating {
+                    voiceButton.change(icon: "mic.fill")
+                    voiceButton.tintColor = .systemRed
+                    placeholderLabel.text = String.localized("Listening...")
+                } else {
+                    voiceButton.change(icon: "mic")
+                    voiceButton.tintColor = .label
+                    placeholderLabel.text = String.localized("Type something...")
+                }
+            }
+        }
+    }
 
     weak var delegate: Delegate?
 
@@ -121,7 +139,12 @@ class InputEditor: EditorSectionView {
         placeholderLabel.textColor = .placeholderText
         elementClipper.addSubview(placeholderLabel)
         voiceButton.tapAction = { [weak self] in
-            self?.delegate?.onInputEditorMicButtonTapped()
+            guard let self else { return }
+            if isDictating {
+                delegate?.onInputEditorDictationCancelled()
+            } else {
+                delegate?.onInputEditorDictationRequested()
+            }
         }
         elementClipper.addSubview(voiceButton)
         moreButton.tapAction = { [weak self] in

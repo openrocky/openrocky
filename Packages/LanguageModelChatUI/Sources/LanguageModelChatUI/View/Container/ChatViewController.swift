@@ -72,6 +72,10 @@ open class ChatViewController: UIViewController {
     public var onConversationListTap: (() -> Void)?
     /// Called when the user taps the prompts button in the control panel.
     public var onPromptsTap: (() -> Void)?
+    /// Called when the user taps the mic button to start STT dictation.
+    public var onDictationRequested: (() -> Void)?
+    /// Called when the user cancels an in-progress dictation.
+    public var onDictationCancelled: (() -> Void)?
 
     public weak var menuDelegate: ChatViewControllerMenuDelegate? {
         didSet {
@@ -577,6 +581,14 @@ extension ChatViewController: ChatInputDelegate {
 
     public func chatInputDidTapPrompts(_: ChatInputView) {
         onPromptsTap?()
+    }
+
+    public func chatInputDidRequestDictation(_: ChatInputView) {
+        onDictationRequested?()
+    }
+
+    public func chatInputDidCancelDictation(_: ChatInputView) {
+        onDictationCancelled?()
     }
 
     /// Programmatically set text in the input and submit it.

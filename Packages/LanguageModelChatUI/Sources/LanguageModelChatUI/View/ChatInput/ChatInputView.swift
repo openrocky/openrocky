@@ -283,6 +283,20 @@ open class ChatInputView: EditorSectionView {
         inputEditor.layoutStatus == .voice
     }
 
+    /// Set dictation state (recording indicator on mic button).
+    public func setDictating(_ active: Bool) {
+        inputEditor.isDictating = active
+    }
+
+    /// Insert dictated text into the input field and end dictation state.
+    public func insertDictatedText(_ text: String) {
+        let existing = inputEditor.textView.text ?? ""
+        let separator = existing.isEmpty ? "" : " "
+        inputEditor.set(text: existing + separator + text)
+        inputEditor.isDictating = false
+        inputEditor.textView.becomeFirstResponder()
+    }
+
     public func prepareForReuse() {
         storage = .init(id: "-1")
         resetValues()

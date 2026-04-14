@@ -237,6 +237,7 @@ struct ContentView: View {
             bootstrap: shellRuntime.probe,
             transcript: sessionRuntime.session.liveTranscript,
             providerConfiguration: chatProviderStore.configuration,
+            sttConfiguration: sttProviderStore.configuration,
             skillStore: skillStore,
             contentTopInset: 0,
             conversationID: conversationID,

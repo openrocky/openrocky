@@ -15,6 +15,7 @@ struct OpenRockyChatExperienceScreen: View {
     let bootstrap: OpenRockyShellProbeResult?
     let transcript: String
     let providerConfiguration: OpenRockyProviderConfiguration
+    let sttConfiguration: OpenRockySTTProviderConfiguration
     let skillStore: OpenRockyBuiltInToolStore
     let contentTopInset: CGFloat
     let conversationID: String
@@ -33,6 +34,7 @@ struct OpenRockyChatExperienceScreen: View {
                     transcript: transcript,
                     bootstrap: bootstrap,
                     providerConfiguration: providerConfiguration,
+                    sttConfiguration: sttConfiguration,
                     skillStore: skillStore,
                     contentTopInset: contentTopInset,
                     conversationID: conversationID,
@@ -86,6 +88,7 @@ private struct OpenRockyChatViewControllerRepresentable: UIViewControllerReprese
     let transcript: String
     let bootstrap: OpenRockyShellProbeResult?
     let providerConfiguration: OpenRockyProviderConfiguration
+    let sttConfiguration: OpenRockySTTProviderConfiguration
     let skillStore: OpenRockyBuiltInToolStore
     let contentTopInset: CGFloat
     let conversationID: String
@@ -135,6 +138,36 @@ private struct OpenRockyChatViewControllerRepresentable: UIViewControllerReprese
             }
             controller.present(picker, animated: true)
         }
+        // Dictation: mic button in input bar → record → STT → insert text
+        let sttConfig = sttConfiguration
+        let dictationService = OpenRockyDictationService()
+        dictationService.onResult = { [weak controller] text in
+            controller?.chatInputView.insertDictatedText(text)
+        }
+        dictationService.onError = { [weak controller] error in
+            controller?.chatInputView.setDictating(false)
+            let alert = UIAlertController(title: "Dictation Failed", message: error, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            controller?.present(alert, animated: true)
+        }
+        dictationService.onRecordingStateChanged = { [weak controller] isRecording in
+            controller?.chatInputView.setDictating(isRecording)
+        }
+        controller.onDictationRequested = { [weak controller] in
+            guard let controller else { return }
+            if sttConfig.isConfigured {
+                dictationService.startDictation(configuration: sttConfig)
+            } else {
+                // Fall back to Apple's built-in speech recognition
+                controller.chatInputView.presentSpeechRecognition()
+            }
+        }
+        controller.onDictationCancelled = {
+            dictationService.stopDictation()
+        }
+        // Keep dictation service alive
+        objc_setAssociatedObject(controller, "dictationService", dictationService, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+
         controller.onLinkTap = { [weak controller] url in
             if url.scheme == "rocky", url.host == "workspace" {
                 // rocky://workspace/path/to/file.md

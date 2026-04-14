@@ -74,6 +74,14 @@ extension ChatInputView: InputEditor.Delegate {
     func onInputEditorVoiceSessionStop() {
         delegate?.chatInputDidStopVoiceSession(self)
     }
+
+    func onInputEditorDictationRequested() {
+        delegate?.chatInputDidRequestDictation(self)
+    }
+
+    func onInputEditorDictationCancelled() {
+        delegate?.chatInputDidCancelDictation(self)
+    }
 }
 
 // MARK: - AttachmentsBar.Delegate
@@ -127,7 +135,7 @@ extension ChatInputView: ControlPanel.Delegate {
 // MARK: - Speech Recognition
 
 extension ChatInputView {
-    func presentSpeechRecognition() {
+    public func presentSpeechRecognition() {
         let controller = SimpleSpeechController()
         controller.callback = { [weak self] text in
             self?.inputEditor.set(
