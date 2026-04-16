@@ -99,8 +99,22 @@ fi
 # No separate altool/notarytool step needed.
 
 DESTINATION="upload"
-if [[ -z "${APPLE_ID:-}" || -z "${APPLE_APP_SPECIFIC_PASSWORD:-}" ]]; then
-    log "No APPLE_ID / APPLE_APP_SPECIFIC_PASSWORD set. Exporting IPA only."
+AUTH_FLAGS=()
+
+if [[ -n "${ASC_API_KEY_ID:-}" && -n "${ASC_API_ISSUER_ID:-}" ]]; then
+    # Preferred: App Store Connect API key authentication
+    AUTH_FLAGS+=(-authenticationKeyID "$ASC_API_KEY_ID" -authenticationKeyIssuerID "$ASC_API_ISSUER_ID")
+    if [[ -n "${ASC_API_KEY_P8_PATH:-}" ]]; then
+        AUTH_FLAGS+=(-authenticationKeyPath "$ASC_API_KEY_P8_PATH")
+    fi
+    log "Using ASC API Key authentication"
+elif [[ -n "${APPLE_ID:-}" && -n "${APPLE_APP_SPECIFIC_PASSWORD:-}" ]]; then
+    # Fallback: Apple ID + app-specific password (requires Xcode account)
+    log "Using Apple ID authentication"
+else
+    log "No auth configured. Exporting IPA only (no upload)."
+    log "Set ASC_API_KEY_ID + ASC_API_ISSUER_ID + ASC_API_KEY_P8_PATH for API key auth,"
+    log "or APPLE_ID + APPLE_APP_SPECIFIC_PASSWORD for Apple ID auth."
     DESTINATION="export"
 fi
 
@@ -133,13 +147,13 @@ xcodebuild -exportArchive \
     -archivePath "$ARCHIVE" \
     -exportPath "$EXPORT_DIR" \
     -exportOptionsPlist "$EXPORT_PLIST" \
-    -allowProvisioningUpdates
+    -allowProvisioningUpdates \
+    "${AUTH_FLAGS[@]}"
 
 if [[ "$DESTINATION" == "export" ]]; then
     IPA=$(find "$EXPORT_DIR" -name "*.ipa" -print -quit)
     log "IPA exported: $IPA"
     log "Upload manually: open Transporter.app and drag the IPA"
-    log "Or set APPLE_ID + APPLE_APP_SPECIFIC_PASSWORD to auto-upload"
     exit 0
 fi
 

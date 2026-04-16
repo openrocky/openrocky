@@ -10,6 +10,10 @@ let package = Package(
     ],
     products: [
         .library(
+            name: "ServerEvent",
+            targets: ["ServerEvent"]
+        ),
+        .library(
             name: "ChatClientKit",
             targets: ["ChatClientKit"]
         ),
