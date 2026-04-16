@@ -63,6 +63,28 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
         }
     }
 
+    /// Human-readable description for each suggested model.
+    nonisolated func modelDescription(_ modelID: String) -> String? {
+        switch (self, modelID) {
+        case (.openAI, "tts-1"):
+            "Standard quality, fastest response (~0.3s latency)"
+        case (.openAI, "tts-1-hd"):
+            "HD quality, richer audio detail, slightly slower"
+        case (.miniMax, "speech-02-hd"):
+            "HD quality with emotional expression"
+        case (.miniMax, "speech-02"):
+            "Standard quality, lower latency"
+        case (.elevenLabs, "eleven_multilingual_v2"):
+            "Best quality, 29 languages, highest accuracy"
+        case (.elevenLabs, "eleven_turbo_v2_5"):
+            "Low latency, English-optimized"
+        case (.elevenLabs, "eleven_flash_v2_5"):
+            "Ultra-fast, good for real-time use"
+        default:
+            nil
+        }
+    }
+
     nonisolated var summary: String {
         switch self {
         case .openAI:

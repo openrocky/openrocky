@@ -21,7 +21,7 @@ struct OpenRockySTTProviderInstanceListView: View {
         List {
             if sttProviderStore.instances.isEmpty {
                 Section {
-                    Text("No speech recognition providers configured. Add one to enable voice input with the traditional pipeline.")
+                    Text("No speech recognition providers configured. Add one to enable voice input with the Classic pipeline or chat dictation.")
                         .foregroundStyle(.secondary)
                 }
             } else {

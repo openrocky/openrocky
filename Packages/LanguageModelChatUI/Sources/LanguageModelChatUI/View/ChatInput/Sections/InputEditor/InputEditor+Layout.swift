@@ -246,22 +246,24 @@ extension InputEditor {
             textLeading = conversationListButton.frame.maxX + iconSpacing
             textTrailing = moreButton.frame.minX - iconSpacing
         } else {
-            bossButton.frame = CGRect(
-                x: inset.left,
-                y: inset.top,
-                width: iconSize.width,
-                height: iconSize.height
-            )
-            bossButton.alpha = 1
-            voiceButton.frame = CGRect(
-                x: moreButton.frame.minX - iconSize.width - iconSpacing,
-                y: inset.top,
-                width: iconSize.width,
-                height: iconSize.height
-            )
-            voiceButton.alpha = 1
-            textLeading = bossButton.frame.maxX + iconSpacing
-            textTrailing = voiceButton.frame.minX - iconSpacing
+            // Camera button is hidden in standard layout — it overlaps the conversation list button
+            bossButton.alpha = 0
+
+            if sttAvailable {
+                voiceButton.frame = CGRect(
+                    x: moreButton.frame.minX - iconSize.width - iconSpacing,
+                    y: inset.top,
+                    width: iconSize.width,
+                    height: iconSize.height
+                )
+                voiceButton.alpha = 1
+                textLeading = conversationListButton.frame.maxX + iconSpacing
+                textTrailing = voiceButton.frame.minX - iconSpacing
+            } else {
+                voiceButton.alpha = 0
+                textLeading = conversationListButton.frame.maxX + iconSpacing
+                textTrailing = moreButton.frame.minX - iconSpacing
+            }
         }
 
         let textLayoutHeight = textLayoutHeight(textHeight.value)

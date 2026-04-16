@@ -15,6 +15,7 @@ struct OpenRockyPreferencesView: View {
 
     var body: some View {
         List {
+            // Voice Pipeline mode selector
             Section {
                 ForEach(OpenRockyVoiceMode.allCases) { mode in
                     Button {
@@ -46,53 +47,37 @@ struct OpenRockyPreferencesView: View {
             } header: {
                 Text("Voice Pipeline")
             } footer: {
-                if voiceMode == OpenRockyVoiceMode.traditional.rawValue {
-                    Text("Requires Speech-to-Text, Chat, and Text-to-Speech providers to be configured in Settings > Providers.")
+                if voiceMode == OpenRockyVoiceMode.classic.rawValue {
+                    Text("Requires Speech-to-Text, Chat, and Text-to-Speech providers to be configured.")
                 } else {
                     Text("Requires a Realtime voice provider (OpenAI or GLM) to be configured.")
                 }
             }
 
+            // Voice session settings — merged into one section
             Section {
                 Toggle("Voice Interruption", isOn: $preferences.voiceInterruptionEnabled)
-                if preferences.voiceInterruptionEnabled {
-                    Text("When enabled, speaking while the assistant is talking will interrupt playback.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            } header: {
-                Text("Voice")
-            } footer: {
-                Text("Configure voice session behavior.")
-            }
-
-            Section {
                 Toggle("Auto Greeting", isOn: $preferences.voiceAutoGreeting)
                 Toggle("Show Transcript", isOn: $preferences.voiceTranscriptVisible)
-            } header: {
-                Text("Voice Session")
-            }
-
-            Section {
                 Stepper(
                     "Context Messages: \(preferences.voiceContextMessageCount)",
                     value: $preferences.voiceContextMessageCount,
-                    in: 2...50,
+                    in: 2...100,
                     step: 2
                 )
             } header: {
-                Text("Voice Context")
+                Text("Voice Session")
             } footer: {
-                Text("Number of recent messages included as context for voice mode. More context = better memory but higher latency and cost.")
+                if voiceMode == OpenRockyVoiceMode.classic.rawValue {
+                    Text("In Classic mode, all messages are used as context. Older messages are auto-compressed when history exceeds this threshold.")
+                } else {
+                    Text("Number of recent messages included as context for Realtime voice mode. More context = better memory but higher latency.")
+                }
             }
 
+            // General settings
             Section {
                 Toggle("Auto-save Conversations", isOn: $preferences.chatAutoSaveConversation)
-            } header: {
-                Text("Chat")
-            }
-
-            Section {
                 Toggle("Haptic Feedback", isOn: $preferences.hapticFeedbackEnabled)
             } header: {
                 Text("General")

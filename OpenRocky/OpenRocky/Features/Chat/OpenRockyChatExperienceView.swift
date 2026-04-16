@@ -121,6 +121,7 @@ private struct OpenRockyChatViewControllerRepresentable: UIViewControllerReprese
             controller?.submitText(prompt)
         }
         controller.emptyStateView = emptyState
+        controller.sttAvailable = sttConfiguration.isConfigured
         controller.onVoiceSessionToggle = onVoiceToggle
         controller.onVoiceSessionStop = onVoiceStop
         controller.onConversationListTap = onConversationListTap

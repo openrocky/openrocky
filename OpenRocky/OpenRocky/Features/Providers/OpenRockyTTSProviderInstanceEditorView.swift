@@ -127,9 +127,16 @@ struct OpenRockyTTSProviderInstanceEditorView: View {
                             Image(systemName: modelID == model ? "checkmark.circle.fill" : "circle")
                                 .foregroundStyle(modelID == model ? Color.accentColor : .secondary)
                                 .font(.system(size: 18))
-                            Text(model)
-                                .foregroundStyle(.primary)
-                                .font(.system(.subheadline, design: .monospaced))
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(model)
+                                    .foregroundStyle(.primary)
+                                    .font(.system(.subheadline, design: .monospaced))
+                                if let desc = selectedProvider.modelDescription(model) {
+                                    Text(desc)
+                                        .foregroundStyle(.secondary)
+                                        .font(.caption2)
+                                }
+                            }
                             Spacer()
                         }
                     }

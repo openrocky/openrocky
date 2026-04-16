@@ -36,6 +36,11 @@ class InputEditor: EditorSectionView {
     /// When true, only the + button and text/send are shown (no camera or mic).
     var minimalistLayout: Bool = false
 
+    /// Whether STT (speech-to-text) dictation is available. Controls mic button visibility.
+    var sttAvailable: Bool = false {
+        didSet { setNeedsLayout() }
+    }
+
     let inset: UIEdgeInsets = .init(top: 10, left: 10, bottom: 10, right: 10)
     let iconSpacing: CGFloat = 10
     let iconSize = CGSize(width: 30, height: 30)

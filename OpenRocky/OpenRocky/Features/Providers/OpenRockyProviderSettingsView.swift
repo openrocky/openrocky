@@ -101,7 +101,7 @@ struct OpenRockyProviderSettingsView: View {
                 } header: {
                     Text("Voice Pipeline")
                 } footer: {
-                    Text("Realtime mode uses Voice (Realtime). Traditional mode uses STT + Chat + TTS.")
+                    Text("Realtime mode uses Voice (Realtime). Classic mode uses STT + Chat + TTS.")
                 }
 
                 // Intelligence: character, tools, skills, memory
@@ -252,8 +252,14 @@ struct OpenRockyProviderSettingsView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .fontWeight(.semibold)
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 20))
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }

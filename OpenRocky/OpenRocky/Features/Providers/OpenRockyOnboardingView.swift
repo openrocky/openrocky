@@ -31,13 +31,15 @@ struct OpenRockyOnboardingView: View {
 
     @State private var floatingOffset: CGFloat = 0
 
-    @State private var enableTraditionalVoice = false
+    @State private var enableClassicVoice = false
+    @State private var oauthState: OpenAIOAuthState = .idle
 
     private enum OnboardingStep: Comparable {
         case welcome
         case providerChoice
+        case authMethod       // OpenAI only: choose API Key or OAuth
         case apiKey
-        case traditionalVoice
+        case classicVoice
         case done
     }
 
@@ -127,7 +129,7 @@ struct OpenRockyOnboardingView: View {
         }
 
         /// Whether this provider has STT/TTS that can be set up with the same key.
-        var supportsTraditionalVoice: Bool {
+        var supportsClassicVoice: Bool {
             switch self {
             case .openAI: true
             case .glm: false
@@ -159,10 +161,12 @@ struct OpenRockyOnboardingView: View {
                     welcomeStep
                 case .providerChoice:
                     providerChoiceStep
+                case .authMethod:
+                    authMethodStep
                 case .apiKey:
                     apiKeyStep
-                case .traditionalVoice:
-                    traditionalVoiceStep
+                case .classicVoice:
+                    classicVoiceStep
                 case .done:
                     doneStep
                 }
@@ -183,7 +187,7 @@ struct OpenRockyOnboardingView: View {
             Circle()
                 .fill(
                     RadialGradient(
-                        colors: [OpenRockyPalette.accent.opacity(0.12), .clear],
+                        colors: [OpenRockyPalette.accent.opacity(0.06), .clear],
                         center: .center,
                         startRadius: 20,
                         endRadius: 300
@@ -327,8 +331,10 @@ struct OpenRockyOnboardingView: View {
                 Button {
                     apiKey = ""
                     customHost = ""
+                    oauthState = .idle
                     withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
-                        step = .apiKey
+                        // OpenAI supports both API Key and OAuth — show auth method choice
+                        step = selectedProvider == .openAI ? .authMethod : .apiKey
                     }
                 } label: {
                     HStack(spacing: 8) {
@@ -432,6 +438,189 @@ struct OpenRockyOnboardingView: View {
             )
         }
         .buttonStyle(.plain)
+    }
+
+    // MARK: - Auth Method (OpenAI only)
+
+    private var authMethodStep: some View {
+        VStack(spacing: 24) {
+            Spacer()
+
+            ZStack {
+                ForEach(0..<3, id: \.self) { i in
+                    Circle()
+                        .stroke(OpenRockyPalette.accent.opacity(0.15), lineWidth: 1.5)
+                        .frame(width: CGFloat(80 + i * 40), height: CGFloat(80 + i * 40))
+                }
+
+                Image(systemName: "lock.shield.fill")
+                    .font(.system(size: 48))
+                    .foregroundStyle(OpenRockyPalette.accent)
+            }
+
+            VStack(spacing: 12) {
+                Text("How to Connect")
+                    .font(.system(size: 26, weight: .black, design: .rounded))
+                    .foregroundStyle(OpenRockyPalette.text)
+
+                Text("Choose how you want to authenticate with OpenAI.")
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+
+            VStack(spacing: 12) {
+                // API Key option
+                authMethodCard(
+                    icon: "key.fill",
+                    title: "API Key",
+                    subtitle: "Paste your OpenAI API key. Works with all models.",
+                    action: {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                            step = .apiKey
+                        }
+                    }
+                )
+
+                // OAuth option
+                authMethodCard(
+                    icon: "person.badge.key.fill",
+                    title: "Sign in with OpenAI",
+                    subtitle: "Use your ChatGPT account. No API key needed.",
+                    isLoading: oauthState == .authenticating,
+                    action: {
+                        signInWithOAuth()
+                    }
+                )
+
+                if case let .failed(message) = oauthState {
+                    Text(message)
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(.red)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 8)
+                }
+            }
+            .padding(.horizontal, 30)
+
+            Spacer()
+
+            Button {
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                    step = .providerChoice
+                }
+            } label: {
+                Text("Back")
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .foregroundStyle(OpenRockyPalette.muted)
+                    .padding(.vertical, 8)
+            }
+            .padding(.bottom, 40)
+        }
+        .padding(.horizontal, 32)
+        .frame(maxWidth: 500)
+    }
+
+    private func authMethodCard(
+        icon: String,
+        title: String,
+        subtitle: String,
+        isLoading: Bool = false,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(OpenRockyPalette.accent.opacity(0.14))
+                        .frame(width: 44, height: 44)
+                    if isLoading {
+                        ProgressView()
+                            .controlSize(.small)
+                    } else {
+                        Image(systemName: icon)
+                            .font(.system(size: 20, weight: .semibold))
+                            .foregroundStyle(OpenRockyPalette.accent)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(title)
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundStyle(OpenRockyPalette.text)
+                    Text(subtitle)
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(OpenRockyPalette.muted)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(OpenRockyPalette.muted)
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(OpenRockyPalette.card)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .stroke(OpenRockyPalette.stroke, lineWidth: 1)
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+        .disabled(isLoading)
+    }
+
+    private func signInWithOAuth() {
+        oauthState = .authenticating
+        Task {
+            do {
+                let credential = try await OpenRockyOpenAIOAuthService.signIn()
+                oauthState = .authenticated
+
+                // Create chat provider instance with OAuth
+                let chatInstance = OpenRockyProviderInstance(
+                    id: UUID().uuidString,
+                    name: "OpenAI",
+                    kind: .openAI,
+                    modelID: OpenRockyProviderKind.openAI.defaultModel,
+                    customHost: nil,
+                    isBuiltIn: false
+                )
+                providerStore.add(chatInstance, credential: nil)
+                providerStore.setOpenAIOAuthCredential(credential, for: chatInstance.id)
+                providerStore.setActive(id: chatInstance.id)
+
+                // Create voice provider instance with OAuth token
+                let voiceInstance = OpenRockyRealtimeProviderInstance(
+                    id: UUID().uuidString,
+                    name: "OpenAI Voice",
+                    kind: .openAI,
+                    modelID: OpenRockyRealtimeProviderKind.openAI.defaultModel,
+                    customHost: nil,
+                    isBuiltIn: false
+                )
+                realtimeProviderStore.add(voiceInstance, credential: credential.accessToken)
+                realtimeProviderStore.setActive(id: voiceInstance.id)
+
+                // Proceed to traditional voice or done
+                if selectedProvider.supportsClassicVoice, sttProviderStore != nil, ttsProviderStore != nil {
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                        step = .classicVoice
+                    }
+                } else {
+                    withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+                        step = .done
+                    }
+                }
+            } catch {
+                oauthState = .failed(message: error.localizedDescription)
+            }
+        }
     }
 
     // MARK: - API Key
@@ -582,7 +771,7 @@ struct OpenRockyOnboardingView: View {
 
     // MARK: - Traditional Voice Setup
 
-    private var traditionalVoiceStep: some View {
+    private var classicVoiceStep: some View {
         VStack(spacing: 24) {
             Spacer()
 
@@ -599,11 +788,11 @@ struct OpenRockyOnboardingView: View {
             }
 
             VStack(spacing: 12) {
-                Text("Traditional Voice Mode")
+                Text("Classic Voice Mode")
                     .font(.system(size: 26, weight: .black, design: .rounded))
                     .foregroundStyle(OpenRockyPalette.text)
 
-                Text("Use separate STT + Chat + TTS providers.\nWorks with any chat model, not just realtime.")
+                Text("Use separate STT + Chat + TTS providers.\nWorks with any chat model, not just Realtime.")
                     .font(.system(size: 15, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -613,17 +802,17 @@ struct OpenRockyOnboardingView: View {
                 // Enable toggle
                 Button {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                        enableTraditionalVoice.toggle()
+                        enableClassicVoice.toggle()
                     }
                 } label: {
                     HStack(spacing: 14) {
                         ZStack {
                             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                .fill(enableTraditionalVoice ? OpenRockyPalette.accent.opacity(0.14) : OpenRockyPalette.card)
+                                .fill(enableClassicVoice ? OpenRockyPalette.accent.opacity(0.14) : OpenRockyPalette.card)
                                 .frame(width: 44, height: 44)
                             Image(systemName: "mic.and.signal.meter.fill")
                                 .font(.system(size: 20, weight: .semibold))
-                                .foregroundStyle(enableTraditionalVoice ? OpenRockyPalette.accent : OpenRockyPalette.muted)
+                                .foregroundStyle(enableClassicVoice ? OpenRockyPalette.accent : OpenRockyPalette.muted)
                         }
 
                         VStack(alignment: .leading, spacing: 3) {
@@ -639,9 +828,9 @@ struct OpenRockyOnboardingView: View {
 
                         Spacer()
 
-                        Image(systemName: enableTraditionalVoice ? "checkmark.circle.fill" : "circle")
+                        Image(systemName: enableClassicVoice ? "checkmark.circle.fill" : "circle")
                             .font(.system(size: 22))
-                            .foregroundStyle(enableTraditionalVoice ? OpenRockyPalette.accent : OpenRockyPalette.stroke)
+                            .foregroundStyle(enableClassicVoice ? OpenRockyPalette.accent : OpenRockyPalette.stroke)
                     }
                     .padding(14)
                     .background(
@@ -649,19 +838,19 @@ struct OpenRockyOnboardingView: View {
                             .fill(OpenRockyPalette.card)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .stroke(enableTraditionalVoice ? OpenRockyPalette.accent.opacity(0.6) : OpenRockyPalette.stroke, lineWidth: enableTraditionalVoice ? 2 : 1)
+                                    .stroke(enableClassicVoice ? OpenRockyPalette.accent.opacity(0.6) : OpenRockyPalette.stroke, lineWidth: enableClassicVoice ? 2 : 1)
                             )
                     )
                 }
                 .buttonStyle(.plain)
 
-                if enableTraditionalVoice {
+                if enableClassicVoice {
                     HStack(alignment: .top, spacing: 10) {
                         Image(systemName: "info.circle.fill")
                             .font(.system(size: 16, weight: .semibold))
                             .foregroundStyle(OpenRockyPalette.accent)
                             .padding(.top, 1)
-                        Text("This will create \(selectedProvider.displayName) STT and TTS providers using the same API key. You can switch between Realtime and Traditional voice in Settings > Preferences.")
+                        Text("This will create \(selectedProvider.displayName) STT and TTS providers using the same API key. You can switch between Realtime and Classic voice in Settings > Preferences.")
                             .font(.system(size: 13, weight: .medium, design: .rounded))
                             .foregroundStyle(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -685,8 +874,8 @@ struct OpenRockyOnboardingView: View {
 
             VStack(spacing: 12) {
                 Button {
-                    if enableTraditionalVoice {
-                        setupTraditionalVoice()
+                    if enableClassicVoice {
+                        setupClassicVoice()
                     }
                     withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
                         step = .done
@@ -695,7 +884,7 @@ struct OpenRockyOnboardingView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "arrow.right")
                             .font(.system(size: 14, weight: .bold))
-                        Text(enableTraditionalVoice ? "Set Up & Continue" : "Skip")
+                        Text(enableClassicVoice ? "Set Up & Continue" : "Skip")
                             .font(.system(size: 17, weight: .bold, design: .rounded))
                     }
                     .foregroundStyle(.white)
@@ -715,7 +904,7 @@ struct OpenRockyOnboardingView: View {
         .frame(maxWidth: 500)
     }
 
-    private func setupTraditionalVoice() {
+    private func setupClassicVoice() {
         let key = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !key.isEmpty else { return }
 
@@ -809,7 +998,7 @@ struct OpenRockyOnboardingView: View {
     }
 
     private var doneSubtitle: String {
-        if enableTraditionalVoice {
+        if enableClassicVoice {
             return "\(selectedProvider.displayName) chat, voice, STT, and TTS are ready.\nSwitch voice modes in Settings > Preferences."
         }
         return "\(selectedProvider.displayName) chat and voice are ready.\nExplore more providers and settings anytime."
@@ -856,9 +1045,9 @@ struct OpenRockyOnboardingView: View {
         isSubmitting = false
 
         // If the provider supports STT/TTS (OpenAI), offer traditional voice setup
-        if selectedProvider.supportsTraditionalVoice, sttProviderStore != nil, ttsProviderStore != nil {
+        if selectedProvider.supportsClassicVoice, sttProviderStore != nil, ttsProviderStore != nil {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
-                step = .traditionalVoice
+                step = .classicVoice
             }
         } else {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {

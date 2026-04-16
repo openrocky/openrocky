@@ -152,8 +152,8 @@ struct ContentView: View {
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            if sessionRuntime.activeVoiceMode == .traditional {
-                Text("Traditional voice mode requires Chat, Speech-to-Text, and Text-to-Speech providers. Please configure them in Settings.")
+            if sessionRuntime.activeVoiceMode == .classic {
+                Text("Classic voice mode requires Chat, Speech-to-Text, and Text-to-Speech providers. Please configure them in Settings.")
             } else {
                 Text("Please set up a voice provider in Settings before starting a voice session.")
             }
@@ -320,8 +320,8 @@ struct ContentView: View {
     private func toggleVoiceSession() {
         if showsVoiceOverlay {
             endVoiceSession()
-        } else if sessionRuntime.activeVoiceMode == .traditional {
-            // Traditional mode needs STT + TTS + Chat configured
+        } else if sessionRuntime.activeVoiceMode == .classic {
+            // Classic mode needs STT + TTS + Chat configured
             let sttReady = sttProviderStore.configuration.isConfigured
             let ttsReady = ttsProviderStore.configuration.isConfigured
             let chatReady = chatProviderStore.configuration.isConfigured

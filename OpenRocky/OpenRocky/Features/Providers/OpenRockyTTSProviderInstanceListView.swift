@@ -21,7 +21,7 @@ struct OpenRockyTTSProviderInstanceListView: View {
         List {
             if ttsProviderStore.instances.isEmpty {
                 Section {
-                    Text("No text-to-speech providers configured. Add one to enable voice output with the traditional pipeline.")
+                    Text("No text-to-speech providers configured. Add one to enable voice output with the Classic pipeline.")
                         .foregroundStyle(.secondary)
                 }
             } else {

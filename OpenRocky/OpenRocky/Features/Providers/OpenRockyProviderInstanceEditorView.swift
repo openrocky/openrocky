@@ -662,12 +662,12 @@ private enum TestConnectionState: Equatable {
     case failure(message: String)
 }
 
-private enum OpenAIAuthMethod: String, Equatable {
+enum OpenAIAuthMethod: String, Equatable {
     case apiKey
     case oauth
 }
 
-private enum OpenAIOAuthState: Equatable {
+enum OpenAIOAuthState: Equatable {
     case idle
     case authenticating
     case authenticated

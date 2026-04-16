@@ -283,6 +283,12 @@ open class ChatInputView: EditorSectionView {
         inputEditor.layoutStatus == .voice
     }
 
+    /// Whether STT dictation is available (controls mic button visibility).
+    public var sttAvailable: Bool {
+        get { inputEditor.sttAvailable }
+        set { inputEditor.sttAvailable = newValue }
+    }
+
     /// Set dictation state (recording indicator on mic button).
     public func setDictating(_ active: Bool) {
         inputEditor.isDictating = active

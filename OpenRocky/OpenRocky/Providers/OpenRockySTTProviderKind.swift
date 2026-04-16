@@ -58,6 +58,36 @@ enum OpenRockySTTProviderKind: String, Codable, CaseIterable, Identifiable {
         }
     }
 
+    /// Human-readable description for each suggested model.
+    nonisolated func modelDescription(_ modelID: String) -> String? {
+        switch (self, modelID) {
+        case (.openAI, "whisper-1"):
+            "Classic Whisper, reliable multilingual recognition"
+        case (.openAI, "gpt-4o-transcribe"):
+            "GPT-4o powered, best accuracy, higher cost"
+        case (.openAI, "gpt-4o-mini-transcribe"):
+            "GPT-4o mini, good accuracy at lower cost"
+        case (.groq, "whisper-large-v3-turbo"):
+            "Fastest, recommended for real-time use"
+        case (.groq, "whisper-large-v3"):
+            "Highest accuracy, slightly slower"
+        case (.groq, "distil-whisper-large-v3-en"):
+            "English only, ultra-fast"
+        case (.deepgram, "nova-2"):
+            "Best accuracy, production recommended"
+        case (.deepgram, "nova-3"):
+            "Latest generation, improved accuracy"
+        case (.deepgram, "enhanced"):
+            "Enhanced model, balanced speed/accuracy"
+        case (.aliCloud, "paraformer-v2"):
+            "Best Chinese recognition accuracy"
+        case (.aliCloud, "paraformer-realtime-v2"):
+            "Optimized for real-time streaming"
+        default:
+            nil
+        }
+    }
+
     nonisolated var summary: String {
         switch self {
         case .openAI:

@@ -48,6 +48,6 @@ final class OpenRockyPreferences {
         self.voiceTranscriptVisible = defaults.object(forKey: "rocky.pref.voiceTranscriptVisible") as? Bool ?? true
         self.chatAutoSaveConversation = defaults.object(forKey: "rocky.pref.chatAutoSaveConversation") as? Bool ?? true
         self.hapticFeedbackEnabled = defaults.object(forKey: "rocky.pref.hapticFeedbackEnabled") as? Bool ?? true
-        self.voiceContextMessageCount = defaults.object(forKey: "rocky.pref.voiceContextMessageCount") as? Int ?? 10
+        self.voiceContextMessageCount = defaults.object(forKey: "rocky.pref.voiceContextMessageCount") as? Int ?? 30
     }
 }
