@@ -154,7 +154,7 @@ xcodebuild -exportArchive \
     -exportPath "$EXPORT_DIR" \
     -exportOptionsPlist "$EXPORT_PLIST" \
     -allowProvisioningUpdates \
-    "${AUTH_FLAGS[@]}"
+    ${AUTH_FLAGS[@]+"${AUTH_FLAGS[@]}"}
 
 if [[ "$DESTINATION" == "export" ]]; then
     IPA=$(find "$EXPORT_DIR" -name "*.ipa" -print -quit)
