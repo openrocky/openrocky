@@ -94,36 +94,11 @@ if [[ "$ARCHIVE_ONLY" -eq 1 ]]; then
     exit 0
 fi
 
-# ── Step 3: Export + Upload to TestFlight ─────────────────────────────────────
-# Using destination=upload makes xcodebuild upload directly to App Store Connect
-# No separate altool/notarytool step needed.
+# ── Step 3: Export IPA ───────────────────────────────────────────────────────
+# Always export locally first (destination=export), then upload separately.
+# "destination=upload" requires Xcode GUI account session which fails in CLI.
 
-DESTINATION="upload"
-AUTH_FLAGS=()
-APPLE_ID_PLIST_KEYS=""
-
-if [[ -n "${ASC_API_KEY_ID:-}" && -n "${ASC_API_ISSUER_ID:-}" ]]; then
-    # App Store Connect API key authentication
-    AUTH_FLAGS+=(-authenticationKeyID "$ASC_API_KEY_ID" -authenticationKeyIssuerID "$ASC_API_ISSUER_ID")
-    if [[ -n "${ASC_API_KEY_P8_PATH:-}" ]]; then
-        AUTH_FLAGS+=(-authenticationKeyPath "$ASC_API_KEY_P8_PATH")
-    fi
-    log "Using ASC API Key authentication"
-elif [[ -n "${APPLE_ID:-}" && -n "${APPLE_APP_SPECIFIC_PASSWORD:-}" ]]; then
-    # Apple ID + app-specific password — pass credentials via ExportOptions.plist
-    APPLE_ID_PLIST_KEYS="    <key>appleID</key>
-    <string>${APPLE_ID}</string>
-    <key>appleAppSpecificPassword</key>
-    <string>${APPLE_APP_SPECIFIC_PASSWORD}</string>"
-    log "Using Apple ID authentication ($APPLE_ID)"
-else
-    log "No auth configured. Exporting IPA only (no upload)."
-    log "Set APPLE_ID + APPLE_APP_SPECIFIC_PASSWORD for Apple ID auth,"
-    log "or ASC_API_KEY_ID + ASC_API_ISSUER_ID + ASC_API_KEY_P8_PATH for API key auth."
-    DESTINATION="export"
-fi
-
-log "Exporting (destination=$DESTINATION)..."
+log "Exporting IPA..."
 rm -rf "$EXPORT_DIR"
 mkdir -p "$EXPORT_DIR"
 
@@ -143,8 +118,7 @@ cat > "$EXPORT_PLIST" <<PLIST
     <key>manageAppVersionAndBuildNumber</key>
     <false/>
     <key>destination</key>
-    <string>${DESTINATION}</string>
-${APPLE_ID_PLIST_KEYS}
+    <string>export</string>
 </dict>
 </plist>
 PLIST
@@ -153,13 +127,26 @@ xcodebuild -exportArchive \
     -archivePath "$ARCHIVE" \
     -exportPath "$EXPORT_DIR" \
     -exportOptionsPlist "$EXPORT_PLIST" \
-    -allowProvisioningUpdates \
-    ${AUTH_FLAGS[@]+"${AUTH_FLAGS[@]}"}
+    -allowProvisioningUpdates
 
-if [[ "$DESTINATION" == "export" ]]; then
-    IPA=$(find "$EXPORT_DIR" -name "*.ipa" -print -quit)
-    log "IPA exported: $IPA"
-    log "Upload manually: open Transporter.app and drag the IPA"
+IPA=$(find "$EXPORT_DIR" -name "*.ipa" -print -quit)
+[[ -n "$IPA" ]] || err "IPA not found after export"
+log "IPA exported: $IPA"
+
+# ── Step 4: Upload to TestFlight ─────────────────────────────────────────────
+
+if [[ -n "${ASC_API_KEY_ID:-}" && -n "${ASC_API_ISSUER_ID:-}" ]]; then
+    log "Uploading via ASC API Key..."
+    API_KEY_ARGS=(--apiKey "$ASC_API_KEY_ID" --apiIssuer "$ASC_API_ISSUER_ID")
+    xcrun altool --upload-app --file "$IPA" --type ios "${API_KEY_ARGS[@]}"
+elif [[ -n "${APPLE_ID:-}" && -n "${APPLE_APP_SPECIFIC_PASSWORD:-}" ]]; then
+    log "Uploading via Apple ID ($APPLE_ID)..."
+    xcrun altool --upload-app --file "$IPA" --type ios \
+        --username "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD"
+else
+    log "No upload credentials configured."
+    log "Set APPLE_ID + APPLE_APP_SPECIFIC_PASSWORD, or ASC_API_KEY_ID + ASC_API_ISSUER_ID."
+    log "Upload manually: open Transporter.app and drag $IPA"
     exit 0
 fi
 
