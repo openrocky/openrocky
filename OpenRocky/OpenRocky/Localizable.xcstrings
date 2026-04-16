@@ -501,6 +501,7 @@
       }
     },
     "Chat" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -538,6 +539,9 @@
         }
       }
     },
+    "Choose how you want to authenticate with OpenAI." : {
+
+    },
     "Choose Provider" : {
 
     },
@@ -551,6 +555,12 @@
 
     },
     "Choose Your Provider" : {
+
+    },
+    "Classic Voice Mode" : {
+
+    },
+    "Classic voice mode requires Chat, Speech-to-Text, and Text-to-Speech providers. Please configure them in Settings." : {
 
     },
     "Clear" : {
@@ -667,9 +677,6 @@
       }
     },
     "Configure unified chat + voice provider" : {
-
-    },
-    "Configure voice session behavior." : {
 
     },
     "Configured" : {
@@ -1409,6 +1416,9 @@
         }
       }
     },
+    "How to Connect" : {
+
+    },
     "https://api.aiproxy.pro/..." : {
 
     },
@@ -1449,6 +1459,9 @@
       }
     },
     "Imported %lld skills" : {
+
+    },
+    "In Classic mode, all messages are used as context. Older messages are auto-compressed when history exceeds this threshold." : {
 
     },
     "Info" : {
@@ -1818,10 +1831,10 @@
         }
       }
     },
-    "No speech recognition providers configured. Add one to enable voice input with the traditional pipeline." : {
+    "No speech recognition providers configured. Add one to enable voice input with the Classic pipeline or chat dictation." : {
 
     },
-    "No text-to-speech providers configured. Add one to enable voice output with the traditional pipeline." : {
+    "No text-to-speech providers configured. Add one to enable voice output with the Classic pipeline." : {
 
     },
     "No usage data for this period" : {
@@ -1854,7 +1867,7 @@
         }
       }
     },
-    "Number of recent messages included as context for voice mode. More context = better memory but higher latency and cost." : {
+    "Number of recent messages included as context for Realtime voice mode. More context = better memory but higher latency." : {
 
     },
     "OAuth" : {
@@ -2243,7 +2256,7 @@
         }
       }
     },
-    "Realtime mode uses Voice (Realtime). Traditional mode uses STT + Chat + TTS." : {
+    "Realtime mode uses Voice (Realtime). Classic mode uses STT + Chat + TTS." : {
 
     },
     "Realtime voice conversations" : {
@@ -2345,7 +2358,7 @@
     "Requires a supported iPhone with iOS 26 or later. No API key needed." : {
 
     },
-    "Requires Speech-to-Text, Chat, and Text-to-Speech providers to be configured in Settings > Providers." : {
+    "Requires Speech-to-Text, Chat, and Text-to-Speech providers to be configured." : {
 
     },
     "Reset to Default" : {
@@ -2934,7 +2947,7 @@
         }
       }
     },
-    "This will create %@ STT and TTS providers using the same API key. You can switch between Realtime and Traditional voice in Settings > Preferences." : {
+    "This will create %@ STT and TTS providers using the same API key. You can switch between Realtime and Classic voice in Settings > Preferences." : {
 
     },
     "This will delete all log files." : {
@@ -3018,12 +3031,6 @@
           }
         }
       }
-    },
-    "Traditional Voice Mode" : {
-
-    },
-    "Traditional voice mode requires Chat, Speech-to-Text, and Text-to-Speech providers. Please configure them in Settings." : {
-
     },
     "Transcribing..." : {
 
@@ -3165,7 +3172,7 @@
         }
       }
     },
-    "Use separate STT + Chat + TTS providers.\nWorks with any chat model, not just realtime." : {
+    "Use separate STT + Chat + TTS providers.\nWorks with any chat model, not just Realtime." : {
 
     },
     "Use TLS" : {
@@ -3234,9 +3241,6 @@
           }
         }
       }
-    },
-    "Voice Context" : {
-
     },
     "VOICE FIRST" : {
 
@@ -3336,9 +3340,6 @@
           }
         }
       }
-    },
-    "When enabled, speaking while the assistant is talking will interrupt playback." : {
-
     },
     "Workspace" : {
       "extractionState" : "stale",
