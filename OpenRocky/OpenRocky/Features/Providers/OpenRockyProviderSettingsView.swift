@@ -74,7 +74,7 @@ struct OpenRockyProviderSettingsView: View {
                         )
                     } label: {
                         settingsRow(
-                            icon: "mic.badge.waveform",
+                            icon: "waveform",
                             tint: .teal,
                             title: "Speech-to-Text",
                             subtitle: sttStatusSummary,
