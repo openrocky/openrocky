@@ -19,6 +19,7 @@ enum OpenRockyRealtimeEvent: Sendable {
     case assistantTranscriptDelta(String)
     case assistantTranscriptFinal(String)
     case assistantAudioChunk(String)
+    case assistantAudioDone
     case toolCallRequested(name: String, arguments: String, callID: String)
     case error(String)
 }

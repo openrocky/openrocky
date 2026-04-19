@@ -35,6 +35,12 @@ final class OpenRockyPreferences {
         didSet { UserDefaults.standard.set(hapticFeedbackEnabled, forKey: "rocky.pref.hapticFeedbackEnabled") }
     }
 
+    /// Number of recent messages to include as context for voice mode chat inference.
+    /// Higher values provide more context but increase latency and token usage.
+    var voiceContextMessageCount: Int {
+        didSet { UserDefaults.standard.set(voiceContextMessageCount, forKey: "rocky.pref.voiceContextMessageCount") }
+    }
+
     private init() {
         let defaults = UserDefaults.standard
         self.voiceInterruptionEnabled = defaults.object(forKey: "rocky.pref.voiceInterruptionEnabled") as? Bool ?? false
@@ -42,5 +48,6 @@ final class OpenRockyPreferences {
         self.voiceTranscriptVisible = defaults.object(forKey: "rocky.pref.voiceTranscriptVisible") as? Bool ?? true
         self.chatAutoSaveConversation = defaults.object(forKey: "rocky.pref.chatAutoSaveConversation") as? Bool ?? true
         self.hapticFeedbackEnabled = defaults.object(forKey: "rocky.pref.hapticFeedbackEnabled") as? Bool ?? true
+        self.voiceContextMessageCount = defaults.object(forKey: "rocky.pref.voiceContextMessageCount") as? Int ?? 30
     }
 }

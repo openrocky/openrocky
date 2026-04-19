@@ -94,17 +94,11 @@ if [[ "$ARCHIVE_ONLY" -eq 1 ]]; then
     exit 0
 fi
 
-# ── Step 3: Export + Upload to TestFlight ─────────────────────────────────────
-# Using destination=upload makes xcodebuild upload directly to App Store Connect
-# No separate altool/notarytool step needed.
+# ── Step 3: Export IPA ───────────────────────────────────────────────────────
+# Always export locally first (destination=export), then upload separately.
+# "destination=upload" requires Xcode GUI account session which fails in CLI.
 
-DESTINATION="upload"
-if [[ -z "${APPLE_ID:-}" || -z "${APPLE_APP_SPECIFIC_PASSWORD:-}" ]]; then
-    log "No APPLE_ID / APPLE_APP_SPECIFIC_PASSWORD set. Exporting IPA only."
-    DESTINATION="export"
-fi
-
-log "Exporting (destination=$DESTINATION)..."
+log "Exporting IPA..."
 rm -rf "$EXPORT_DIR"
 mkdir -p "$EXPORT_DIR"
 
@@ -124,7 +118,7 @@ cat > "$EXPORT_PLIST" <<PLIST
     <key>manageAppVersionAndBuildNumber</key>
     <false/>
     <key>destination</key>
-    <string>${DESTINATION}</string>
+    <string>export</string>
 </dict>
 </plist>
 PLIST
@@ -135,11 +129,24 @@ xcodebuild -exportArchive \
     -exportOptionsPlist "$EXPORT_PLIST" \
     -allowProvisioningUpdates
 
-if [[ "$DESTINATION" == "export" ]]; then
-    IPA=$(find "$EXPORT_DIR" -name "*.ipa" -print -quit)
-    log "IPA exported: $IPA"
-    log "Upload manually: open Transporter.app and drag the IPA"
-    log "Or set APPLE_ID + APPLE_APP_SPECIFIC_PASSWORD to auto-upload"
+IPA=$(find "$EXPORT_DIR" -name "*.ipa" -print -quit)
+[[ -n "$IPA" ]] || err "IPA not found after export"
+log "IPA exported: $IPA"
+
+# ── Step 4: Upload to TestFlight ─────────────────────────────────────────────
+
+if [[ -n "${ASC_API_KEY_ID:-}" && -n "${ASC_API_ISSUER_ID:-}" ]]; then
+    log "Uploading via ASC API Key..."
+    API_KEY_ARGS=(--apiKey "$ASC_API_KEY_ID" --apiIssuer "$ASC_API_ISSUER_ID")
+    xcrun altool --upload-app --file "$IPA" --type ios "${API_KEY_ARGS[@]}"
+elif [[ -n "${APPLE_ID:-}" && -n "${APPLE_APP_SPECIFIC_PASSWORD:-}" ]]; then
+    log "Uploading via Apple ID ($APPLE_ID)..."
+    xcrun altool --upload-app --file "$IPA" --type ios \
+        --username "$APPLE_ID" --password "$APPLE_APP_SPECIFIC_PASSWORD"
+else
+    log "No upload credentials configured."
+    log "Set APPLE_ID + APPLE_APP_SPECIFIC_PASSWORD, or ASC_API_KEY_ID + ASC_API_ISSUER_ID."
+    log "Upload manually: open Transporter.app and drag $IPA"
     exit 0
 fi
 

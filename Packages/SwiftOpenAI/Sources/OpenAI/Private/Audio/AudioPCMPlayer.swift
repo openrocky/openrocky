@@ -73,73 +73,133 @@ final class AudioPCMPlayer {
   /// Called on the RealtimeActor when the last pending buffer finishes playing.
   public var onPlaybackDrained: (() -> Void)?
 
+  // MARK: - Initial Buffering
+  // Accumulate the first few audio chunks as raw PCM16 data and merge into a
+  // single continuous AVAudioPCMBuffer before scheduling playback. This matches
+  // the approach used by official GLM SDKs (pcm-player flushTime: 500ms,
+  // realtime-front 200KB accumulation) and eliminates micro-gaps between tiny
+  // individually-scheduled buffers that cause clicking/beeping artifacts.
+
+  /// Accumulated raw PCM16 data waiting to be flushed as a single buffer.
+  private var accumulatedPCMData = Data()
+  /// Whether initial buffering has completed and playback has started.
+  private var hasStartedPlayback: Bool = false
+  /// Byte threshold before flushing initial buffer (~500ms at 24kHz mono 16-bit).
+  private let initialBufferThreshold: Int = 24_000
+
   public func playPCM16Audio(from base64String: String) {
     guard let audioData = Data(base64Encoded: base64String) else {
       logger.error("Could not decode base64 string for audio playback")
       return
     }
 
-    var bufferList = AudioBufferList(
-      mNumberBuffers: 1,
-      mBuffers:
-      AudioBuffer(
-        mNumberChannels: 1,
-        mDataByteSize: UInt32(audioData.count),
-        mData: UnsafeMutableRawPointer(mutating: (audioData as NSData).bytes)))
-
-    guard
-      let inPCMBuf = AVAudioPCMBuffer(
-        pcmFormat: inputFormat,
-        bufferListNoCopy: &bufferList)
-    else {
-      logger.error("Could not create input buffer for audio playback")
-      return
-    }
-
-    guard
-      let outPCMBuf = AVAudioPCMBuffer(
-        pcmFormat: playableFormat,
-        frameCapacity: AVAudioFrameCount(UInt32(audioData.count) * 2))
-    else {
-      logger.error("Could not create output buffer for audio playback")
-      return
-    }
-
-    guard let converter = AVAudioConverter(from: inputFormat, to: playableFormat) else {
-      logger.error("Could not create audio converter needed to map from pcm16int to pcm32float")
-      return
-    }
-
-    do {
-      try converter.convert(to: outPCMBuf, from: inPCMBuf)
-    } catch {
-      logger.error("Could not map from pcm16int to pcm32float: \(error.localizedDescription)")
-      return
-    }
-
-    if audioEngine.isRunning {
-      pendingBufferCount += 1
-      playerNode.scheduleBuffer(outPCMBuf, at: nil, options: []) { [weak self] in
-        Task { @RealtimeActor [weak self] in
-          guard let self else { return }
-          self.pendingBufferCount -= 1
-          if self.pendingBufferCount <= 0 {
-            self.pendingBufferCount = 0
-            self.onPlaybackDrained?()
-          }
-        }
+    if hasStartedPlayback {
+      // After initial buffering, schedule each chunk immediately.
+      // The player has a ~500ms head start so underruns are unlikely.
+      if let buf = convertToPCM32(audioData: audioData) {
+        scheduleBuffer(buf)
       }
-      if !playerNode.isPlaying {
-        playerNode.play()
+    } else {
+      // Accumulate raw PCM16 bytes; will be merged into one buffer on flush
+      accumulatedPCMData.append(audioData)
+      if accumulatedPCMData.count >= initialBufferThreshold {
+        flushAccumulatedData()
       }
     }
   }
 
+  /// Force-flush any accumulated audio data and start playback.
+  /// Call this when the server signals no more audio is coming (response.audio.done)
+  /// to handle responses shorter than the buffer threshold.
+  public func flushBufferedAudio() {
+    guard !hasStartedPlayback, !accumulatedPCMData.isEmpty else { return }
+    flushAccumulatedData()
+  }
+
   public func interruptPlayback() {
+    // Clear any accumulated data that hasn't started playing yet
+    accumulatedPCMData = Data()
+    hasStartedPlayback = false
+
     guard pendingBufferCount > 0 else { return }
     logger.debug("Interrupting playback")
     playerNode.stop()
     pendingBufferCount = 0
+  }
+
+  // MARK: - Private Helpers
+
+  /// Number of samples for fade-in/fade-out (~2ms at 24kHz).
+  /// Matches the official GLM pcm-player which uses 50-sample linear fades
+  /// to eliminate clicks/pops at buffer boundaries.
+  private let fadeSamples: Int = 50
+
+  private func convertToPCM32(audioData: Data) -> AVAudioPCMBuffer? {
+    let sampleCount = audioData.count / 2  // PCM16 = 2 bytes per sample
+    guard sampleCount > 0 else { return nil }
+
+    guard
+      let outPCMBuf = AVAudioPCMBuffer(
+        pcmFormat: playableFormat,
+        frameCapacity: AVAudioFrameCount(sampleCount))
+    else {
+      logger.error("Could not create output buffer for audio playback")
+      return nil
+    }
+
+    // Convert PCM16 Int to PCM32 Float directly (no AVAudioConverter needed)
+    // and apply fade-in/fade-out in the same pass.
+    guard let channelData = outPCMBuf.floatChannelData?[0] else { return nil }
+    audioData.withUnsafeBytes { rawBuffer in
+      let int16Ptr = rawBuffer.bindMemory(to: Int16.self)
+      for i in 0..<sampleCount {
+        var sample = Float(int16Ptr[i]) / 32768.0
+        // Fade-in: ramp from 0 to 1 over the first fadeSamples
+        if i < fadeSamples {
+          sample *= Float(i) / Float(fadeSamples)
+        }
+        // Fade-out: ramp from 1 to 0 over the last fadeSamples
+        if i >= sampleCount - fadeSamples {
+          sample *= Float(sampleCount - 1 - i) / Float(fadeSamples)
+        }
+        channelData[i] = sample
+      }
+    }
+    outPCMBuf.frameLength = AVAudioFrameCount(sampleCount)
+
+    return outPCMBuf
+  }
+
+  private func scheduleBuffer(_ buffer: AVAudioPCMBuffer) {
+    guard audioEngine.isRunning else { return }
+    pendingBufferCount += 1
+    playerNode.scheduleBuffer(buffer, at: nil, options: []) { [weak self] in
+      Task { @RealtimeActor [weak self] in
+        guard let self else { return }
+        self.pendingBufferCount -= 1
+        if self.pendingBufferCount <= 0 {
+          self.pendingBufferCount = 0
+          self.hasStartedPlayback = false
+          self.onPlaybackDrained?()
+        }
+      }
+    }
+    if !playerNode.isPlaying {
+      playerNode.play()
+    }
+  }
+
+  /// Merge all accumulated raw PCM16 data into a single continuous buffer
+  /// and schedule it for playback. This avoids micro-gaps between small buffers.
+  private func flushAccumulatedData() {
+    let byteCount = accumulatedPCMData.count
+    guard byteCount > 0 else { return }
+    logger.debug("Flushing \(byteCount) bytes of accumulated PCM16 as single buffer")
+    if let buf = convertToPCM32(audioData: accumulatedPCMData) {
+      scheduleBuffer(buf)
+    }
+    accumulatedPCMData = Data()
+    hasStartedPlayback = true
   }
 
   let audioEngine: AVAudioEngine

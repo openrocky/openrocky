@@ -13,6 +13,8 @@ import Combine
 struct ContentView: View {
     @StateObject private var chatProviderStore = OpenRockyProviderStore()
     @StateObject private var voiceProviderStore = OpenRockyRealtimeProviderStore()
+    @StateObject private var sttProviderStore = OpenRockySTTProviderStore()
+    @StateObject private var ttsProviderStore = OpenRockyTTSProviderStore()
     @ObservedObject private var shellRuntime = OpenRockyShellRuntime.shared
     @StateObject private var sessionRuntime = OpenRockySessionRuntime()
     @StateObject private var skillStore = OpenRockyBuiltInToolStore.shared
@@ -50,7 +52,9 @@ struct ContentView: View {
             sessionRuntime.conversationID = conversationID
             sessionRuntime.syncProviders(
                 chatConfiguration: chatProviderStore.configuration,
-                voiceConfiguration: voiceProviderStore.configuration
+                voiceConfiguration: voiceProviderStore.configuration,
+                sttConfiguration: sttProviderStore.configuration,
+                ttsConfiguration: ttsProviderStore.configuration
             )
             if !onboardingCompleted || !chatProviderStore.configuration.isConfigured {
                 showsOnboarding = true
@@ -88,7 +92,9 @@ struct ContentView: View {
         .onChange(of: chatProviderStore.configuration) { _, _ in
             sessionRuntime.syncProviders(
                 chatConfiguration: chatProviderStore.configuration,
-                voiceConfiguration: voiceProviderStore.configuration
+                voiceConfiguration: voiceProviderStore.configuration,
+                sttConfiguration: sttProviderStore.configuration,
+                ttsConfiguration: ttsProviderStore.configuration
             )
             // Force chat controller/client recreation when provider config changes,
             // even if high-level identity fields stay the same.
@@ -97,13 +103,33 @@ struct ContentView: View {
         .onChange(of: voiceProviderStore.configuration) { _, _ in
             sessionRuntime.syncProviders(
                 chatConfiguration: chatProviderStore.configuration,
-                voiceConfiguration: voiceProviderStore.configuration
+                voiceConfiguration: voiceProviderStore.configuration,
+                sttConfiguration: sttProviderStore.configuration,
+                ttsConfiguration: ttsProviderStore.configuration
+            )
+        }
+        .onChange(of: sttProviderStore.configuration) { _, _ in
+            sessionRuntime.syncProviders(
+                chatConfiguration: chatProviderStore.configuration,
+                voiceConfiguration: voiceProviderStore.configuration,
+                sttConfiguration: sttProviderStore.configuration,
+                ttsConfiguration: ttsProviderStore.configuration
+            )
+        }
+        .onChange(of: ttsProviderStore.configuration) { _, _ in
+            sessionRuntime.syncProviders(
+                chatConfiguration: chatProviderStore.configuration,
+                voiceConfiguration: voiceProviderStore.configuration,
+                sttConfiguration: sttProviderStore.configuration,
+                ttsConfiguration: ttsProviderStore.configuration
             )
         }
         .sheet(isPresented: $showsProviderSettings) {
             OpenRockyProviderSettingsView(
                 providerStore: chatProviderStore,
                 realtimeProviderStore: voiceProviderStore,
+                sttProviderStore: sttProviderStore,
+                ttsProviderStore: ttsProviderStore,
                 skillStore: skillStore,
                 characterStore: characterStore
             )
@@ -114,17 +140,23 @@ struct ContentView: View {
         }) {
             OpenRockyOnboardingView(
                 providerStore: chatProviderStore,
-                realtimeProviderStore: voiceProviderStore
+                realtimeProviderStore: voiceProviderStore,
+                sttProviderStore: sttProviderStore,
+                ttsProviderStore: ttsProviderStore
             )
         }
         .overlay { keyboardShortcutButtons }
-        .alert("Voice Provider Not Configured", isPresented: $showsVoiceNotConfiguredAlert) {
+        .alert("Voice Not Configured", isPresented: $showsVoiceNotConfiguredAlert) {
             Button("Open Settings") {
                 showsProviderSettings = true
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("Please set up a voice provider in Settings before starting a voice session.")
+            if sessionRuntime.activeVoiceMode == .classic {
+                Text("Classic voice mode requires Chat, Speech-to-Text, and Text-to-Speech providers. Please configure them in Settings.")
+            } else {
+                Text("Please set up a voice provider in Settings before starting a voice session.")
+            }
         }
     }
 
@@ -207,6 +239,7 @@ struct ContentView: View {
             bootstrap: shellRuntime.probe,
             transcript: sessionRuntime.session.liveTranscript,
             providerConfiguration: chatProviderStore.configuration,
+            sttConfiguration: sttProviderStore.configuration,
             skillStore: skillStore,
             contentTopInset: 0,
             conversationID: conversationID,
@@ -287,6 +320,17 @@ struct ContentView: View {
     private func toggleVoiceSession() {
         if showsVoiceOverlay {
             endVoiceSession()
+        } else if sessionRuntime.activeVoiceMode == .classic {
+            // Classic mode needs STT + TTS + Chat configured
+            let sttReady = sttProviderStore.configuration.isConfigured
+            let ttsReady = ttsProviderStore.configuration.isConfigured
+            let chatReady = chatProviderStore.configuration.isConfigured
+            if sttReady && ttsReady && chatReady {
+                showsVoiceOverlay = true
+                sessionRuntime.startVoiceSession(configuration: voiceProviderStore.configuration)
+            } else {
+                showsVoiceNotConfiguredAlert = true
+            }
         } else if !voiceProviderStore.configuration.isConfigured {
             showsVoiceNotConfiguredAlert = true
         } else {

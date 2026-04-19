@@ -24,6 +24,14 @@ public protocol ChatInputDelegate: AnyObject {
     func chatInputDidTapConversationList(_ input: ChatInputView)
     /// Called when user taps the prompts button in the control panel.
     func chatInputDidTapPrompts(_ input: ChatInputView)
+    /// Called when user taps the mic button to start STT dictation (speech-to-text into the text field).
+    func chatInputDidRequestDictation(_ input: ChatInputView)
+    /// Called when user long-presses the mic button (push-to-talk start).
+    func chatInputDidBeginPushToTalk(_ input: ChatInputView)
+    /// Called when user releases the mic button (push-to-talk end).
+    func chatInputDidEndPushToTalk(_ input: ChatInputView)
+    /// Called when user cancels an in-progress dictation.
+    func chatInputDidCancelDictation(_ input: ChatInputView)
 }
 
 /// Default implementations making all methods optional.
@@ -39,4 +47,8 @@ public extension ChatInputDelegate {
     func chatInputDidStopVoiceSession(_: ChatInputView) {}
     func chatInputDidTapConversationList(_: ChatInputView) {}
     func chatInputDidTapPrompts(_: ChatInputView) {}
+    func chatInputDidRequestDictation(_: ChatInputView) {}
+    func chatInputDidBeginPushToTalk(_: ChatInputView) {}
+    func chatInputDidEndPushToTalk(_: ChatInputView) {}
+    func chatInputDidCancelDictation(_: ChatInputView) {}
 }

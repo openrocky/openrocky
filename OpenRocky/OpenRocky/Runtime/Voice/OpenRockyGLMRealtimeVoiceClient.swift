@@ -364,6 +364,9 @@ Voice-specific rules:
             "input_audio_format": "wav",
             "output_audio_format": "pcm",
             "instructions": instructions,
+            "input_audio_noise_reduction": [
+                "type": "near_field"
+            ] as [String: Any],
             "turn_detection": [
                 "type": "client_vad"
             ] as [String: Any],
@@ -483,7 +486,7 @@ Voice-specific rules:
 
         case "response.audio.done":
             rlog.info("GLM: response.audio.done", category: "Voice")
-            break
+            emit(.assistantAudioDone)
 
         case "response.function_call_arguments.done":
             let rawName = json["name"] as? String ?? ""
@@ -555,6 +558,8 @@ Voice-specific rules:
         let mapping = consolidatedToolMapping[name] ?? [:]
 
         if let originalName = mapping[action] {
+            // Transform parameters for tools that need different field names
+            transformParameters(&json, toolName: name, action: action)
             // Re-serialize remaining args without the "action" key
             if let newData = try? JSONSerialization.data(withJSONObject: json),
                let newArgs = String(data: newData, encoding: .utf8) {
@@ -565,6 +570,35 @@ Voice-specific rules:
 
         // No mapping found — pass through as-is
         return (name, arguments)
+    }
+
+    /// Transform GLM-facing parameter names to the actual tool parameter names.
+    /// For example, the health tool uses `metric_name`/`days` in the GLM definition
+    /// but the toolbox expects `metric`/`start_date`/`end_date`.
+    private static func transformParameters(_ json: inout [String: Any], toolName: String, action: String) {
+        if toolName == "health" && action == "metric" {
+            // Rename metric_name → metric
+            if let metricName = json.removeValue(forKey: "metric_name") {
+                json["metric"] = metricName
+            }
+            // Convert days → start_date/end_date (ISO-8601)
+            if let days = json.removeValue(forKey: "days") as? Int {
+                let calendar = Calendar.current
+                let end = Date()
+                let start = calendar.date(byAdding: .day, value: -days, to: end) ?? end
+                let formatter = ISO8601DateFormatter()
+                formatter.formatOptions = [.withInternetDateTime]
+                json["start_date"] = formatter.string(from: start)
+                json["end_date"] = formatter.string(from: end)
+            }
+        } else if toolName == "health" && action == "summary" {
+            // summary expects a "date" field; use today if not provided
+            if json["date"] == nil {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd"
+                json["date"] = formatter.string(from: Date())
+            }
+        }
     }
 
     // MARK: - Consolidated Tool Definitions

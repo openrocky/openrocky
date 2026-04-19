@@ -283,6 +283,31 @@ open class ChatInputView: EditorSectionView {
         inputEditor.layoutStatus == .voice
     }
 
+    /// Whether STT dictation is available (controls mic button visibility).
+    public var sttAvailable: Bool {
+        get { inputEditor.sttAvailable }
+        set { inputEditor.sttAvailable = newValue }
+    }
+
+    /// Set dictation state (recording indicator on mic button).
+    public func setDictating(_ active: Bool) {
+        inputEditor.isDictating = active
+    }
+
+    /// Update dictation audio level for waveform animation (0.0–1.0).
+    public func updateDictationAudioLevel(_ level: Float) {
+        inputEditor.updateDictationAudioLevel(level)
+    }
+
+    /// Insert dictated text into the input field and end dictation state.
+    public func insertDictatedText(_ text: String) {
+        let existing = inputEditor.textView.text ?? ""
+        let separator = existing.isEmpty ? "" : " "
+        inputEditor.set(text: existing + separator + text)
+        inputEditor.isDictating = false
+        inputEditor.textView.becomeFirstResponder()
+    }
+
     public func prepareForReuse() {
         storage = .init(id: "-1")
         resetValues()

@@ -22,5 +22,9 @@ extension InputEditor {
         func onInputEditorPastingImage(image: UIImage)
         func onInputEditorVoiceSessionToggle()
         func onInputEditorVoiceSessionStop()
+        func onInputEditorDictationRequested()
+        func onInputEditorDictationCancelled()
+        func onInputEditorPushToTalkBegan()
+        func onInputEditorPushToTalkEnded()
     }
 }

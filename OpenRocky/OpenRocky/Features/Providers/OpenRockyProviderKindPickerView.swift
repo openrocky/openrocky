@@ -78,3 +78,85 @@ struct OpenRockyRealtimeProviderKindPickerView: View {
         }
     }
 }
+
+struct OpenRockySTTProviderKindPickerView: View {
+    @Environment(\.dismiss) private var dismiss
+    let onSelect: (OpenRockySTTProviderKind) -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(OpenRockySTTProviderKind.allCases) { kind in
+                    Button {
+                        onSelect(kind)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(kind.displayName)
+                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.primary)
+                            Text(kind.summary)
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(2)
+                            HStack(spacing: 12) {
+                                Label(kind.estimatedLatency, systemImage: "bolt")
+                                Label(kind.priceRange, systemImage: "dollarsign.circle")
+                            }
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                            .foregroundStyle(.tertiary)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            }
+            .navigationTitle("Choose STT Provider")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+struct OpenRockyTTSProviderKindPickerView: View {
+    @Environment(\.dismiss) private var dismiss
+    let onSelect: (OpenRockyTTSProviderKind) -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                ForEach(OpenRockyTTSProviderKind.allCases) { kind in
+                    Button {
+                        onSelect(kind)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(kind.displayName)
+                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.primary)
+                            Text(kind.summary)
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(.secondary)
+                                .lineLimit(2)
+                            HStack(spacing: 12) {
+                                Label(kind.estimatedLatency, systemImage: "bolt")
+                                Label(kind.priceRange, systemImage: "dollarsign.circle")
+                            }
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                            .foregroundStyle(.tertiary)
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+            }
+            .navigationTitle("Choose TTS Provider")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+        }
+    }
+}

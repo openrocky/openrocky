@@ -186,6 +186,12 @@ final class OpenRockyRealtimeVoiceBridge {
         audioController?.playPCM16Audio(base64String: audio)
     }
 
+    /// Flush any buffered audio when the server signals all audio chunks have been sent.
+    /// This handles responses shorter than the initial buffer threshold.
+    func flushBufferedAudio() {
+        audioController?.flushBufferedAudio()
+    }
+
     func interruptPlayback() {
         audioController?.interruptPlayback()
         // Resume mic immediately when playback is interrupted (user wants to speak)
@@ -200,6 +206,8 @@ final class OpenRockyRealtimeVoiceBridge {
     /// Called when the assistant finishes its response (transcript final).
     /// Defers mic resume until all queued audio buffers have actually played out.
     func resumeMicAfterPlayback() {
+        // Ensure any remaining buffered audio is flushed before checking playback state
+        audioController?.flushBufferedAudio()
         if audioController?.isPlaybackActive == true {
             // Audio still playing — defer resume until playback drains
             rlog.debug("resumeMicAfterPlayback: deferring (playback active)", category: "Audio")

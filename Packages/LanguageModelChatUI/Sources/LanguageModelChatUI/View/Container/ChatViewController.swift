@@ -72,6 +72,22 @@ open class ChatViewController: UIViewController {
     public var onConversationListTap: (() -> Void)?
     /// Called when the user taps the prompts button in the control panel.
     public var onPromptsTap: (() -> Void)?
+    /// Whether STT dictation is available (controls mic button visibility in input bar).
+    public var sttAvailable: Bool = false {
+        didSet {
+            guard isViewLoaded else { return }
+            chatInputView.sttAvailable = sttAvailable
+        }
+    }
+
+    /// Called when the user taps the mic button to start STT dictation.
+    public var onDictationRequested: (() -> Void)?
+    /// Called when the user cancels an in-progress dictation.
+    public var onDictationCancelled: (() -> Void)?
+    /// Called when the user long-presses the mic button (push-to-talk start).
+    public var onPushToTalkBegan: (() -> Void)?
+    /// Called when the user releases the mic button (push-to-talk end).
+    public var onPushToTalkEnded: (() -> Void)?
 
     public weak var menuDelegate: ChatViewControllerMenuDelegate? {
         didSet {
@@ -147,6 +163,7 @@ open class ChatViewController: UIViewController {
         currentSession = session
         messageListView.session = session
         chatInputView.delegate = self
+        chatInputView.sttAvailable = sttAvailable
         chatInputView.bind(conversationID: conversationID)
         if let emptyStateView {
             view.insertSubview(emptyStateView, aboveSubview: messageListView)
@@ -577,6 +594,22 @@ extension ChatViewController: ChatInputDelegate {
 
     public func chatInputDidTapPrompts(_: ChatInputView) {
         onPromptsTap?()
+    }
+
+    public func chatInputDidRequestDictation(_: ChatInputView) {
+        onDictationRequested?()
+    }
+
+    public func chatInputDidCancelDictation(_: ChatInputView) {
+        onDictationCancelled?()
+    }
+
+    public func chatInputDidBeginPushToTalk(_: ChatInputView) {
+        onPushToTalkBegan?()
+    }
+
+    public func chatInputDidEndPushToTalk(_: ChatInputView) {
+        onPushToTalkEnded?()
     }
 
     /// Programmatically set text in the input and submit it.

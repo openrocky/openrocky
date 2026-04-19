@@ -12,15 +12,33 @@ import SwiftUI
 struct OpenRockyProviderSettingsView: View {
     @ObservedObject var providerStore: OpenRockyProviderStore
     @ObservedObject var realtimeProviderStore: OpenRockyRealtimeProviderStore
+    @ObservedObject var sttProviderStore: OpenRockySTTProviderStore
+    @ObservedObject var ttsProviderStore: OpenRockyTTSProviderStore
     @ObservedObject var skillStore: OpenRockyBuiltInToolStore
     @ObservedObject var characterStore: OpenRockyCharacterStore
     @StateObject private var customSkillStore = OpenRockyCustomSkillStore.shared
+    @ObservedObject private var healthService = OpenRockyProviderHealthService.shared
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
             List {
-                Section("Providers") {
+                // Preferences at the top — voice mode switch is the most important entry point
+                Section {
+                    NavigationLink {
+                        OpenRockyPreferencesView()
+                    } label: {
+                        settingsRow(
+                            icon: "slider.horizontal.3",
+                            tint: .indigo,
+                            title: "Preferences",
+                            subtitle: voiceModeSummary
+                        )
+                    }
+                }
+
+                // AI Model: the brain behind the assistant
+                Section("AI Model") {
                     NavigationLink {
                         OpenRockyProviderInstanceListView(providerStore: providerStore)
                     } label: {
@@ -28,35 +46,65 @@ struct OpenRockyProviderSettingsView: View {
                             icon: "bubble.left.and.text.bubble.right.fill",
                             tint: OpenRockyPalette.accent,
                             title: "Chat",
-                            subtitle: chatStatusSummary
+                            subtitle: chatStatusSummary,
+                            healthStatus: providerStore.activeInstance.map { healthService.status(for: $0.id) }
                         )
                     }
+                }
 
+                // Voice Pipeline: all voice-related providers grouped together
+                Section {
                     NavigationLink {
                         OpenRockyRealtimeProviderInstanceListView(realtimeProviderStore: realtimeProviderStore)
                     } label: {
                         settingsRow(
-                            icon: "waveform.circle.fill",
+                            icon: "bolt.circle.fill",
                             tint: OpenRockyPalette.secondary,
-                            title: "Voice",
+                            title: "Realtime Voice",
                             subtitle: voiceStatusSummary
                         )
                     }
-                }
 
-                Section("Analytics") {
                     NavigationLink {
-                        OpenRockyUsageSettingsView()
+                        OpenRockySTTProviderInstanceListView(
+                            sttProviderStore: sttProviderStore,
+                            chatProviderStore: providerStore,
+                            realtimeProviderStore: realtimeProviderStore,
+                            ttsProviderStore: ttsProviderStore
+                        )
                     } label: {
                         settingsRow(
-                            icon: "chart.bar.fill",
-                            tint: .purple,
-                            title: "Usage",
-                            subtitle: usageSummary
+                            icon: "waveform",
+                            tint: .teal,
+                            title: "Speech-to-Text",
+                            subtitle: sttStatusSummary,
+                            healthStatus: sttProviderStore.activeInstance.map { healthService.status(for: $0.id) }
                         )
                     }
+
+                    NavigationLink {
+                        OpenRockyTTSProviderInstanceListView(
+                            ttsProviderStore: ttsProviderStore,
+                            chatProviderStore: providerStore,
+                            realtimeProviderStore: realtimeProviderStore,
+                            sttProviderStore: sttProviderStore
+                        )
+                    } label: {
+                        settingsRow(
+                            icon: "speaker.wave.2.fill",
+                            tint: .mint,
+                            title: "Text-to-Speech",
+                            subtitle: ttsStatusSummary,
+                            healthStatus: ttsProviderStore.activeInstance.map { healthService.status(for: $0.id) }
+                        )
+                    }
+                } header: {
+                    Text("Voice Pipeline")
+                } footer: {
+                    Text("Realtime mode uses Voice (Realtime). Classic mode uses STT + Chat + TTS.")
                 }
 
+                // Intelligence: character, tools, skills, memory
                 Section("Intelligence") {
                     NavigationLink {
                         OpenRockyCharacterSettingsView(characterStore: characterStore)
@@ -103,7 +151,8 @@ struct OpenRockyProviderSettingsView: View {
                     }
                 }
 
-                Section("Features") {
+                // Features & Data
+                Section("Features & Data") {
                     NavigationLink {
                         OpenRockyFeaturesSettingsView(toolStore: skillStore)
                     } label: {
@@ -114,9 +163,7 @@ struct OpenRockyProviderSettingsView: View {
                             subtitle: "Siri, Email & more"
                         )
                     }
-                }
 
-                Section("Storage") {
                     NavigationLink {
                         OpenRockyWorkspaceFilesView(
                             rootURL: workspaceURL,
@@ -141,20 +188,21 @@ struct OpenRockyProviderSettingsView: View {
                             subtitle: mountsSummary
                         )
                     }
-                }
 
-                Section {
                     NavigationLink {
-                        OpenRockyPreferencesView()
+                        OpenRockyUsageSettingsView()
                     } label: {
                         settingsRow(
-                            icon: "slider.horizontal.3",
-                            tint: .indigo,
-                            title: "Preferences",
-                            subtitle: "Voice, chat & general settings"
+                            icon: "chart.bar.fill",
+                            tint: .purple,
+                            title: "Usage",
+                            subtitle: usageSummary
                         )
                     }
+                }
 
+                // System
+                Section("System") {
                     NavigationLink {
                         OpenRockyFeedbackView()
                     } label: {
@@ -190,15 +238,28 @@ struct OpenRockyProviderSettingsView: View {
                             subtitle: "View & share runtime logs"
                         )
                     }
-
                 }
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                healthService.checkAll(
+                    chatStore: providerStore,
+                    realtimeStore: realtimeProviderStore,
+                    sttStore: sttProviderStore,
+                    ttsStore: ttsProviderStore
+                )
+            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .fontWeight(.semibold)
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 20))
+                            .symbolRenderingMode(.hierarchical)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         }
@@ -210,6 +271,12 @@ struct OpenRockyProviderSettingsView: View {
         }
         return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
             .appendingPathComponent("OpenRockyWorkspace")
+    }
+
+    private var voiceModeSummary: String {
+        let mode = UserDefaults.standard.string(forKey: "rocky.pref.voiceMode") ?? OpenRockyVoiceMode.realtime.rawValue
+        let modeName = OpenRockyVoiceMode(rawValue: mode)?.displayName ?? "Realtime"
+        return "Voice mode: \(modeName)"
     }
 
     private var chatStatusSummary: String {
@@ -224,6 +291,22 @@ struct OpenRockyProviderSettingsView: View {
         let config = realtimeProviderStore.configuration
         if config.isConfigured {
             return config.provider.displayName
+        }
+        return "Not configured"
+    }
+
+    private var sttStatusSummary: String {
+        let config = sttProviderStore.configuration
+        if config.isConfigured {
+            return "\(config.provider.displayName) · \(config.modelID)"
+        }
+        return "Not configured"
+    }
+
+    private var ttsStatusSummary: String {
+        let config = ttsProviderStore.configuration
+        if config.isConfigured {
+            return "\(config.provider.displayName) · \(config.modelID)"
         }
         return "Not configured"
     }
@@ -255,7 +338,7 @@ struct OpenRockyProviderSettingsView: View {
         return "\(enabled) of \(count) enabled"
     }
 
-    private func settingsRow(icon: String, tint: Color, title: String, subtitle: String) -> some View {
+    private func settingsRow(icon: String, tint: Color, title: String, subtitle: String, healthStatus: OpenRockyProviderHealthService.HealthStatus? = nil) -> some View {
         HStack(spacing: 12) {
             ZStack {
                 RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -272,8 +355,31 @@ struct OpenRockyProviderSettingsView: View {
                     .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(.secondary)
             }
+            Spacer()
+            if let status = healthStatus {
+                healthDot(status)
+            }
         }
         .padding(.vertical, 4)
+    }
+
+    @ViewBuilder
+    private func healthDot(_ status: OpenRockyProviderHealthService.HealthStatus) -> some View {
+        switch status {
+        case .unknown:
+            EmptyView()
+        case .checking:
+            ProgressView()
+                .controlSize(.mini)
+        case .healthy:
+            Circle()
+                .fill(.green)
+                .frame(width: 8, height: 8)
+        case .unhealthy:
+            Circle()
+                .fill(.red)
+                .frame(width: 8, height: 8)
+        }
     }
 }
 

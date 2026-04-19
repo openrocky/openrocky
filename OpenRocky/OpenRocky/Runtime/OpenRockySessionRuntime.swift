@@ -12,6 +12,38 @@ import Foundation
 import ChatClientKit
 import LanguageModelChatUI
 
+/// Voice mode: realtime (WebSocket end-to-end) or classic (STT + Chat + TTS).
+enum OpenRockyVoiceMode: String, CaseIterable, Identifiable {
+    case realtime
+    case classic
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .realtime: "Realtime"
+        case .classic: "Classic (STT+Chat+TTS)"
+        }
+    }
+
+    var summary: String {
+        switch self {
+        case .realtime: "Low-latency end-to-end voice via WebSocket. Requires OpenAI or GLM."
+        case .classic: "Separate STT, Chat, and TTS providers. Works with any chat model."
+        }
+    }
+
+    /// Map legacy raw values to current cases (e.g. "traditional" → .classic).
+    init?(legacyRawValue: String) {
+        switch legacyRawValue {
+        case "realtime": self = .realtime
+        case "classic": self = .classic
+        case "traditional": self = .classic  // backwards compat
+        default: return nil
+        }
+    }
+}
+
 @MainActor
 final class OpenRockySessionRuntime: ObservableObject {
     @Published private(set) var session: OpenRockyPreviewSession
@@ -19,6 +51,7 @@ final class OpenRockySessionRuntime: ObservableObject {
     @Published private(set) var isMicrophoneActive = false
 
     private let bridge = OpenRockyRealtimeVoiceBridge()
+    private let classicBridge = OpenRockyTraditionalVoiceBridge()
     private let toolbox = OpenRockyToolbox()
     private let chatRuntime = OpenRockyChatInferenceRuntime()
     private let characterStore = OpenRockyCharacterStore.shared
@@ -30,7 +63,11 @@ final class OpenRockySessionRuntime: ObservableObject {
     private var lastToolName: String?
     private var chatConfiguration = OpenRockyProviderConfiguration(provider: .openAI, modelID: OpenRockyProviderKind.openAI.defaultModel)
     private var voiceConfiguration = OpenRockyRealtimeProviderConfiguration(provider: .openAI, modelID: OpenRockyRealtimeProviderKind.openAI.defaultModel)
+    private var sttConfiguration = OpenRockySTTProviderConfiguration(provider: .openAI, modelID: OpenRockySTTProviderKind.openAI.defaultModel)
+    private var ttsConfiguration = OpenRockyTTSProviderConfiguration(provider: .openAI, modelID: OpenRockyTTSProviderKind.openAI.defaultModel)
     private var voiceFeatures = OpenRockyRealtimeVoiceFeatures.openAI
+    /// The active voice mode for the current session.
+    private(set) var activeVoiceMode: OpenRockyVoiceMode = .realtime
     private var chatTask: Task<Void, Never>?
     /// Active tool execution tasks from voice provider — cancelled on voice stop / turn reset.
     private var toolTasks: [Task<Void, Never>] = []
@@ -55,22 +92,58 @@ final class OpenRockySessionRuntime: ObservableObject {
         }
         toolbox.subagentStatusHandler = statusHandler
         chatRuntime.toolbox.subagentStatusHandler = statusHandler
+
+        // Wire up tool result status from chatRuntime → timeline
+        chatRuntime.onToolStatus = { [weak self] status in
+            guard let self else { return }
+            let icon = status.succeeded ? "done" : "failed"
+            self.appendTimeline(kind: .tool, text: "Tool `\(status.name)` \(icon): \(status.resultSummary)")
+            self.statusText = status.succeeded
+                ? "Tool \(status.name) completed."
+                : "Tool \(status.name) failed."
+        }
     }
 
     func syncProviders(
         chatConfiguration: OpenRockyProviderConfiguration,
-        voiceConfiguration: OpenRockyRealtimeProviderConfiguration
+        voiceConfiguration: OpenRockyRealtimeProviderConfiguration,
+        sttConfiguration: OpenRockySTTProviderConfiguration? = nil,
+        ttsConfiguration: OpenRockyTTSProviderConfiguration? = nil
     ) {
         self.chatConfiguration = chatConfiguration.normalized()
         self.voiceConfiguration = voiceConfiguration.normalized()
+        if let sttConfiguration { self.sttConfiguration = sttConfiguration.normalized() }
+        if let ttsConfiguration { self.ttsConfiguration = ttsConfiguration.normalized() }
         // Keep the toolbox's subagent chat configuration in sync
         let normalizedChat = chatConfiguration.normalized()
         toolbox.subagentChatConfiguration = normalizedChat
         chatRuntime.toolbox.subagentChatConfiguration = normalizedChat
+
+        // Determine voice mode based on user preference and provider availability
+        let sttReady = self.sttConfiguration.isConfigured
+        let ttsReady = self.ttsConfiguration.isConfigured
+        let realtimeReady = voiceConfiguration.isConfigured
+        let storedMode = UserDefaults.standard.string(forKey: "rocky.pref.voiceMode") ?? ""
+        let preferClassic = OpenRockyVoiceMode(legacyRawValue: storedMode) == .classic
+        let classicReady = sttReady && ttsReady && chatConfiguration.isConfigured
+
+        if preferClassic && classicReady {
+            // User explicitly prefers classic and it's ready
+            activeVoiceMode = .classic
+        } else if !realtimeReady && classicReady {
+            // No realtime provider configured but classic is ready — auto-switch
+            activeVoiceMode = .classic
+        } else {
+            activeVoiceMode = .realtime
+        }
+
+        let providerName = activeVoiceMode == .realtime
+            ? voiceConfiguration.provider.displayName
+            : "STT+Chat+TTS"
         session.provider = ProviderStatus(
-            name: voiceConfiguration.provider.displayName,
-            model: voiceConfiguration.modelID,
-            isConnected: voiceConfiguration.isConfigured
+            name: providerName,
+            model: activeVoiceMode == .realtime ? voiceConfiguration.modelID : chatConfiguration.modelID,
+            isConnected: activeVoiceMode == .realtime ? voiceConfiguration.isConfigured : (sttReady && ttsReady && chatConfiguration.isConfigured)
         )
     }
 
@@ -93,7 +166,7 @@ final class OpenRockySessionRuntime: ObservableObject {
             config.openaiVoice = voice
         }
 
-        syncProviders(chatConfiguration: chatConfiguration, voiceConfiguration: config)
+        syncProviders(chatConfiguration: chatConfiguration, voiceConfiguration: config, sttConfiguration: sttConfiguration, ttsConfiguration: ttsConfiguration)
         // Clear all previous voice state for a fresh session
         resetAssistantTurn()
         userTranscriptBuffer = ""
@@ -103,24 +176,39 @@ final class OpenRockySessionRuntime: ObservableObject {
         statusText = "Starting voice session..."
         refreshPlan(connect: .active, capture: .queued, tool: .queued, answer: .queued)
 
-        rlog.info("Starting voice session: provider=\(config.provider.rawValue) model=\(config.modelID)", category: "Session")
-        Task {
-            do {
-                try await bridge.startIfNeeded(
-                    configuration: config,
-                    voiceInputEnabled: true,
-                    soulInstructions: characterStore.voiceSystemPrompt,
-                    realtimeTools: toolbox.realtimeTools(),
-                    eventSink: makeEventSink()
-                )
-            } catch {
-                handle(error: error)
+        if activeVoiceMode == .classic {
+            rlog.info("Starting traditional voice session: STT=\(sttConfiguration.provider.rawValue) TTS=\(ttsConfiguration.provider.rawValue) Chat=\(chatConfiguration.provider.rawValue)", category: "Session")
+            Task {
+                do {
+                    try await classicBridge.start(
+                        sttConfiguration: sttConfiguration,
+                        ttsConfiguration: ttsConfiguration,
+                        eventSink: makeEventSink()
+                    )
+                } catch {
+                    handle(error: error)
+                }
+            }
+        } else {
+            rlog.info("Starting realtime voice session: provider=\(config.provider.rawValue) model=\(config.modelID)", category: "Session")
+            Task {
+                do {
+                    try await bridge.startIfNeeded(
+                        configuration: config,
+                        voiceInputEnabled: true,
+                        soulInstructions: characterStore.voiceSystemPrompt,
+                        realtimeTools: toolbox.realtimeTools(),
+                        eventSink: makeEventSink()
+                    )
+                } catch {
+                    handle(error: error)
+                }
             }
         }
     }
 
     func stopVoiceSession() {
-        rlog.info("Stopping voice session", category: "Session")
+        rlog.info("Stopping voice session (mode=\(activeVoiceMode.rawValue))", category: "Session")
         isMicrophoneActive = false
         session.mode = .ready
         statusText = "Voice session stopped."
@@ -128,7 +216,11 @@ final class OpenRockySessionRuntime: ObservableObject {
         appendTimeline(kind: .system, text: "Voice session stopped and the live runtime was disconnected.")
 
         Task {
-            await bridge.stop()
+            if activeVoiceMode == .classic {
+                await classicBridge.stop()
+            } else {
+                await bridge.stop()
+            }
         }
     }
 
@@ -207,7 +299,7 @@ final class OpenRockySessionRuntime: ObservableObject {
             statusText = "Planning from live transcript..."
             refreshPlan(connect: .done, capture: .done, tool: voiceFeatures.supportsToolCalls ? .active : .queued, answer: .queued)
             appendTimeline(kind: .speech, text: "Voice transcript: \(finalText)")
-            if voiceFeatures.supportsAssistantStreaming == false {
+            if activeVoiceMode == .classic || voiceFeatures.supportsAssistantStreaming == false {
                 runChatInference(prompt: finalText, configuration: chatConfiguration)
             }
         case .assistantTranscriptDelta(let delta):
@@ -252,11 +344,24 @@ final class OpenRockySessionRuntime: ObservableObject {
                 )
             }
             // Resume mic after assistant finishes speaking (echo suppression lift)
-            Task { await bridge.resumeMicAfterPlayback() }
+            if activeVoiceMode == .classic {
+                Task { await classicBridge.resumeListening() }
+            } else {
+                Task { await bridge.resumeMicAfterPlayback() }
+            }
             lastToolName = nil
         case .assistantAudioChunk:
-            Task {
-                await bridge.handlePlaybackEvent(event)
+            if activeVoiceMode == .realtime {
+                Task {
+                    await bridge.handlePlaybackEvent(event)
+                }
+            }
+            // Traditional mode handles its own playback in synthesizeAndPlay
+        case .assistantAudioDone:
+            if activeVoiceMode == .realtime {
+                Task {
+                    await bridge.flushBufferedAudio()
+                }
             }
         case .toolCallRequested(let name, let arguments, let callID):
             lastToolName = name
@@ -393,22 +498,44 @@ final class OpenRockySessionRuntime: ObservableObject {
         // Reset conversation for voice — avoids tool_use/tool_result mismatch from prior turns
         chatRuntime.resetConversation()
 
-        // Reload recent messages so the chat model has conversation context
-        // Limit to last 10 messages to keep inference fast for voice mode
+        // Reload recent messages so the chat model has conversation context.
+        // Classic mode loads all history (auto-compaction handles long conversations).
+        // Realtime mode uses the configured context window.
         if !conversationID.isEmpty {
             let allHistory = storage.messages(in: conversationID)
-            let recentHistory = Array(allHistory.suffix(10))
-            chatRuntime.loadHistory(from: recentHistory)
+            if activeVoiceMode == .classic {
+                // Classic: load all messages — auto-compact if needed before inference
+                chatRuntime.loadHistory(from: allHistory)
+            } else {
+                // Realtime: truncate to configured window
+                let contextCount = OpenRockyPreferences.shared.voiceContextMessageCount
+                let recentHistory = Array(allHistory.suffix(contextCount))
+                chatRuntime.loadHistory(from: recentHistory)
+            }
         }
+
+        // Use classic voice prompt when in classic mode for concise + dual-output responses
+        let systemPrompt: String? = activeVoiceMode == .classic ? characterStore.classicVoiceSystemPrompt : nil
+        let shouldCompact = activeVoiceMode == .classic
+        let compactThreshold = OpenRockyPreferences.shared.voiceContextMessageCount
 
         chatTask = Task { [weak self] in
             guard let self else { return }
 
             do {
+                // Auto-compact long history before inference (classic mode)
+                if shouldCompact {
+                    await self.chatRuntime.compactHistoryIfNeeded(
+                        threshold: compactThreshold,
+                        configuration: configuration
+                    )
+                }
+
                 rlog.info("Chat inference starting for prompt: \(prompt.prefix(80))", category: "Session")
                 try await self.chatRuntime.run(
                     prompt: prompt,
-                    configuration: configuration
+                    configuration: configuration,
+                    systemPromptOverride: systemPrompt
                 ) { chunk in
                     self.applyChatChunk(chunk)
                 }
@@ -443,7 +570,11 @@ final class OpenRockySessionRuntime: ObservableObject {
             statusText = "OpenRocky is responding..."
             refreshPlan(connect: .done, capture: .done, tool: .queued, answer: .active)
         case .tool(let request):
-            appendTimeline(kind: .tool, text: "Chat provider requested tool `\(request.name)` but typed fallback tool execution is not wired yet.")
+            lastToolName = request.name
+            session.mode = .executing
+            statusText = "Running \(request.name)..."
+            refreshPlan(connect: .done, capture: .done, tool: .active, answer: .queued, toolDetail: "Executing \(request.name) via chat inference.")
+            appendTimeline(kind: .tool, text: "Chat tool call: `\(request.name)`")
         case .image, .thinkingBlock, .redactedThinking:
             break
         }
@@ -456,12 +587,18 @@ final class OpenRockySessionRuntime: ObservableObject {
             rlog.warning("finishChatInference: empty text, skipping", category: "Session")
             return
         }
-        session.assistantReply = finalText
+
+        // Parse dual output (<voice> / <display>) for classic mode
+        let parsed = Self.parseDualOutput(finalText)
+        let displayText = parsed.display ?? finalText
+        let voiceText = parsed.voice ?? finalText
+
+        session.assistantReply = displayText
         session.mode = .ready
         statusText = "OpenRocky is ready for the next follow-up."
         refreshPlan(connect: .done, capture: .done, tool: .queued, answer: .done)
-        appendTimeline(kind: .result, text: finalText)
-        saveVoiceTurnToConversation(userText: userTranscriptBuffer, assistantText: finalText)
+        appendTimeline(kind: .result, text: displayText)
+        saveVoiceTurnToConversation(userText: userTranscriptBuffer, assistantText: displayText)
         chatTurnAlreadySaved = true
         // Record chat usage (estimate tokens from transcript length)
         let estimatedTokens = max(1, (userTranscriptBuffer.count + finalText.count) / 4)
@@ -470,23 +607,42 @@ final class OpenRockySessionRuntime: ObservableObject {
             model: chatConfiguration.modelID,
             totalTokens: estimatedTokens
         )
-        // Send response to voice provider for TTS (Doubao ChatTTSText)
-        // Strip markdown formatting for natural TTS
-        let ttsText = finalText
-            .replacingOccurrences(of: "**", with: "")
-            .replacingOccurrences(of: "__", with: "")
-            .replacingOccurrences(of: "```", with: "")
-            .replacingOccurrences(of: "`", with: "")
-            .replacingOccurrences(of: "##", with: "")
-            .replacingOccurrences(of: "#", with: "")
-        Task {
-            do {
-                rlog.info("Sending TTS text (\(ttsText.count) chars)", category: "Session")
-                try await bridge.speakText(ttsText)
-            } catch {
-                rlog.error("speakText failed: \(error.localizedDescription)", category: "Session")
+        // Send response to TTS — use voice-only part when dual output is present
+        let ttsText = OpenRockyTraditionalVoiceBridge.stripMarkdown(voiceText)
+        if activeVoiceMode == .classic, isMicrophoneActive {
+            // Classic mode: use the dedicated TTS client
+            Task {
+                rlog.info("Classic TTS: synthesizing \(ttsText.count) chars", category: "Session")
+                await classicBridge.synthesizeAndPlay(text: ttsText)
+            }
+        } else {
+            // Realtime mode: send to voice provider for TTS
+            Task {
+                do {
+                    rlog.info("Sending TTS text (\(ttsText.count) chars)", category: "Session")
+                    try await bridge.speakText(ttsText)
+                } catch {
+                    rlog.error("speakText failed: \(error.localizedDescription)", category: "Session")
+                }
             }
         }
+    }
+
+    /// Parse dual output tags from classic voice mode responses.
+    /// Returns (voice, display) where either may be nil if tags are absent.
+    static func parseDualOutput(_ text: String) -> (voice: String?, display: String?) {
+        let voicePattern = #/<voice>\s*([\s\S]*?)\s*</voice>/#
+        let displayPattern = #/<display>\s*([\s\S]*?)\s*</display>/#
+
+        let voice = text.firstMatch(of: voicePattern).map { String($0.1) }
+        let display = text.firstMatch(of: displayPattern).map { String($0.1) }
+
+        // If both tags are present, return parsed content
+        if voice != nil || display != nil {
+            return (voice, display)
+        }
+        // No tags — plain response
+        return (nil, nil)
     }
 
     private func refreshPlan(

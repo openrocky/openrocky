@@ -120,6 +120,13 @@ public final class AudioController {
     audioPCMPlayer.interruptPlayback()
   }
 
+  /// Flush any accumulated audio buffers and start playback.
+  /// Call when the server signals no more audio chunks are coming,
+  /// to handle responses shorter than the initial buffer threshold.
+  public func flushBufferedAudio() {
+    audioPCMPlayer?.flushBufferedAudio()
+  }
+
   /// Set a callback that fires when all queued audio buffers have finished playing.
   public func setPlaybackDrainedHandler(_ handler: @escaping () -> Void) {
     audioPCMPlayer?.onPlaybackDrained = handler
