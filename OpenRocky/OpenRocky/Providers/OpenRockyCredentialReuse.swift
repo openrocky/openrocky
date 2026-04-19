@@ -192,7 +192,8 @@ extension OpenRockyTTSProviderKind {
         case .volcengine: .volcengine
         case .azureSpeech: .azureSpeech
         case .googleCloud: .googleCloud
-        case .aliCloud: .aliCloud
+        case .aliCloud, .qwenTTS: .aliCloud
+        case .zhipuGLM: .zhipuAI
         }
     }
 }

@@ -320,6 +320,10 @@ final class OpenRockyTraditionalVoiceBridge {
             return OpenRockyAzureTTSClient(configuration: configuration)
         case .googleCloud:
             return OpenRockyGoogleTTSClient(configuration: configuration)
+        case .qwenTTS:
+            return OpenRockyQwenTTSClient(configuration: configuration)
+        case .zhipuGLM:
+            return OpenRockyZhipuGLMTTSClient(configuration: configuration)
         }
     }
 

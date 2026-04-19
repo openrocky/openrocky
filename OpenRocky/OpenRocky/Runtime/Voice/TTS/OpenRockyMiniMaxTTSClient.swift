@@ -30,7 +30,9 @@ final class OpenRockyMiniMaxTTSClient: OpenRockyTTSClient, @unchecked Sendable {
         }
 
         let baseURL = configuration.customHost ?? configuration.provider.defaultBaseURL
-        let url = URL(string: "\(baseURL)/api/v1/t2a_v2")!
+        guard let url = URL(string: "\(baseURL)/api/v1/t2a_v2") else {
+            throw OpenRockyTTSClientError.synthesisFailed("Invalid MiniMax TTS endpoint URL")
+        }
 
         let body: [String: Any] = [
             "model": configuration.modelID,

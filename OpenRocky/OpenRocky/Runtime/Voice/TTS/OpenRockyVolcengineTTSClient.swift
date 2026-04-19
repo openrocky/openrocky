@@ -28,7 +28,9 @@ final class OpenRockyVolcengineTTSClient: OpenRockyTTSClient, @unchecked Sendabl
         }
 
         let baseURL = configuration.customHost ?? configuration.provider.defaultBaseURL
-        let url = URL(string: "\(baseURL)/api/v1/tts")!
+        guard let url = URL(string: "\(baseURL)/api/v1/tts") else {
+            throw OpenRockyTTSClientError.synthesisFailed("Invalid Volcengine TTS endpoint URL")
+        }
 
         let body: [String: Any] = [
             "app": ["appid": "default", "cluster": "volcano_tts"] as [String: Any],

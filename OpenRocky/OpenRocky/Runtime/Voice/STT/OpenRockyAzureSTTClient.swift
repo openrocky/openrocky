@@ -28,7 +28,9 @@ final class OpenRockyAzureSTTClient: OpenRockySTTClient, @unchecked Sendable {
 
         let baseURL = configuration.customHost ?? configuration.provider.defaultBaseURL
         let language = configuration.language ?? "en-US"
-        let url = URL(string: "\(baseURL)/speech/recognition/conversation/cognitiveservices/v1?language=\(language)&format=detailed")!
+        guard let url = URL(string: "\(baseURL)/speech/recognition/conversation/cognitiveservices/v1?language=\(language)&format=detailed") else {
+            throw OpenRockySTTClientError.transcriptionFailed("Invalid Azure STT endpoint URL")
+        }
 
         let wavData = OpenRockyOpenAISTTClient.makeWAV(pcmData: audioData, sampleRate: 24000, channels: 1, bitsPerSample: 16)
 
@@ -36,7 +38,7 @@ final class OpenRockyAzureSTTClient: OpenRockySTTClient, @unchecked Sendable {
         request.httpMethod = "POST"
         request.setValue(credential, forHTTPHeaderField: "Ocp-Apim-Subscription-Key")
         request.setValue("audio/wav; codecs=audio/pcm; samplerate=24000", forHTTPHeaderField: "Content-Type")
-        request.setValue("Accept", forHTTPHeaderField: "application/json")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.timeoutInterval = 30
         request.httpBody = wavData
 

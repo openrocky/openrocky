@@ -28,7 +28,10 @@ final class OpenRockyGoogleTTSClient: OpenRockyTTSClient, @unchecked Sendable {
         }
 
         let baseURL = configuration.customHost ?? configuration.provider.defaultBaseURL
-        let url = URL(string: "\(baseURL)/v1/text:synthesize?key=\(credential)")!
+        let encodedKey = credential.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? credential
+        guard let url = URL(string: "\(baseURL)/v1/text:synthesize?key=\(encodedKey)") else {
+            throw OpenRockyTTSClientError.synthesisFailed("Invalid Google TTS endpoint URL")
+        }
 
         let voiceName = configuration.resolvedVoice
         // Derive language from voice name (e.g. "en-US-Neural2-C" → "en-US")

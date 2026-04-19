@@ -24,7 +24,7 @@ final class OpenRockyTTSPreview: ObservableObject {
     /// Sample text used for TTS preview, adapted by provider.
     static func sampleText(for provider: OpenRockyTTSProviderKind) -> String {
         switch provider {
-        case .miniMax, .volcengine, .aliCloud:
+        case .miniMax, .volcengine, .aliCloud, .qwenTTS, .zhipuGLM:
             "你好，我是你的语音助手，很高兴认识你。"
         case .openAI, .elevenLabs, .azureSpeech, .googleCloud:
             "Hello, I'm your voice assistant. Nice to meet you!"
@@ -110,6 +110,10 @@ final class OpenRockyTTSPreview: ObservableObject {
             return OpenRockyAzureTTSClient(configuration: configuration)
         case .googleCloud:
             return OpenRockyGoogleTTSClient(configuration: configuration)
+        case .qwenTTS:
+            return OpenRockyQwenTTSClient(configuration: configuration)
+        case .zhipuGLM:
+            return OpenRockyZhipuGLMTTSClient(configuration: configuration)
         }
     }
 }

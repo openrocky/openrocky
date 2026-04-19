@@ -271,8 +271,15 @@ final class OpenRockyChatInferenceRuntime {
         guard nonToolMessages.count > threshold else { return }
 
         let recentCount = max(threshold / 2, 10)
-        let toKeep = Array(conversationHistory.suffix(recentCount))
-        let toCompact = Array(conversationHistory.dropLast(recentCount))
+        var toKeep = Array(conversationHistory.suffix(recentCount))
+        var toCompact = Array(conversationHistory.dropLast(recentCount))
+
+        // Move orphaned leading tool messages from toKeep into toCompact —
+        // a tool message without its preceding tool_call breaks the chat completion API.
+        while let first = toKeep.first, first.role == "tool" {
+            toCompact.append(first)
+            toKeep.removeFirst()
+        }
 
         guard toCompact.count >= 5 else { return }
 

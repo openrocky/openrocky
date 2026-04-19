@@ -27,7 +27,9 @@ final class OpenRockyOpenAISTTClient: OpenRockySTTClient, @unchecked Sendable {
         }
 
         let baseURL = configuration.customHost ?? configuration.provider.defaultBaseURL
-        let url = URL(string: "\(baseURL)/v1/audio/transcriptions")!
+        guard let url = URL(string: "\(baseURL)/v1/audio/transcriptions") else {
+            throw OpenRockySTTClientError.transcriptionFailed("Invalid STT endpoint URL")
+        }
 
         let boundary = "OpenRocky-\(UUID().uuidString)"
         var request = URLRequest(url: url)

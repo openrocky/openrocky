@@ -27,7 +27,10 @@ final class OpenRockyGoogleSTTClient: OpenRockySTTClient, @unchecked Sendable {
         }
 
         let baseURL = configuration.customHost ?? configuration.provider.defaultBaseURL
-        let url = URL(string: "\(baseURL)/v1/speech:recognize?key=\(credential)")!
+        let encodedKey = credential.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? credential
+        guard let url = URL(string: "\(baseURL)/v1/speech:recognize?key=\(encodedKey)") else {
+            throw OpenRockySTTClientError.transcriptionFailed("Invalid Google STT endpoint URL")
+        }
 
         let language = configuration.language ?? "en-US"
         let body: [String: Any] = [

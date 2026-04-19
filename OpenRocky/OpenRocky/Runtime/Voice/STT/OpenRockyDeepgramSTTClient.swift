@@ -31,7 +31,9 @@ final class OpenRockyDeepgramSTTClient: OpenRockySTTClient, @unchecked Sendable 
         if let language = configuration.language {
             urlString += "&language=\(language)"
         }
-        let url = URL(string: urlString)!
+        guard let url = URL(string: urlString) else {
+            throw OpenRockySTTClientError.transcriptionFailed("Invalid Deepgram STT endpoint URL")
+        }
 
         let wavData = OpenRockyOpenAISTTClient.makeWAV(pcmData: audioData, sampleRate: 24000, channels: 1, bitsPerSample: 16)
 

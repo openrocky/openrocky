@@ -17,6 +17,8 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
     case azureSpeech
     case googleCloud
     case aliCloud
+    case qwenTTS
+    case zhipuGLM
 
     nonisolated var id: String { rawValue }
 
@@ -29,18 +31,22 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
         case .azureSpeech: String(localized: "Azure Speech")
         case .googleCloud: String(localized: "Google Cloud TTS")
         case .aliCloud: String(localized: "Alibaba Cloud CosyVoice")
+        case .qwenTTS: String(localized: "Alibaba Qwen-TTS")
+        case .zhipuGLM: String(localized: "Zhipu GLM-TTS")
         }
     }
 
     nonisolated var defaultModel: String {
         switch self {
         case .openAI: "tts-1"
-        case .miniMax: "speech-02-hd"
+        case .miniMax: "speech-2.8-hd"
         case .elevenLabs: "eleven_multilingual_v2"
         case .volcengine: "default"
         case .azureSpeech: "default"
         case .googleCloud: "default"
-        case .aliCloud: "cosyvoice-v1"
+        case .aliCloud: "cosyvoice-v2"
+        case .qwenTTS: "qwen-tts-latest"
+        case .zhipuGLM: "glm-tts"
         }
     }
 
@@ -49,7 +55,7 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
         case .openAI:
             ["tts-1", "tts-1-hd"]
         case .miniMax:
-            ["speech-02-hd", "speech-02"]
+            ["speech-2.8-hd", "speech-2.8-turbo", "speech-02-hd", "speech-02"]
         case .elevenLabs:
             ["eleven_multilingual_v2", "eleven_turbo_v2_5", "eleven_flash_v2_5"]
         case .volcengine:
@@ -59,7 +65,11 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
         case .googleCloud:
             ["default"]
         case .aliCloud:
-            ["cosyvoice-v1"]
+            ["cosyvoice-v2", "cosyvoice-v1"]
+        case .qwenTTS:
+            ["qwen-tts-latest", "qwen-tts"]
+        case .zhipuGLM:
+            ["glm-tts"]
         }
     }
 
@@ -70,6 +80,10 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
             "Standard quality, fastest response (~0.3s latency)"
         case (.openAI, "tts-1-hd"):
             "HD quality, richer audio detail, slightly slower"
+        case (.miniMax, "speech-2.8-hd"):
+            "Latest HD model, best naturalness and emotional control"
+        case (.miniMax, "speech-2.8-turbo"):
+            "Latest turbo model, lowest latency"
         case (.miniMax, "speech-02-hd"):
             "HD quality with emotional expression"
         case (.miniMax, "speech-02"):
@@ -80,6 +94,16 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
             "Low latency, English-optimized"
         case (.elevenLabs, "eleven_flash_v2_5"):
             "Ultra-fast, good for real-time use"
+        case (.aliCloud, "cosyvoice-v2"):
+            "CosyVoice v2 — improved Chinese naturalness, multilingual"
+        case (.aliCloud, "cosyvoice-v1"):
+            "CosyVoice v1 — original release"
+        case (.qwenTTS, "qwen-tts-latest"):
+            "Latest Qwen-TTS, expressive and emotional"
+        case (.qwenTTS, "qwen-tts"):
+            "Stable Qwen-TTS"
+        case (.zhipuGLM, "glm-tts"):
+            "Zhipu GLM-TTS — natural Chinese voices"
         default:
             nil
         }
@@ -101,12 +125,17 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
             "Google Cloud Text-to-Speech. WaveNet and Neural2 voices, 40+ languages."
         case .aliCloud:
             "Alibaba CosyVoice TTS. Great Chinese voices, OpenAI-compatible API."
+        case .qwenTTS:
+            "Alibaba Qwen-TTS via DashScope. Expressive multi-emotion voices, multilingual."
+        case .zhipuGLM:
+            "Zhipu GLM-TTS via BigModel. Natural Chinese voices, OpenAI-shaped API."
         }
     }
 
     nonisolated var credentialTitle: String {
         switch self {
-        case .openAI, .miniMax, .elevenLabs, .aliCloud: String(localized: "API Key")
+        case .openAI, .miniMax, .elevenLabs, .aliCloud, .qwenTTS, .zhipuGLM:
+            String(localized: "API Key")
         case .volcengine: String(localized: "Access Token")
         case .azureSpeech: String(localized: "Subscription Key")
         case .googleCloud: String(localized: "API Key")
@@ -122,6 +151,8 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
         case .azureSpeech: "your-subscription-key..."
         case .googleCloud: "your-api-key..."
         case .aliCloud: "sk-..."
+        case .qwenTTS: "sk-..."
+        case .zhipuGLM: "your-api-key..."
         }
     }
 
@@ -134,6 +165,8 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
         case .azureSpeech: "https://portal.azure.com/#view/Microsoft_Azure_ProjectOxford/CognitiveServicesHub/~/SpeechServices"
         case .googleCloud: "https://console.cloud.google.com/apis/credentials"
         case .aliCloud: "https://dashscope.console.aliyun.com/apiKey"
+        case .qwenTTS: "https://dashscope.console.aliyun.com/apiKey"
+        case .zhipuGLM: "https://open.bigmodel.cn/usercenter/apikeys"
         }
     }
 
@@ -150,6 +183,8 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
         case .azureSpeech: "https://eastus.tts.speech.microsoft.com"
         case .googleCloud: "https://texttospeech.googleapis.com"
         case .aliCloud: "https://dashscope.aliyuncs.com/compatible-mode"
+        case .qwenTTS: "https://dashscope.aliyuncs.com"
+        case .zhipuGLM: "https://open.bigmodel.cn"
         }
     }
 
@@ -162,6 +197,8 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
         case .azureSpeech: "en-US-JennyNeural"
         case .googleCloud: "en-US-Neural2-C"
         case .aliCloud: "longxiaochun"
+        case .qwenTTS: "Cherry"
+        case .zhipuGLM: "tongtong"
         }
     }
 
@@ -175,6 +212,8 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
         case .azureSpeech: "~0.3-0.5s"
         case .googleCloud: "~0.3-0.5s"
         case .aliCloud: "~0.5-1s"
+        case .qwenTTS: "~0.8-1.5s"
+        case .zhipuGLM: "~0.5-1s"
         }
     }
 
@@ -188,6 +227,8 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
         case .azureSpeech: "$16/1M chars"
         case .googleCloud: "$16/1M chars"
         case .aliCloud: "~$1/1M chars"
+        case .qwenTTS: "~$2/1M chars"
+        case .zhipuGLM: "~$1/1M chars"
         }
     }
 
@@ -195,7 +236,7 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
     nonisolated var isOpenAICompatible: Bool {
         switch self {
         case .openAI, .aliCloud: true
-        case .miniMax, .elevenLabs, .volcengine, .azureSpeech, .googleCloud: false
+        case .miniMax, .elevenLabs, .volcengine, .azureSpeech, .googleCloud, .qwenTTS, .zhipuGLM: false
         }
     }
 
@@ -264,6 +305,23 @@ enum OpenRockyTTSProviderKind: String, Codable, CaseIterable, Identifiable {
                 OpenRockyTTSVoice(id: "longxiaoxia", name: "Xiaoxia", subtitle: "Chinese female, sweet"),
                 OpenRockyTTSVoice(id: "longyue", name: "Yue", subtitle: "Chinese male, calm"),
                 OpenRockyTTSVoice(id: "longlaotie", name: "Laotie", subtitle: "Chinese male, deep"),
+            ]
+        case .qwenTTS:
+            [
+                OpenRockyTTSVoice(id: "Cherry", name: "Cherry", subtitle: "Female, expressive"),
+                OpenRockyTTSVoice(id: "Ethan", name: "Ethan", subtitle: "Male, energetic"),
+                OpenRockyTTSVoice(id: "Chelsie", name: "Chelsie", subtitle: "Female, calm"),
+                OpenRockyTTSVoice(id: "Serena", name: "Serena", subtitle: "Female, gentle"),
+                OpenRockyTTSVoice(id: "Dylan", name: "Dylan", subtitle: "Male, casual"),
+                OpenRockyTTSVoice(id: "Jada", name: "Jada", subtitle: "Female, warm"),
+                OpenRockyTTSVoice(id: "Sunny", name: "Sunny", subtitle: "Female, bright"),
+            ]
+        case .zhipuGLM:
+            [
+                OpenRockyTTSVoice(id: "tongtong", name: "Tongtong", subtitle: "Chinese female, warm"),
+                OpenRockyTTSVoice(id: "qiumu", name: "Qiumu", subtitle: "Chinese male, calm"),
+                OpenRockyTTSVoice(id: "xiaochen", name: "Xiaochen", subtitle: "Chinese female, sweet"),
+                OpenRockyTTSVoice(id: "xiaoxun", name: "Xiaoxun", subtitle: "Chinese male, deep"),
             ]
         }
     }

@@ -30,7 +30,9 @@ final class OpenRockyOpenAITTSClient: OpenRockyTTSClient, @unchecked Sendable {
         }
 
         let baseURL = configuration.customHost ?? configuration.provider.defaultBaseURL
-        let url = URL(string: "\(baseURL)/v1/audio/speech")!
+        guard let url = URL(string: "\(baseURL)/v1/audio/speech") else {
+            throw OpenRockyTTSClientError.synthesisFailed("Invalid TTS endpoint URL")
+        }
 
         let body: [String: Any] = [
             "model": configuration.modelID,

@@ -29,7 +29,9 @@ final class OpenRockyAzureTTSClient: OpenRockyTTSClient, @unchecked Sendable {
         }
 
         let baseURL = configuration.customHost ?? configuration.provider.defaultBaseURL
-        let url = URL(string: "\(baseURL)/cognitiveservices/v1")!
+        guard let url = URL(string: "\(baseURL)/cognitiveservices/v1") else {
+            throw OpenRockyTTSClientError.synthesisFailed("Invalid Azure TTS endpoint URL")
+        }
 
         let voiceName = configuration.resolvedVoice
         // Derive language from voice name (e.g. "en-US-JennyNeural" → "en-US")
